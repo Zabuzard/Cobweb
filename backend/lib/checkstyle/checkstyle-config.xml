@@ -17,15 +17,16 @@
 
 <module name = "Checker">
     <property name="charset" value="UTF-8"/>
-
     <property name="severity" value="warning"/>
-
     <property name="fileExtensions" value="java, properties, xml"/>
-    <!-- Checks for whitespace                               -->
-    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-        <module name="FileTabCharacter">
-            <property name="eachLine" value="true"/>
-        </module>
+	
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+	
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
 
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
