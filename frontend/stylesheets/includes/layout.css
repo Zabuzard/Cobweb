@@ -35,6 +35,14 @@
   text-align: center;
 }
 
+#messagePane {
+  margin: 50px 7px 0px;
+}
+
+#message {
+	padding: 10px;
+}
+
 #mapLayerChanger {
   position: relative;
   left: 10px;

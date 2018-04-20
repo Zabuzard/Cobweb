@@ -18,17 +18,36 @@ var mapStreetLayer;
 var mapSatelliteLayer;
 var isMapLayerStreet;
 
+var transModeToId = {
+	"carMode" : 0,
+	"tramMode" : 1,
+	"footMode" : 2,
+	"bikeMode" : 3
+}
+
+var transIdToMode = {
+	0 : "carMode",
+	1 : "tramMode",
+	2 : "footMode",
+	3 : "bikeMode"
+}
+
 $(document).ready(init);
  
 function init() {
-	 initUI();
-	 initMap();
+	initUI();
+	initMap();
+	
+	if (hasHash()) {
+		planRouteFromHashHandler();
+	}
 }
 
 function initUI() {
 	// Departure date and time
 	$('#departureDate').datepicker().datepicker("setDate", new Date());
-	$('#departureTime').wickedpicker();
+	$('#departureTime').timepicker({'scrollDefault' : 'now', 'timeFormat' : 'H:i'});
+	$('#departureTime').timepicker('setTime', new Date());
 	
 	// Transportation modes
 	$('#carMode').addClass('transportationModeSelected');
@@ -60,30 +79,4 @@ function initMap() {
 	
 	map.addLayer(mapStreetLayer);
 	isMapLayerStreet = true;
-}
-
-function transportationModeClickHandler() {
-	$(this).toggleClass('transportationModeSelected');
-}
-
-function layerChangeHandler() {
-	var layerToRemove;
-	var layerToAdd;
-	
-	if (isMapLayerStreet) {
-		layerToRemove = mapStreetLayer;
-		layerToAdd = mapSatelliteLayer;
-	} else {
-		layerToRemove = mapSatelliteLayer;
-		layerToAdd = mapStreetLayer;
-	}
-	
-	map.removeLayer(layerToRemove);
-	map.addLayer(layerToAdd);
-	
-	isMapLayerStreet = !isMapLayerStreet;
-}
-
-function planRouteHandler() {
-	alert('Hello World');
 }
