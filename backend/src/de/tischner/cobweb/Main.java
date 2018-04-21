@@ -1,18 +1,16 @@
 package de.tischner.cobweb;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import de.topobyte.osm4j.core.access.OsmIterator;
 import de.topobyte.osm4j.core.model.iface.EntityContainer;
 import de.topobyte.osm4j.core.model.iface.EntityType;
+import de.topobyte.osm4j.core.model.iface.OsmNode;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.xml.dynsax.OsmXmlIterator;
 
 /**
@@ -37,25 +35,31 @@ public final class Main {
 
   private static void osmTest() throws MalformedURLException, IOException {
     // Get the input
-    InputStream fin = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm.bz2"));
-    BufferedInputStream in = new BufferedInputStream(fin);
-    BZip2CompressorInputStream input = new BZip2CompressorInputStream(in);
+//    InputStream fin = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm.bz2"));
+//    BufferedInputStream in = new BufferedInputStream(fin);
+//    BZip2CompressorInputStream input = new BZip2CompressorInputStream(in);
+    final InputStream input = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm"));
 
     // Create an iterator for XML data
-    OsmIterator iterator = new OsmXmlIterator(input, false);
+    final OsmIterator iterator = new OsmXmlIterator(input, false);
 
     // Initialize some counters
     int numNodes = 0;
     int numWays = 0;
     int numRelations = 0;
 
-    long startTime = System.currentTimeMillis();
+    final long startTime = System.currentTimeMillis();
 
     // Iterate elements and increment our counters
     // depending on the type of element
-    for (EntityContainer container : iterator) {
+    for (final EntityContainer container : iterator) {
       if (container.getType() == EntityType.Node) {
         numNodes++;
+        final OsmNode node = (OsmNode) container.getEntity();
+        if (node.getNumberOfTags() != 0) {
+          final OsmTag tag = node.getTag(0);
+          System.out.println(tag.getKey() + " : " + tag.getValue());
+        }
       } else if (container.getType() == EntityType.Way) {
         numWays++;
       } else if (container.getType() == EntityType.Relation) {
@@ -67,12 +71,14 @@ public final class Main {
       }
       if (numWays != 0 && numWays % 100000 == 0) {
         System.out.println("Ways: " + numWays);
+        System.out.println(container);
       }
       if (numRelations != 0 && numRelations % 100000 == 0) {
         System.out.println("Relations: " + numRelations);
+        System.out.println(container);
       }
     }
-    long endTime = System.currentTimeMillis();
+    final long endTime = System.currentTimeMillis();
 
     // Print the results
     System.out.println("nodes: " + numNodes);
