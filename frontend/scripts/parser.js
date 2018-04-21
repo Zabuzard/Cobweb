@@ -1,6 +1,5 @@
 /**
- * Methods that parse information out of the site and utility
- * tools directly related to that.
+ * Methods that parse information out of the site.
  * Like parsing request fields and validating user input.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
@@ -90,39 +89,4 @@ function validateRequest(request) {
 	}
 	
 	return request;
-}
-
-function setUrlToRequest(request) {
-	var hash = window.location.hash.substring(1);
-	var currentParams = deparam(hash);
-	
-	for (var key in request) {
-		if (request.hasOwnProperty(key)) {
-			var value = request[key]
-			currentParams[key] = value;
-		}
-	}
-	
-	window.location.hash = $.param(currentParams);
-}
-
-function setUiToRequest(request) {
-	$('#from').val(request.from);
-	$('#to').val(request.to);
-	
-	var date = new Date(request.depTime);
-	$('#departureDate').datepicker("setDate", date);
-	$('#departureTime').timepicker('setTime', date);
-	
-	// Deselect all transportation modes
-	$('.transportationMode.transportationModeSelected').each(function() {
-		$(this).removeClass('transportationModeSelected');
-	});
-	
-	// Select according to request
-	for (var i = 0; i < request.modes.length; i++) {
-		var transId = request.modes[i];
-		transMode = transIdToMode[transId];
-		$('#' + transMode).addClass('transportationModeSelected');
-	}
 }

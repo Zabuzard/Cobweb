@@ -12,6 +12,8 @@ public final class Main {
    * @param args Not supported
    */
   public static void main(final String[] args) {
+    // TODO When answering the AJAX, don't forget to:
+    // Access-Control-Allow-Origin: *
     System.out.println("Hello World!");
   }
 

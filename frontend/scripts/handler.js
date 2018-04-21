@@ -41,6 +41,11 @@ function planRouteFromHashHandler() {
 }
 
 function planRouteHandler() {
+	// Clear any previous error messages
+	clearErrorMessage();
+	// Delete any previous routes
+	clearMapRouteMarker();
+	
 	var request = parseRequestFromPanel();
 	
 	if (request == null) {
@@ -51,16 +56,53 @@ function planRouteHandler() {
 }
 
 function handleInvalidRequest(request) {
-	$('#message').text('The request is invalid.');
-	$('#message').addClass('errorMessage');
+	setErrorMessage('The request is invalid.');
 }
 
 function handleValidRequest(request) {
-	$('#message').removeClass('errorMessage');
-	$('#message').text('');
+	clearErrorMessage();
 	
 	setUrlToRequest(request);
 	
-	// TODO Do some AJAX etc
-	alert('TODO: ' + JSON.stringify(request));
+	sendRequestToServer(request);
+}
+
+function handleRouteServerError(status, error) {
+	var text = "Error while communicating with the server.\n";
+	text += "Status: " + status + "\n";
+	text += "Message: " + error;
+	setErrorMessage(text);
+}
+
+function handleRouteServerResponse(response) {
+	// Iterate all journeys
+	for (var i = 0; i < response.journeys.length; i++) {
+		handleJourney(response.journeys[i]);
+	}
+}
+
+function handleJourney(journey) {
+	var depTime = new Date(journey.depTime);
+	var arrTime = new Date(journey.arrTime);
+	
+	// Place departure node
+	placeDepartureNode(journey.route[0], depTime);
+	
+	// Process all nodes and edges except arrival and departure node
+	for (var i = 1; i < journey.route.length - 1; i++) {
+		var element = journey.route[i];
+		if (element.type == 1) {
+			// Element is edge
+			placeEdge(element);
+		} else {
+			// Element is node
+			placeNode(element);
+		}
+	}
+	
+	// Place arrival node
+	placeArrivalNode(journey.route[journey.route.length - 1], arrTime);
+	
+	// Zoom into departure node
+	zoomIntoNode(journey.route[0]);
 }

@@ -6,17 +6,19 @@
  *
  */
 
+var routeRequestServer = 'http://localhost:835/route';
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
 var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
 var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
 var mapMaxZoom = 20;
-var mapDefaultLat = 51.505;
-var mapDefaultLong = -0.09;
+var mapDefaultLat = 49.23299;
+var mapDefaultLong = 6.97633;
 var mapDefaultZoom = 10;
 var map;
 var mapStreetLayer;
 var mapSatelliteLayer;
 var isMapLayerStreet;
+var mapRouteMarkerGroup = [];
 
 var transModeToId = {
 	"carMode" : 0,
@@ -79,4 +81,25 @@ function initMap() {
 	
 	map.addLayer(mapStreetLayer);
 	isMapLayerStreet = true;
+}
+
+function sendRequestToServer(request) {
+	/*
+	$.ajax({
+		url: routeRequestServer,
+		method: 'POST',
+		timeout: 5 * 1000,
+		contentType: 'application/json; charset=utf-8',
+		dataType: 'json',
+		data: JSON.stringify(request),
+		success: function(response) {
+			handleRouteServerResponse(response);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			handleRouteServerError(textStatus, errorThrown);
+		}
+	});
+	*/
+	// TODO Activate AJAX call and deactive mock
+	handleRouteServerResponse(mockServerResponse());
 }

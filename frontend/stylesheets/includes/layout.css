@@ -41,6 +41,7 @@
 
 #message {
 	padding: 10px;
+	white-space: pre-line;
 }
 
 #mapLayerChanger {
