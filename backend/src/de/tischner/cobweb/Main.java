@@ -1,10 +1,16 @@
 package de.tischner.cobweb;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import de.topobyte.osm4j.core.access.OsmIterator;
 import de.topobyte.osm4j.core.model.iface.EntityContainer;
@@ -30,15 +36,62 @@ public final class Main {
     // TODO When answering the AJAX, don't forget to:
     // Access-Control-Allow-Origin: *
     System.out.println("Hello World!");
-    Main.osmTest();
+    // Main.osmTest();
+//    Main.manualTest();
+    Main.manualTestCompressed();
   }
 
+  private static void manualTest() throws IOException {
+    final AtomicLong counter = new AtomicLong();
+    final long startTime = System.currentTimeMillis();
+    Files.lines(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm")).forEach(line -> {
+      // Consume some time with O(line)
+      if (!line.contains("?!?")) {
+        counter.incrementAndGet();
+      }
+    });
+    final long endTime = System.currentTimeMillis();
+    System.out.println("Lines: " + counter.get());
+    System.out.println("Time: " + (endTime - startTime));
+  }
+
+  private static void manualTestCompressed() throws IOException {
+    final AtomicLong counter = new AtomicLong();
+    final long startTime = System.currentTimeMillis();
+
+    final InputStream fin = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm.bz2"));
+    final BufferedInputStream in = new BufferedInputStream(fin);
+    final BZip2CompressorInputStream input = new BZip2CompressorInputStream(in);
+    final BufferedReader br = new BufferedReader(new InputStreamReader(input));
+
+    while (true) {
+      final String line = br.readLine();
+      if (line == null) {
+        break;
+      }
+      // Consume some time with O(line)
+      if (!line.contains("?!?")) {
+        counter.incrementAndGet();
+      }
+    }
+    final long endTime = System.currentTimeMillis();
+    System.out.println("Lines: " + counter.get());
+    System.out.println("Time: " + (endTime - startTime));
+  }
+
+  @SuppressWarnings("resource")
   private static void osmTest() throws MalformedURLException, IOException {
     // Get the input
-//    InputStream fin = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm.bz2"));
-//    BufferedInputStream in = new BufferedInputStream(fin);
-//    BZip2CompressorInputStream input = new BZip2CompressorInputStream(in);
-    final InputStream input = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm"));
+    final boolean testCompressed = false;
+    final InputStream input;
+    if (testCompressed) {
+      final InputStream fin = Files
+          .newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm.bz2"));
+      final BufferedInputStream in = new BufferedInputStream(fin);
+      input = new BZip2CompressorInputStream(in);
+    } else {
+      input = Files.newInputStream(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm"));
+    }
 
     // Create an iterator for XML data
     final OsmIterator iterator = new OsmXmlIterator(input, false);
