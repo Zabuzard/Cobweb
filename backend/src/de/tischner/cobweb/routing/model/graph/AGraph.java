@@ -1,4 +1,4 @@
-package de.tischner.cobweb.model.graph;
+package de.tischner.cobweb.routing.model.graph;
 
 import java.util.Collection;
 import java.util.Collections;

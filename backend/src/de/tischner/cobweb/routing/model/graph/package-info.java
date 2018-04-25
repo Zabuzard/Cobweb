@@ -1,9 +1,8 @@
 /**
  * The package contains classes related to the modeling of graphs, nodes and
- * edges which are specific to road networks. That are streets used by cars and
- * bikes for example.
+ * edges.
  * 
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
-package de.tischner.cobweb.model.graph.road;
+package de.tischner.cobweb.routing.model.graph;

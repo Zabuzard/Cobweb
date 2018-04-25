@@ -1,7 +1,7 @@
-package de.tischner.cobweb.model.graph.road;
+package de.tischner.cobweb.routing.model.graph.road;
 
-import de.tischner.cobweb.model.graph.IEdge;
-import de.tischner.cobweb.model.graph.INode;
+import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.INode;
 
 public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasId {
 

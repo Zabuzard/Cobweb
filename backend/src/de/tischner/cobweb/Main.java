@@ -42,6 +42,7 @@ public final class Main {
   }
 
   private static void manualTest() throws IOException {
+    // TODO Remove tests
     final AtomicLong counter = new AtomicLong();
     final long startTime = System.currentTimeMillis();
     Files.lines(Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm")).forEach(line -> {
@@ -56,6 +57,7 @@ public final class Main {
   }
 
   private static void manualTestCompressed() throws IOException {
+    // TODO Remove tests
     final AtomicLong counter = new AtomicLong();
     final long startTime = System.currentTimeMillis();
 
@@ -81,6 +83,7 @@ public final class Main {
 
   @SuppressWarnings("resource")
   private static void osmTest() throws MalformedURLException, IOException {
+    // TODO Remove tests
     // Get the input
     final boolean testCompressed = false;
     final InputStream input;
