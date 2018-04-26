@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.parsing.osm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +54,7 @@ public final class OsmReducer {
   private final Path mInputPath;
 
   public OsmReducer(final Path inputPath) {
+    // TODO Apply filter etc, rewrite, currently its just in a test state
     mInputPath = inputPath;
     mIdToNode = new LinkedHashMap<>();
     mIdToWay = new LinkedHashMap<>();

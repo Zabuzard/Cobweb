@@ -1,6 +1,5 @@
 package de.tischner.cobweb.routing.model.graph;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,12 +8,10 @@ import java.util.Set;
 
 public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGraph<N, E> {
   private long mAmountOfEdges;
-  private final Set<N> mNodes;
   private final Map<N, Set<E>> mNodeToIncomingEdges;
   private final Map<N, Set<E>> mNodeToOutgoingEdges;
 
   public AGraph() {
-    mNodes = new HashSet<>();
     mNodeToIncomingEdges = new HashMap<>();
     mNodeToOutgoingEdges = new HashMap<>();
     mAmountOfEdges = 0L;
@@ -28,11 +25,6 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
       mAmountOfEdges++;
     }
     return wasAdded;
-  }
-
-  @Override
-  public boolean addNode(final N node) {
-    return mNodes.add(node);
   }
 
   @Override
@@ -57,11 +49,6 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
   }
 
   @Override
-  public Collection<N> getNodes() {
-    return mNodes;
-  }
-
-  @Override
   public Set<E> getOutgoingEdges(final N source) {
     final Set<E> edges = mNodeToOutgoingEdges.get(source);
     if (edges == null) {
@@ -72,7 +59,7 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public long getSize() {
-    return mNodes.size();
+    return getNodes().size();
   }
 
   @Override
@@ -83,20 +70,6 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
       mAmountOfEdges--;
     }
     return wasRemoved;
-  }
-
-  @Override
-  public boolean removeNode(final N node) {
-    if (!mNodes.contains(node)) {
-      return false;
-    }
-
-    // Remove all incoming and outgoing edges
-    mNodeToIncomingEdges.get(node).forEach(this::removeEdge);
-    mNodeToOutgoingEdges.get(node).forEach(this::removeEdge);
-
-    mNodes.remove(node);
-    return true;
   }
 
   private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, Set<E>> nodeToEdges) {
