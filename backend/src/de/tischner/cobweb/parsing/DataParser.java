@@ -4,19 +4,19 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tischner.cobweb.parsing.osm.AOsmFileHandler;
+import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.OsmParser;
 
 public final class DataParser {
   private final ParseConfig mConfig;
-  private final Set<AOsmFileHandler> mOsmHandler;
+  private final Set<IOsmFileHandler> mOsmHandler;
 
   public DataParser(final ParseConfig config) {
     mConfig = config;
     mOsmHandler = new HashSet<>();
   }
 
-  public void addOsmHandler(final AOsmFileHandler handler) {
+  public void addOsmHandler(final IOsmFileHandler handler) {
     mOsmHandler.add(handler);
   }
 
@@ -29,7 +29,7 @@ public final class DataParser {
     }
   }
 
-  public void removeOsmHandler(final AOsmFileHandler handler) {
+  public void removeOsmHandler(final IOsmFileHandler handler) {
     mOsmHandler.remove(handler);
   }
 }

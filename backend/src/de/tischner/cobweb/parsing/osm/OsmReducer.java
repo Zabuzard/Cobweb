@@ -27,13 +27,13 @@ import de.topobyte.osm4j.xml.dynsax.OsmXmlIterator;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
 /**
- * 
+ *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class OsmReducer {
   /**
-   * 
+   *
    * @param args Not supported
    */
   public static void main(final String[] args) {

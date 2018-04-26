@@ -21,13 +21,13 @@ import de.topobyte.osm4j.xml.dynsax.OsmXmlIterator;
 
 /**
  * The entry class of the application.
- * 
+ *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Main {
   /**
-   * 
+   *
    * @param args Not supported
    * @throws IOException
    * @throws MalformedURLException
@@ -36,9 +36,13 @@ public final class Main {
     // TODO When answering the AJAX, don't forget to:
     // Access-Control-Allow-Origin: *
     System.out.println("Hello World!");
-    // Main.osmTest();
+//    Main.osmTest();
 //    Main.manualTest();
-    Main.manualTestCompressed();
+//    Main.manualTestCompressed();
+
+    final Application app = new Application(args);
+    app.initialize();
+    app.start();
   }
 
   private static void manualTest() throws IOException {

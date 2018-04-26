@@ -5,11 +5,11 @@ import java.nio.file.Path;
 
 public final class FileUtils {
   public static FileExtension getFileExtension(final File file) {
-    return getFileExtension(file.getName());
+    return FileUtils.getFileExtension(file.getName());
   }
 
   public static FileExtension getFileExtension(final Path file) {
-    return getFileExtension(file.getFileName().toString());
+    return FileUtils.getFileExtension(file.getFileName().toString());
   }
 
   public static FileExtension getFileExtension(final String fileName) {
@@ -18,7 +18,7 @@ public final class FileUtils {
       return FileExtension.NONE;
     }
     final String extension = fileName.substring(dotIndex + 1);
-    return parseFileExtension(extension);
+    return FileUtils.parseFileExtension(extension);
   }
 
   private static FileExtension parseFileExtension(final String extension) {

@@ -3,7 +3,7 @@ package de.tischner.cobweb.routing.model.graph.road;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasId {
+public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdge<N>, IHasId {
 
   private final double mCost;
   private final N mDestination;
@@ -19,7 +19,7 @@ public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasI
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.tischner.cobweb.model.graph.IEdge#getCost()
    */
   @Override
@@ -29,7 +29,7 @@ public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasI
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.tischner.cobweb.model.graph.IEdge#getDesintation()
    */
   @Override
@@ -39,7 +39,7 @@ public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasI
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.tischner.cobweb.model.graph.road.IHasId#getId()
    */
   @Override
@@ -49,7 +49,7 @@ public final class RoadEdge<N extends INode & IHasId> implements IEdge<N>, IHasI
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.tischner.cobweb.model.graph.IEdge#getSource()
    */
   @Override

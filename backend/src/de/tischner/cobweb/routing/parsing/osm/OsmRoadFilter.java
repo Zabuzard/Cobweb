@@ -13,7 +13,7 @@ public final class OsmRoadFilter implements IOsmFilter {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
    * .iface.OsmNode)
@@ -27,7 +27,7 @@ public final class OsmRoadFilter implements IOsmFilter {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
    * .iface.OsmRelation)
@@ -40,7 +40,7 @@ public final class OsmRoadFilter implements IOsmFilter {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
    * .iface.OsmWay)

@@ -52,16 +52,16 @@ public final class OsmParser {
     return pathsToConsider;
   }
 
-  private final Collection<AOsmFileHandler> mAllHandler;
+  private final Collection<IOsmFileHandler> mAllHandler;
   private final Path mDirectory;
 
   private final boolean mUseMetaData;
 
-  public OsmParser(final Path directory, final Collection<AOsmFileHandler> allHandler) {
+  public OsmParser(final Path directory, final Collection<IOsmFileHandler> allHandler) {
     this(directory, allHandler, false);
   }
 
-  public OsmParser(final Path directory, final Collection<AOsmFileHandler> allHandler, final boolean useMetaData) {
+  public OsmParser(final Path directory, final Collection<IOsmFileHandler> allHandler, final boolean useMetaData) {
     mDirectory = directory;
     mAllHandler = allHandler;
     mUseMetaData = useMetaData;
@@ -72,7 +72,7 @@ public final class OsmParser {
       final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory);
       for (final Path file : files) {
         // Collect all handler that accept this file
-        final List<AOsmFileHandler> interestedHandler = mAllHandler.stream().filter(handler -> handler.acceptFile(file))
+        final List<IOsmFileHandler> interestedHandler = mAllHandler.stream().filter(handler -> handler.acceptFile(file))
             .collect(Collectors.toList());
         // Do not parse if nobody accepts
         if (interestedHandler.isEmpty()) {
@@ -105,7 +105,7 @@ public final class OsmParser {
     }
   }
 
-  private void streamFile(final Path file, final Collection<AOsmFileHandler> interestedHandler)
+  private void streamFile(final Path file, final Collection<IOsmFileHandler> interestedHandler)
       throws OsmInputException, IOException {
     try (InputStream input = pathToStream(file)) {
       // Ignore file
