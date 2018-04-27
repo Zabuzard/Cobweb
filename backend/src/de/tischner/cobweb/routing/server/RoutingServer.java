@@ -1,5 +1,6 @@
 package de.tischner.cobweb.routing.server;
 
+import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
@@ -9,10 +10,10 @@ import de.tischner.cobweb.routing.model.graph.road.ISpatial;
 
 public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>> {
 
-  private final RoutingConfig mConfig;
+  private final IRoutingConfigProvider mConfig;
   private final G mGraph;
 
-  public RoutingServer(final RoutingConfig config, final G graph) {
+  public RoutingServer(final IRoutingConfigProvider config, final G graph) {
     // TODO Should get some algorithm for the queries
     mConfig = config;
     mGraph = graph;

@@ -2,6 +2,8 @@ package de.tischner.cobweb;
 
 import java.util.Collections;
 
+import de.tischner.cobweb.config.ConfigLoader;
+import de.tischner.cobweb.config.ConfigStore;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
@@ -17,18 +19,21 @@ import de.tischner.cobweb.routing.server.RoutingServer;
 
 public final class Application {
   private final String[] mArgs;
+  private ConfigStore mConfig;
+  private ConfigLoader mConfigLoader;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
   public Application(final String[] args) {
     mArgs = args;
-    mGraph = null;
-    mRoutingServer = null;
   }
 
   public void initialize() {
     // TODO Error handling
-    // TODO Gather configuration files
+    mConfig = new ConfigStore();
+    mConfigLoader = new ConfigLoader();
+    mConfigLoader.loadConfig(mConfig);
+
     // TODO Choose based on arguments what to do
 //    initializeReducer();
     initializeApi();
@@ -52,19 +57,17 @@ public final class Application {
   }
 
   private void initializeApi() throws ParseException {
-    // TODO Method should get some config files
     // TODO Decide if parsing is need by checking caches
     mGraph = new RoadGraph<>();
-    final DataParser dataParser = new DataParser(null);
+    final DataParser dataParser = new DataParser(mConfig);
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
     createOsmRoutingHandler().forEach(dataParser::addOsmHandler);
     // Parse all data
     dataParser.parseData();
 
-    // TODO Initialize routing and database
-    initializeRouting();
     initializeDatabase();
+    initializeRouting();
   }
 
   private void initializeDatabase() {
@@ -72,8 +75,8 @@ public final class Application {
   }
 
   private void initializeRouting() {
-    // TODO Pass some config and algorithm
-    mRoutingServer = new RoutingServer<>(null, mGraph);
+    // TODO Pass some algorithm
+    mRoutingServer = new RoutingServer<>(mConfig, mGraph);
   }
 
 }

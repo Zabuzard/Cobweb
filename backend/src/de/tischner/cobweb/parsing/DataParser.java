@@ -4,14 +4,15 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.tischner.cobweb.config.IParseConfigProvider;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.OsmParser;
 
 public final class DataParser {
-  private final ParseConfig mConfig;
+  private final IParseConfigProvider mConfig;
   private final Set<IOsmFileHandler> mOsmHandler;
 
-  public DataParser(final ParseConfig config) {
+  public DataParser(final IParseConfigProvider config) {
     mConfig = config;
     mOsmHandler = new HashSet<>();
   }
