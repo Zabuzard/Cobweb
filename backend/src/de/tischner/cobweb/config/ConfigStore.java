@@ -37,6 +37,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   @Override
+  public Path getOsmRoadFilter() {
+    return Paths.get(getSetting(ConfigUtil.KEY_OSM_ROAD_FILTER));
+  }
+
+  @Override
   public int getRoutingServerPort() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_ROUTING_SERVER_PORT));
   }
@@ -78,6 +83,7 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mDefaultSettings.put(ConfigUtil.KEY_GRAPH_CACHE, ConfigUtil.VALUE_GRAPH_CACHE.toString());
     mDefaultSettings.put(ConfigUtil.KEY_USE_GRAPH_CACHE, String.valueOf(ConfigUtil.VALUE_USE_GRAPH_CACHE));
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_SERVER_PORT, String.valueOf(ConfigUtil.VALUE_ROUTING_SERVER_PORT));
+    mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
   }
 
 }

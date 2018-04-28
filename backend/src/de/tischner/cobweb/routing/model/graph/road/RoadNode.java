@@ -5,8 +5,8 @@ import de.tischner.cobweb.routing.model.graph.INode;
 public final class RoadNode implements INode, IHasId, ISpatial {
 
   private final long mId;
-  private final double mLatitude;
-  private final double mLongitude;
+  private double mLatitude;
+  private double mLongitude;
 
   public RoadNode(final long id, final double latitude, final double longitude) {
     mId = id;
@@ -42,6 +42,27 @@ public final class RoadNode implements INode, IHasId, ISpatial {
   @Override
   public double getLongitude() {
     return mLongitude;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(double)
+   */
+  @Override
+  public void setLatitude(final double latitude) {
+    mLatitude = latitude;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLongitude(double)
+   */
+  @Override
+  public void setLongitude(final double longitude) {
+    mLongitude = longitude;
   }
 
 }

@@ -4,6 +4,8 @@ import java.util.Collections;
 
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
+import de.tischner.cobweb.db.OsmDatabaseHandler;
+import de.tischner.cobweb.db.RoutingDatabase;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
@@ -21,6 +23,7 @@ public final class Application {
   private final String[] mArgs;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
+  private RoutingDatabase mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
@@ -35,7 +38,7 @@ public final class Application {
     mConfigLoader.loadConfig(mConfig);
 
     // TODO Choose based on arguments what to do
-//    initializeReducer();
+    // TODO Provide clean caches command, provide reducer command
     initializeApi();
   }
 
@@ -44,20 +47,20 @@ public final class Application {
   }
 
   private Iterable<IOsmFileHandler> createOsmDatabaseHandler() {
-    // TODO Implement something
-    return Collections.emptyList();
+    final IOsmFileHandler databaseHandler = new OsmDatabaseHandler(mDatabase);
+    return Collections.singletonList(databaseHandler);
   }
 
-  private Iterable<IOsmFileHandler> createOsmRoutingHandler() {
+  private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
     final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph);
-    // TODO Filter needs to get some config
-    final IOsmFilter roadFilter = new OsmRoadFilter();
-    final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder);
+    final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
+    final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder, mDatabase);
     return Collections.singletonList(roadHandler);
   }
 
   private void initializeApi() throws ParseException {
     // TODO Decide if parsing is need by checking caches
+    mDatabase = new RoutingDatabase();
     mGraph = new RoadGraph<>();
     final DataParser dataParser = new DataParser(mConfig);
     // Add OSM handler
@@ -66,17 +69,12 @@ public final class Application {
     // Parse all data
     dataParser.parseData();
 
-    initializeDatabase();
     initializeRouting();
-  }
-
-  private void initializeDatabase() {
-    // TODO Implement something
   }
 
   private void initializeRouting() {
     // TODO Pass some algorithm
-    mRoutingServer = new RoutingServer<>(mConfig, mGraph);
+    mRoutingServer = new RoutingServer<>(mConfig, mGraph, mDatabase);
   }
 
 }
