@@ -71,7 +71,8 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   private void offerBuffer() {
     // Offer all items up to the current index
-    mDatabase.offerOsmEntities(Arrays.stream(mEntityBuffer).limit(mBufferIndex + 1));
+    final int size = mBufferIndex + 1;
+    mDatabase.offerOsmEntities(Arrays.stream(mEntityBuffer).limit(size), size);
 
     // Reset index since buffer is empty again
     mBufferIndex = 0;

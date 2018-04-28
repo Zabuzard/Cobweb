@@ -43,6 +43,7 @@ public final class Main {
     final Application app = new Application(args);
     app.initialize();
     app.start();
+    // TODO Make sure shutdown is always called
   }
 
   private static void manualTest() throws IOException {

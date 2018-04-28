@@ -169,8 +169,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   private void submitBufferedRequests() {
     // Send all buffered requests up to the current index
-    final Set<SpatialNodeData> nodeData = mDatabase
-        .getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(mBufferIndex + 1));
+    final int size = mBufferIndex + 1;
+    final Set<SpatialNodeData> nodeData = mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size),
+        size);
     nodeData.forEach(this::insertSpatialData);
 
     // Reset index since buffer is empty again

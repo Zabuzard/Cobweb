@@ -5,7 +5,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ConfigStore implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider {
+public final class ConfigStore
+    implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider, IDatabaseConfigProvider {
   private final Map<String, String> mDefaultSettings;
   private final Map<String, String> mSettings;
 
@@ -29,6 +30,16 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   @Override
   public Path getGtfsDirectory() {
     return Paths.get(getSetting(ConfigUtil.KEY_GTFS_DIRECTORY));
+  }
+
+  @Override
+  public Path getInitDbScript() {
+    return Paths.get(getSetting(ConfigUtil.KEY_INIT_DB_SCRIPT));
+  }
+
+  @Override
+  public String getJDBCUrl() {
+    return getSetting(ConfigUtil.KEY_JDBC_URL);
   }
 
   @Override
@@ -75,6 +86,10 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   private void setupDefaultSettings() {
+    // Database settings
+    mDefaultSettings.put(ConfigUtil.KEY_JDBC_URL, ConfigUtil.VALUE_JDBC_URL);
+    mDefaultSettings.put(ConfigUtil.KEY_INIT_DB_SCRIPT, ConfigUtil.VALUE_INIT_DB_SCRIPT.toString());
+
     // Parse settings
     mDefaultSettings.put(ConfigUtil.KEY_OSM_DIRECTORY, ConfigUtil.VALUE_OSM_DIRECTORY.toString());
     mDefaultSettings.put(ConfigUtil.KEY_GTFS_DIRECTORY, ConfigUtil.VALUE_GTFS_DIRECTORY.toString());

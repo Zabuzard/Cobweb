@@ -1,11 +1,13 @@
 package de.tischner.cobweb;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collections;
 
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
+import de.tischner.cobweb.db.Database;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
-import de.tischner.cobweb.db.RoutingDatabase;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
@@ -23,7 +25,7 @@ public final class Application {
   private final String[] mArgs;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
-  private RoutingDatabase mDatabase;
+  private Database mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
@@ -40,6 +42,12 @@ public final class Application {
     // TODO Choose based on arguments what to do
     // TODO Provide clean caches command, provide reducer command
     initializeApi();
+  }
+
+  public void shutdown() {
+    // TODO Make sure this is always called
+    // TODO Implement something
+    mDatabase.shutdown();
   }
 
   public void start() {
@@ -59,9 +67,10 @@ public final class Application {
   }
 
   private void initializeApi() throws ParseException {
-    // TODO Decide if parsing is need by checking caches
-    mDatabase = new RoutingDatabase();
-    mGraph = new RoadGraph<>();
+    initializeDatabase();
+    initializeGraph();
+
+    // TODO Decide if parsing is need by checking caches and setting up file filter
     final DataParser dataParser = new DataParser(mConfig);
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
@@ -70,6 +79,20 @@ public final class Application {
     dataParser.parseData();
 
     initializeRouting();
+  }
+
+  private void initializeDatabase() throws ParseException {
+    mDatabase = new Database(mConfig);
+    try {
+      mDatabase.initialize();
+    } catch (SQLException | IOException e) {
+      throw new ParseException(e);
+    }
+  }
+
+  private void initializeGraph() {
+    // TODO Check cache and deserialize
+    mGraph = new RoadGraph<>();
   }
 
   private void initializeRouting() {
