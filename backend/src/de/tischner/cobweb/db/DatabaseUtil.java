@@ -9,10 +9,10 @@ public final class DatabaseUtil {
 
   static final String MAXSPEED_TAG = "maxspeed";
   static final String NAME_TAG = "name";
-  static final String QUERY_INSERT_NODE = "INSERT INTO osm_nodes (id, latitude, longitude) VALUES (?, ?, ?)";
-  static final String QUERY_INSERT_NODE_TAGS = "INSERT INTO osm_node_tags (id, name, highway) VALUES (?, ?, ?)";
-  static final String QUERY_INSERT_WAY = "INSERT INTO osm_way_nodes (way_id, node_id) VALUES (?, ?)";
-  static final String QUERY_INSERT_WAY_TAGS = "INSERT INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
+  static final String QUERY_INSERT_NODE = "REPLACE INTO osm_nodes (id, latitude, longitude) VALUES (?, ?, ?)";
+  static final String QUERY_INSERT_NODE_TAGS = "REPLACE INTO osm_node_tags (id, name, highway) VALUES (?, ?, ?)";
+  static final String QUERY_INSERT_WAY = "REPLACE INTO osm_way_nodes (way_id, node_id) VALUES (?, ?)";
+  static final String QUERY_INSERT_WAY_TAGS = "REPLACE INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
   static final String QUERY_NODE_NAME_BY_ID = "SELECT id FROM osm_node_tags WHERE name = ?";
   static final String QUERY_PLACEHOLDER = "?";
   static final String QUERY_SPATIAL_NODE_DATA_DELIMITER = ", ";

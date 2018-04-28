@@ -24,11 +24,11 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
-public final class Database implements IRoutingDatabase {
+public final class ExternalDatabase implements IRoutingDatabase {
 
   private final IDatabaseConfigProvider mConfig;
 
-  public Database(final IDatabaseConfigProvider config) {
+  public ExternalDatabase(final IDatabaseConfigProvider config) {
     mConfig = config;
   }
 
@@ -157,7 +157,6 @@ public final class Database implements IRoutingDatabase {
   }
 
   private void queueOsmNode(final OsmNode node, final Connection connection) throws SQLException {
-    // TODO Insert should only insert if not already contained
     // Retrieve information
     final long id = node.getId();
     final double latitude = node.getLatitude();
@@ -184,7 +183,6 @@ public final class Database implements IRoutingDatabase {
   }
 
   private void queueOsmWay(final OsmWay way, final Connection connection) throws SQLException {
-    // TODO Insert should only insert if not already contained
     // Retrieve information
     final long wayId = way.getId();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);

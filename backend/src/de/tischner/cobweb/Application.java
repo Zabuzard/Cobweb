@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
-import de.tischner.cobweb.db.Database;
+import de.tischner.cobweb.db.ExternalDatabase;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
@@ -25,7 +25,7 @@ public final class Application {
   private final String[] mArgs;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
-  private Database mDatabase;
+  private ExternalDatabase mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
@@ -82,7 +82,7 @@ public final class Application {
   }
 
   private void initializeDatabase() throws ParseException {
-    mDatabase = new Database(mConfig);
+    mDatabase = new ExternalDatabase(mConfig);
     try {
       mDatabase.initialize();
     } catch (SQLException | IOException e) {
