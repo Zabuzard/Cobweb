@@ -5,8 +5,12 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ConfigStore
     implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider, IDatabaseConfigProvider {
+  private final static Logger LOGGER = LoggerFactory.getLogger(ConfigStore.class);
   private final Map<String, String> mDefaultSettings;
   private final Map<String, String> mSettings;
 
@@ -86,6 +90,9 @@ public final class ConfigStore
   }
 
   private void setupDefaultSettings() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Loading default settings");
+    }
     // Database settings
     mDefaultSettings.put(ConfigUtil.KEY_JDBC_URL, ConfigUtil.VALUE_JDBC_URL);
     mDefaultSettings.put(ConfigUtil.KEY_INIT_DB_SCRIPT, ConfigUtil.VALUE_INIT_DB_SCRIPT.toString());

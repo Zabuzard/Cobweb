@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.topobyte.osm4j.core.model.iface.OsmBounds;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
@@ -13,6 +16,7 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
 
 public final class OsmDatabaseHandler implements IOsmFileHandler {
   private static final int BUFFER_SIZE = 100_000;
+  private final static Logger LOGGER = LoggerFactory.getLogger(OsmDatabaseHandler.class);
   private int mBufferIndex;
   private final IRoutingDatabase mDatabase;
   private final OsmEntity[] mEntityBuffer;
@@ -27,7 +31,11 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   public boolean acceptFile(final Path file) {
     // TODO Check cache to see which files are needed
     // We are interested in all OSM files
-    return true;
+    final boolean accept = true;
+    if (accept) {
+      LOGGER.info("Accepts file {}", file);
+    }
+    return accept;
   }
 
   @Override
@@ -72,6 +80,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   private void offerBuffer() {
     // Offer all items up to the current index
     final int size = mBufferIndex + 1;
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Offering buffer of size: {}", size);
+    }
     mDatabase.offerOsmEntities(Arrays.stream(mEntityBuffer).limit(size), size);
 
     // Reset index since buffer is empty again

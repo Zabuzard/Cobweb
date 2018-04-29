@@ -3,8 +3,11 @@ package de.tischner.cobweb.routing.parsing.osm;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.db.SpatialNodeData;
@@ -25,6 +28,7 @@ import de.topobyte.osm4j.core.model.impl.Node;
 public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements IOsmFileHandler {
   private static final int BUFFER_SIZE = 100_000;
+  private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadHandler.class);
   private final long[] mBufferedRequests;
   private int mBufferIndex;
   private final IOsmRoadBuilder<N, E> mBuilder;
@@ -51,7 +55,11 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   public boolean acceptFile(final Path file) {
     // TODO Check cache to see which files are needed
     // We are interested in all OSM files
-    return true;
+    final boolean accept = true;
+    if (accept) {
+      LOGGER.info("Accepts file {}", file);
+    }
+    return accept;
   }
 
   /*
@@ -170,8 +178,11 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   private void submitBufferedRequests() {
     // Send all buffered requests up to the current index
     final int size = mBufferIndex + 1;
-    final Set<SpatialNodeData> nodeData = mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size),
-        size);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Submitting buffered requests of size: {}", size);
+    }
+    final Collection<SpatialNodeData> nodeData = mDatabase
+        .getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size), size);
     nodeData.forEach(this::insertSpatialData);
 
     // Reset index since buffer is empty again

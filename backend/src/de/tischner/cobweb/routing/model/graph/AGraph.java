@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGraph<N, E> {
   private long mAmountOfEdges;
@@ -62,6 +63,10 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
     return getNodes().size();
   }
 
+  public String getSizeInformation() {
+    return toString();
+  }
+
   @Override
   public boolean removeEdge(final E edge) {
     boolean wasRemoved = removeEdgeFromMap(edge, edge.getSource(), mNodeToOutgoingEdges);
@@ -70,6 +75,14 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
       mAmountOfEdges--;
     }
     return wasRemoved;
+  }
+
+  @Override
+  public String toString() {
+    final StringJoiner sj = new StringJoiner(getClass() + "[", ", ", "]");
+    sj.add("nodes=" + getSize());
+    sj.add("edges=" + getAmountOfEdges());
+    return sj.toString();
   }
 
   private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, Set<E>> nodeToEdges) {

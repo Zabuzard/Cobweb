@@ -28,46 +28,54 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
 
 public final class Application {
+  private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
   private final String[] mArgs;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
   private ExternalDatabase mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
-  private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
   private Logger mLogger;
 
-  private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
+  private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
   public Application(final String[] args) {
     mArgs = args;
   }
 
-  private void initializeLogger() {
-    System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, LOGGER_CONFIG.toString());
-    mLogger = LoggerFactory.getLogger(Application.class);
-  }
-
   public void initialize() {
-    // TODO Error handling
     initializeLogger();
+    mLogger.info("Initializing application");
+    try {
+      mConfig = new ConfigStore();
+      mConfigLoader = new ConfigLoader();
+      mConfigLoader.loadConfig(mConfig);
 
-    mConfig = new ConfigStore();
-    mConfigLoader = new ConfigLoader();
-    mConfigLoader.loadConfig(mConfig);
-
-    // TODO Choose based on arguments what to do
-    // TODO Provide clean caches command, provide reducer command
-    initializeApi();
+      // TODO Choose based on arguments what to do
+      // TODO Provide clean caches command, provide reducer command
+      initializeApi();
+    } catch (final Throwable e) {
+      mLogger.error("Error at initialization of application", e);
+    }
   }
 
   public void shutdown() {
-    // TODO Make sure this is always called
-    // TODO Implement something
-    mDatabase.shutdown();
+    mLogger.info("Shutting down application");
+    try {
+      // TODO Make sure this is always called
+      // TODO Implement something
+      mDatabase.shutdown();
+    } catch (final Throwable e) {
+      mLogger.error("Error while shutting down application", e);
+    }
   }
 
   public void start() {
-    // TODO Do something, based on arguments
+    try {
+      mLogger.info("Starting application");
+      // TODO Do something, based on arguments
+    } catch (final Throwable e) {
+      mLogger.error("Error while starting application", e);
+    }
   }
 
   private Iterable<IOsmFileHandler> createOsmDatabaseHandler() {
@@ -98,6 +106,7 @@ public final class Application {
   }
 
   private void initializeDatabase() throws ParseException {
+    mLogger.info("Initializing database");
     mDatabase = new ExternalDatabase(mConfig);
     try {
       mDatabase.initialize();
@@ -107,13 +116,22 @@ public final class Application {
   }
 
   private void initializeGraph() {
+    mLogger.info("Initializing graph");
     // TODO Check cache and deserialize
     mGraph = new RoadGraph<>();
+    mLogger.info("Graph size: {}", mGraph.getSizeInformation());
+  }
+
+  private void initializeLogger() {
+    System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, LOGGER_CONFIG.toString());
+    mLogger = LoggerFactory.getLogger(Application.class);
   }
 
   private void initializeRouting() {
+    mLogger.info("Initializing routing");
     // TODO Pass some algorithm
     mRoutingServer = new RoutingServer<>(mConfig, mGraph, mDatabase);
+    mRoutingServer.initialize();
   }
 
 }

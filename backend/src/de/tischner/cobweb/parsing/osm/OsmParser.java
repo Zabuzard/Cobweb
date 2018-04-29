@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.util.FileExtension;
@@ -25,6 +27,7 @@ import de.topobyte.osm4j.xml.dynsax.OsmXmlReader;
 
 public final class OsmParser {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(OsmParser.class);
   private final static String REDUCED_PREFIX = "reduced_";
 
   private static Collection<Path> findOsmFilesToConsider(final Path directory) throws IOException {
@@ -49,6 +52,9 @@ public final class OsmParser {
       }
     }
 
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("OSM files were {}, only considering {}", allPaths, pathsToConsider);
+    }
     return pathsToConsider;
   }
 
@@ -110,6 +116,9 @@ public final class OsmParser {
     try (InputStream input = pathToStream(file)) {
       // Ignore file
       if (input == null) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("File type is not supported, skipping: {}", file);
+        }
         return;
       }
       final OsmHandlerForwarder forwarder = new OsmHandlerForwarder(interestedHandler);

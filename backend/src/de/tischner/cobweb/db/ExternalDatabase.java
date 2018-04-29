@@ -7,16 +7,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IDatabaseConfigProvider;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
@@ -26,6 +30,7 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
 public final class ExternalDatabase implements IRoutingDatabase {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
   private final IDatabaseConfigProvider mConfig;
 
   public ExternalDatabase(final IDatabaseConfigProvider config) {
@@ -37,6 +42,9 @@ public final class ExternalDatabase implements IRoutingDatabase {
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_NAME_BY_ID)) {
         statement.setString(1, name);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Getting node by name {}, query is: {}", name, statement);
+        }
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
             return Optional.of(result.getLong(1));
@@ -45,24 +53,27 @@ public final class ExternalDatabase implements IRoutingDatabase {
         }
       }
     } catch (final SQLException e) {
-      // TODO Log error
+      LOGGER.error("Error getting node by name: {}", name, e);
       return Optional.empty();
     }
   }
 
   @Override
-  public Set<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
+  public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
     return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
   }
 
   @Override
-  public Set<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
+  public Collection<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
     // Build the query
     final StringJoiner queryBuilder = new StringJoiner(DatabaseUtil.QUERY_SPATIAL_NODE_DATA_DELIMITER,
         DatabaseUtil.QUERY_SPATIAL_NODE_DATA_PREFIX, DatabaseUtil.QUERY_SPATIAL_NODE_DATA_SUFFIX);
     IntStream.range(0, size).forEach(i -> queryBuilder.add(DatabaseUtil.QUERY_PLACEHOLDER));
 
-    final HashSet<SpatialNodeData> nodeData = new HashSet<>(size);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting spatial data for {} nodes, query is: {}", size, queryBuilder.toString());
+    }
+    final List<SpatialNodeData> nodeData = new ArrayList<>(size);
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
         // Fill the statement
@@ -71,8 +82,8 @@ public final class ExternalDatabase implements IRoutingDatabase {
           try {
             statement.setLong(counter.incrementAndGet(), id);
           } catch (final SQLException e) {
-            // TODO Log error
-            // Ignore the error and continue
+            LOGGER.error("Error getting spatial data for {} nodes, can not set parameter {} with node id {}", size,
+                counter.get(), id, e);
           }
         });
 
@@ -84,17 +95,20 @@ public final class ExternalDatabase implements IRoutingDatabase {
             final double longitude = result.getDouble(3);
             nodeData.add(new SpatialNodeData(id, latitude, longitude));
           }
-          return nodeData;
         }
       }
     } catch (final SQLException e) {
-      // TODO Log error
-      return nodeData;
+      LOGGER.error("Error getting spatial data for {} nodes, current result is {}", size, nodeData, e);
     }
+
+    return nodeData;
   }
 
   @Override
   public Optional<Long> getWayIdByName(final String name) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting way by name: {}", name);
+    }
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_NAME_BY_ID)) {
         statement.setString(1, name);
@@ -106,12 +120,15 @@ public final class ExternalDatabase implements IRoutingDatabase {
         }
       }
     } catch (final SQLException e) {
-      // TODO Log error
+      LOGGER.error("Error getting way by name: {}", name, e);
       return Optional.empty();
     }
   }
 
   public void initialize() throws SQLException, IOException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Ensuring database has correct layout.");
+    }
     // Create database tables if they don't exist already
     final Path initDbScript = mConfig.getInitDbScript();
     ScriptExecutor.executeScript(initDbScript, createConnection());
@@ -124,6 +141,9 @@ public final class ExternalDatabase implements IRoutingDatabase {
 
   @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Offering {} nodes to the database", size);
+    }
     try (Connection connection = createConnection()) {
       connection.setAutoCommit(false);
 
@@ -136,7 +156,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
             queueOsmWay((OsmWay) entity, connection);
           }
         } catch (final SQLException e) {
-          // TODO Log error
+          LOGGER.error("Error queueing entity for database insertion: {}", entity, e);
         }
       });
 
@@ -144,11 +164,12 @@ public final class ExternalDatabase implements IRoutingDatabase {
       connection.commit();
       connection.setAutoCommit(true);
     } catch (final SQLException e) {
-      // TODO Log error
+      LOGGER.error("Error offering {} nodes to the database", size, e);
     }
   }
 
   public void shutdown() {
+    LOGGER.info("Shutting down database");
     // TODO Implement something
   }
 

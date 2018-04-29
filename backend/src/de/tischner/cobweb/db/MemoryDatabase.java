@@ -1,14 +1,18 @@
 package de.tischner.cobweb.db;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -16,6 +20,7 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
 public class MemoryDatabase implements IRoutingDatabase {
+  private final static Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
   private final Map<String, Long> mNameToNode;
   private final Map<String, Long> mNameToWay;
   private final Map<Long, SpatialNodeData> mNodeToSpatialData;
@@ -28,23 +33,32 @@ public class MemoryDatabase implements IRoutingDatabase {
 
   @Override
   public Optional<Long> getNodeByName(final String name) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting node by name {}", name);
+    }
     return Optional.ofNullable(mNameToNode.get(name));
   }
 
   @Override
-  public Set<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
+  public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
     return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
   }
 
   @Override
-  public Set<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
-    final Set<SpatialNodeData> result = new HashSet<>(size);
+  public Collection<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting spatial data for {} nodes", size);
+    }
+    final List<SpatialNodeData> result = new ArrayList<>(size);
     nodeIds.mapToObj(mNodeToSpatialData::get).filter(data -> !Objects.isNull(data)).forEach(result::add);
     return result;
   }
 
   @Override
   public Optional<Long> getWayIdByName(final String name) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting way by name {}", name);
+    }
     return Optional.ofNullable(mNameToWay.get(name));
   }
 
@@ -55,6 +69,10 @@ public class MemoryDatabase implements IRoutingDatabase {
 
   @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Offering {} nodes to the database", size);
+    }
+
     entities.forEach(entity -> {
       if (entity instanceof OsmNode) {
         addOsmNode((OsmNode) entity);

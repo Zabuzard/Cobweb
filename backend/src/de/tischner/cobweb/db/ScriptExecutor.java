@@ -9,13 +9,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.StringJoiner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ScriptExecutor {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
   private static final String QUERY_SEPARATOR = " ";
   private static final String SQL_COMMENT = "--";
   private static final String STATEMENT_DELIMITER = ";";
 
   public static void executeScript(final Path script, final Connection connection) throws SQLException, IOException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Parsing script: {}", script);
+    }
     // Set auto-commit to true
     final boolean autoCommitBefore = connection.getAutoCommit();
     try {
@@ -50,6 +57,9 @@ public final class ScriptExecutor {
 
           // Execute statement
           try (Statement statement = connection.createStatement()) {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("Executing statement: {}", statementBuilder.toString());
+            }
             statement.execute(statementBuilder.toString());
           }
 
@@ -58,6 +68,9 @@ public final class ScriptExecutor {
         }
       }
     } finally {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Resetting auto-commit to: {}", autoCommitBefore);
+      }
       connection.setAutoCommit(autoCommitBefore);
     }
   }

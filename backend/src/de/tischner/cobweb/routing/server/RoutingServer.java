@@ -31,11 +31,11 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     return false;
   }
 
-  public void start() {
+  public void shutdown() {
     // TODO Implement
   }
 
-  public void terminate() {
+  public void start() {
     // TODO Implement
   }
 

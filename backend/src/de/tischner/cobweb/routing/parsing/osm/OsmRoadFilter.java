@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
@@ -22,6 +25,7 @@ public final class OsmRoadFilter implements IOsmFilter {
   private static final String COMMENT_PREFIX = "#";
   private static final String DROP_MODE = "--DROP";
   private static final String KEEP_MODE = "--KEEP";
+  private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadFilter.class);
   private static final String TAG_VALUE_SEPARATOR = "=";
   private final IRoutingConfigProvider mConfig;
   private final Map<String, Set<String>> mTagToValuesDrop;
@@ -88,6 +92,9 @@ public final class OsmRoadFilter implements IOsmFilter {
   }
 
   private void initialize() throws ParseException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Initializing OSM road filter");
+    }
     final Path filter = mConfig.getOsmRoadFilter();
     try (BufferedReader br = Files.newBufferedReader(filter)) {
       boolean keepMode = true;
@@ -122,6 +129,10 @@ public final class OsmRoadFilter implements IOsmFilter {
       }
     } catch (final IOException e) {
       throw new ParseException(e);
+    }
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("OSM road filter data keep: {}", mTagToValuesKeep);
+      LOGGER.debug("OSM road filter data drop: {}", mTagToValuesDrop);
     }
   }
 

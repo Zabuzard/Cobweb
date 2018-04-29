@@ -11,9 +11,13 @@ import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ConfigLoader {
   private static final String CONFIG_COMMENT = "Configuration settings for Cobweb.";
   private static final Path CONFIG_PATH = Paths.get("backend", "res", "config.ini");
+  private final static Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
   private final Properties mProperties;
 
   public ConfigLoader() {
@@ -21,6 +25,7 @@ public final class ConfigLoader {
   }
 
   public void loadConfig(final IConfigProvider provider) throws UncheckedIOException {
+    LOGGER.info("Loading config");
     try (InputStream input = Files.newInputStream(CONFIG_PATH)) {
       mProperties.load(input);
     } catch (final NoSuchFileException noSuchFileException) {
@@ -43,6 +48,7 @@ public final class ConfigLoader {
   }
 
   public void saveConfig(final IConfigProvider provider) throws UncheckedIOException {
+    LOGGER.info("Saving config");
     // Fetch and put every setting
     for (final Entry<String, String> entry : provider.getAllSettings().entrySet()) {
       mProperties.put(entry.getKey(), entry.getValue());
