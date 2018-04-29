@@ -8,13 +8,8 @@ CREATE TABLE IF NOT EXISTS `osm_nodes` (
 CREATE TABLE IF NOT EXISTS `osm_node_tags` (
 	`id`	BIGINT NOT NULL UNIQUE,
 	`name`	VARCHAR(45) DEFAULT NULL,
-	`highway`	VARCHAR(45) DEFAULT NULL
-);
-
-CREATE TABLE IF NOT EXISTS `osm_way_nodes` (
-	`way_id`	BIGINT NOT NULL,
-	`node_id`	BIGINT NOT NULL,
-	PRIMARY KEY(`way_id`)
+	`highway`	VARCHAR(45) DEFAULT NULL,
+	PRIMARY KEY(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `osm_way_tags` (

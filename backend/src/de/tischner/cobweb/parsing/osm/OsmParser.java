@@ -31,7 +31,7 @@ public final class OsmParser {
   private final static String REDUCED_PREFIX = "reduced_";
 
   private static Collection<Path> findOsmFilesToConsider(final Path directory) throws IOException {
-    final Set<Path> allPaths = Files.walk(directory).collect(Collectors.toSet());
+    final Set<Path> allPaths = Files.walk(directory).filter(Files::isRegularFile).collect(Collectors.toSet());
     final List<Path> pathsToConsider = new ArrayList<>();
     // Filter out non-reduced versions if reduced are available
     for (final Path path : allPaths) {

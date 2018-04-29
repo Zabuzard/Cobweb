@@ -79,7 +79,7 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public String toString() {
-    final StringJoiner sj = new StringJoiner(getClass() + "[", ", ", "]");
+    final StringJoiner sj = new StringJoiner(", ", getClass().getSimpleName() + "[", "]");
     sj.add("nodes=" + getSize());
     sj.add("edges=" + getAmountOfEdges());
     return sj.toString();

@@ -177,7 +177,7 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   private void submitBufferedRequests() {
     // Send all buffered requests up to the current index
-    final int size = mBufferIndex + 1;
+    final int size = mBufferIndex;
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Submitting buffered requests of size: {}", size);
     }

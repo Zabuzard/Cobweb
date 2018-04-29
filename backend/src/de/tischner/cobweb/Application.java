@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 
 import org.slf4j.Logger;
@@ -46,15 +48,21 @@ public final class Application {
     initializeLogger();
     mLogger.info("Initializing application");
     try {
+      final Instant initStartTime = Instant.now();
       mConfig = new ConfigStore();
       mConfigLoader = new ConfigLoader();
       mConfigLoader.loadConfig(mConfig);
+      // Save to ensure old configuration files get new default parameter
+      mConfigLoader.saveConfig(mConfig);
 
       // TODO Choose based on arguments what to do
       // TODO Provide clean caches command, provide reducer command
       initializeApi();
+      final Instant initEndTime = Instant.now();
+      mLogger.info("Initialization took: {}", Duration.between(initStartTime, initEndTime));
     } catch (final Throwable e) {
       mLogger.error("Error at initialization of application", e);
+      throw e;
     }
   }
 
@@ -66,6 +74,7 @@ public final class Application {
       mDatabase.shutdown();
     } catch (final Throwable e) {
       mLogger.error("Error while shutting down application", e);
+      throw e;
     }
   }
 
@@ -75,6 +84,7 @@ public final class Application {
       // TODO Do something, based on arguments
     } catch (final Throwable e) {
       mLogger.error("Error while starting application", e);
+      throw e;
     }
   }
 
@@ -100,7 +110,12 @@ public final class Application {
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
     createOsmRoutingHandler().forEach(dataParser::addOsmHandler);
     // Parse all data
+    final Instant parseStartTime = Instant.now();
     dataParser.parseData();
+    final Instant parseEndTime = Instant.now();
+    mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
+
+    mLogger.info("Graph size: {}", mGraph.getSizeInformation());
 
     initializeRouting();
   }
@@ -119,7 +134,6 @@ public final class Application {
     mLogger.info("Initializing graph");
     // TODO Check cache and deserialize
     mGraph = new RoadGraph<>();
-    mLogger.info("Graph size: {}", mGraph.getSizeInformation());
   }
 
   private void initializeLogger() {

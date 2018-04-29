@@ -79,7 +79,7 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   private void offerBuffer() {
     // Offer all items up to the current index
-    final int size = mBufferIndex + 1;
+    final int size = mBufferIndex;
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Offering buffer of size: {}", size);
     }

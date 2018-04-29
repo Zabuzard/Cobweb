@@ -57,4 +57,24 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdg
     return mSource;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("RoadEdge [id=");
+    builder.append(mId);
+    builder.append(", ");
+    builder.append(mSource.getId());
+    builder.append(" -(");
+    builder.append(mCost);
+    builder.append(")-> ");
+    builder.append(mDestination.getId());
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

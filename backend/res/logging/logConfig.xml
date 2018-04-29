@@ -1,4 +1,4 @@
-<configuration scan="true">
+<configuration scan="true" debug="false">
   <property name="LEVEL" value="debug" />
   <property name="LOGGING_HOME" value="backend/res/logging" />
 

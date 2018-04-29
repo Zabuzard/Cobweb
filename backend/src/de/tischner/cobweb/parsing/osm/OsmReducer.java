@@ -3,7 +3,10 @@ package de.tischner.cobweb.parsing.osm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,18 +40,43 @@ public final class OsmReducer {
    * @param args Not supported
    */
   public static void main(final String[] args) {
-    final Path input = Paths.get("backend", "res", "osm", "freiburg-regbez-latest.osm");
-    final Path output = Paths.get("backend", "res", "osm", "freiburg-regbez-latest-reduced.osm");
+    final Path input = Paths.get("backend", "res", "input", "osm", "freiburg-regbez-latest.osm");
+    final Path output = Paths.get("backend", "res", "input", "osm", "reduced_freiburg-regbez-latest.osm");
 
-    final OsmReducer reducer = new OsmReducer(input);
-    reducer.readData();
-    reducer.reduceToRoadOnly(0.1, true);
-    reducer.writeToPath(output);
+    final boolean testReduce = false;
+    if (testReduce) {
+      final OsmReducer reducer = new OsmReducer(input);
+      reducer.readData();
+      reducer.reduceToRoadOnly(0.1, true);
+      reducer.writeToPath(output);
+    } else {
+      OsmReducer.checkIfOsmIsValid(output);
+    }
+  }
+
+  private static void checkIfOsmIsValid(final Path path) {
+    System.out.println("Start reading data");
+    final int printEvery = 100_000;
+    long counter = 0;
+
+    try (InputStream input = Files.newInputStream(path)) {
+      final OsmIterator iterator = new OsmXmlIterator(input, true);
+      for (final EntityContainer container : iterator) {
+        counter++;
+        if (counter % printEvery == 0) {
+          System.out.println("Processed elements: " + counter);
+        }
+      }
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    System.out.println("Finished reading data");
   }
 
   private OsmBounds mBounds;
   private LinkedHashMap<Long, OsmNode> mIdToNode;
   private LinkedHashMap<Long, OsmRelation> mIdToRelation;
+
   private LinkedHashMap<Long, OsmWay> mIdToWay;
 
   private final Path mInputPath;
@@ -240,7 +268,10 @@ public final class OsmReducer {
     long counter = 0;
 
     try (OutputStream output = Files.newOutputStream(outputPath)) {
-      final OsmOutputStream writer = new OsmXmlOutputStream(output, true);
+      // We need to use the PrintWriter constructor else we will not be able to write
+      // in UTF-8 with this library
+      final PrintWriter outputWrapper = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+      final OsmOutputStream writer = new OsmXmlOutputStream(outputWrapper, true);
       // Bounds
       if (mBounds != null) {
         writer.write(mBounds);

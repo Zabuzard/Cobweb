@@ -110,8 +110,10 @@ public final class OsmRoadFilter implements IOsmFilter {
         // Line is mode changer
         if (line.equals(KEEP_MODE)) {
           keepMode = true;
+          continue;
         } else if (line.equals(DROP_MODE)) {
           keepMode = false;
+          continue;
         }
 
         // Line is regular tag-entry

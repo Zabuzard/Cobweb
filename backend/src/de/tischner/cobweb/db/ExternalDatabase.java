@@ -71,7 +71,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
     IntStream.range(0, size).forEach(i -> queryBuilder.add(DatabaseUtil.QUERY_PLACEHOLDER));
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting spatial data for {} nodes, query is: {}", size, queryBuilder.toString());
+      LOGGER.debug("Getting spatial data for {} nodes", size);
     }
     final List<SpatialNodeData> nodeData = new ArrayList<>(size);
     try (Connection connection = createConnection()) {
@@ -142,7 +142,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
   @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Offering {} nodes to the database", size);
+      LOGGER.debug("Offering {} entities to the database", size);
     }
     try (Connection connection = createConnection()) {
       connection.setAutoCommit(false);
@@ -164,7 +164,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
       connection.commit();
       connection.setAutoCommit(true);
     } catch (final SQLException e) {
-      LOGGER.error("Error offering {} nodes to the database", size, e);
+      LOGGER.error("Error offering {} entities to the database", size, e);
     }
   }
 
@@ -218,16 +218,6 @@ public final class ExternalDatabase implements IRoutingDatabase {
       DatabaseUtil.setStringOrNull(3, highway, tagStatement);
       DatabaseUtil.setIntOrNull(4, maxSpeed, tagStatement);
       tagStatement.executeUpdate();
-    }
-
-    // Iterate all nodes and insert way data
-    for (int i = 0; i < way.getNumberOfNodes(); i++) {
-      final long nodeId = way.getNodeId(i);
-      try (PreparedStatement wayStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_WAY)) {
-        wayStatement.setLong(1, wayId);
-        wayStatement.setLong(2, nodeId);
-        wayStatement.executeUpdate();
-      }
     }
   }
 

@@ -15,7 +15,7 @@ final class ConfigUtil {
   final static Path VALUE_GRAPH_CACHE = Paths.get("backend", "res", "cache");
   final static Path VALUE_GTFS_DIRECTORY = Paths.get("backend", "res", "input", "gtfs");
   final static Path VALUE_INIT_DB_SCRIPT = Paths.get("backend", "res", "db", "initDb.sql");
-  final static String VALUE_JDBC_URL = "jdbc:sqlite:C:/sqlite/backend/res/db/routing.db";
+  final static String VALUE_JDBC_URL = "jdbc:sqlite:backend/res/db/routing.db";
   final static Path VALUE_OSM_DIRECTORY = Paths.get("backend", "res", "input", "osm");
   final static Path VALUE_OSM_ROAD_FILTER = Paths.get("backend", "res", "filter", "osm", "road.filter");
   final static int VALUE_ROUTING_SERVER_PORT = 845;

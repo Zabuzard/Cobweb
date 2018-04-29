@@ -31,7 +31,7 @@ public final class RoadNode implements INode, IHasId, ISpatial {
       return false;
     }
     final RoadNode other = (RoadNode) obj;
-    if (this.mId != other.mId) {
+    if (mId != other.mId) {
       return false;
     }
     return true;
@@ -76,7 +76,7 @@ public final class RoadNode implements INode, IHasId, ISpatial {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (this.mId ^ (this.mId >>> 32));
+    result = prime * result + (int) (mId ^ (mId >>> 32));
     return result;
   }
 
@@ -110,11 +110,11 @@ public final class RoadNode implements INode, IHasId, ISpatial {
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("RoadNode [id=");
-    builder.append(this.mId);
+    builder.append(mId);
     builder.append(", latitude=");
-    builder.append(this.mLatitude);
+    builder.append(mLatitude);
     builder.append(", longitude=");
-    builder.append(this.mLongitude);
+    builder.append(mLongitude);
     builder.append("]");
     return builder.toString();
   }

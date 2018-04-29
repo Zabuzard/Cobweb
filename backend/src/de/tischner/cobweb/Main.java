@@ -1,8 +1,5 @@
 package de.tischner.cobweb;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +13,8 @@ public final class Main {
   /**
    *
    * @param args Not supported
-   * @throws IOException
-   * @throws MalformedURLException
    */
-  public static void main(final String[] args) throws MalformedURLException, IOException {
+  public static void main(final String[] args) {
     // TODO When answering the AJAX, don't forget to:
     // Access-Control-Allow-Origin: *
 
@@ -35,7 +30,7 @@ public final class Main {
       e.printStackTrace();
     }
 
-    // TODO Make sure shutdown is always called, shut be a shutdown hook
+    // TODO Make sure shutdown is always called, should be a shutdown hook
   }
 
   /**
