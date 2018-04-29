@@ -1,9 +1,15 @@
 package de.tischner.cobweb;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Collections;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.util.ContextInitializer;
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
 import de.tischner.cobweb.db.ExternalDatabase;
@@ -28,13 +34,23 @@ public final class Application {
   private ExternalDatabase mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
+  private Logger mLogger;
+
+  private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
 
   public Application(final String[] args) {
     mArgs = args;
   }
 
+  private void initializeLogger() {
+    System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, LOGGER_CONFIG.toString());
+    mLogger = LoggerFactory.getLogger(Application.class);
+  }
+
   public void initialize() {
     // TODO Error handling
+    initializeLogger();
+
     mConfig = new ConfigStore();
     mConfigLoader = new ConfigLoader();
     mConfigLoader.loadConfig(mConfig);

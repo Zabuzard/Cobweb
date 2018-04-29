@@ -1,0 +1,24 @@
+<configuration scan="true">
+  <property name="LEVEL" value="debug" />
+  <property name="LOGGING_HOME" value="backend/res/logging" />
+
+  <shutdownHook/>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${LOGGING_HOME}/cobweb.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${LEVEL}">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
