@@ -18,9 +18,11 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
 
   Set<E> getOutgoingEdges(N source);
 
-  long getSize();
-
   boolean removeEdge(E edge);
 
   boolean removeNode(N node);
+
+  void reverse();
+
+  long size();
 }

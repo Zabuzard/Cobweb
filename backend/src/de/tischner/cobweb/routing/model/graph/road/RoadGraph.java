@@ -4,17 +4,25 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import de.tischner.cobweb.routing.model.graph.AGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class RoadGraph<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> extends AGraph<N, E>
-    implements ICanGetNodeById<N> {
+public final class RoadGraph<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId & IReversedConsumer>
+    extends AGraph<N, E> implements ICanGetNodeById<N>, IReversedProvider {
   private final Map<Long, N> mIdToNode;
+  private boolean mIsReversed;
 
   public RoadGraph() {
     mIdToNode = new HashMap<>();
+  }
+
+  @Override
+  public boolean addEdge(final E edge) {
+    edge.setReversedProvider(this);
+    return super.addEdge(edge);
   }
 
   @Override
@@ -43,6 +51,11 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial, E extends IEdg
   }
 
   @Override
+  public boolean isReversed() {
+    return mIsReversed;
+  }
+
+  @Override
   public boolean removeNode(final N node) {
     final Long id = node.getId();
     if (!mIdToNode.containsKey(id)) {
@@ -55,6 +68,27 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial, E extends IEdg
 
     mIdToNode.remove(id);
     return true;
+  }
+
+  @Override
+  public void reverse() {
+    mIsReversed = !mIsReversed;
+  }
+
+  @Override
+  protected Map<N, Set<E>> getNodeToIncomingEdges() {
+    if (mIsReversed) {
+      return super.getNodeToOutgoingEdges();
+    }
+    return super.getNodeToIncomingEdges();
+  }
+
+  @Override
+  protected Map<N, Set<E>> getNodeToOutgoingEdges() {
+    if (mIsReversed) {
+      return super.getNodeToIncomingEdges();
+    }
+    return super.getNodeToOutgoingEdges();
   }
 
 }

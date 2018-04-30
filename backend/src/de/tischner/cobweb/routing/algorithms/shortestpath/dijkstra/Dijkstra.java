@@ -124,7 +124,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
           continue;
         }
 
-        final N destination = edge.getDesintation();
+        final N destination = edge.getDestination();
         final double tentativeEdgeDistance = tentativeDistance + edge.getCost();
 
         // Check if the destination is visited for the first time

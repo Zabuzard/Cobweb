@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.util.FileExtension;
-import de.tischner.cobweb.util.FileUtils;
+import de.tischner.cobweb.util.FileUtil;
 import de.topobyte.osm4j.core.access.OsmInputException;
 import de.topobyte.osm4j.core.access.OsmReader;
 import de.topobyte.osm4j.xml.dynsax.OsmXmlReader;
@@ -94,7 +94,7 @@ public final class OsmParser {
 
   private InputStream pathToStream(final Path osmFile) throws IOException {
     final BufferedInputStream bufferedInput = new BufferedInputStream(Files.newInputStream(osmFile));
-    final FileExtension extension = FileUtils.getFileExtension(osmFile);
+    final FileExtension extension = FileUtil.getFileExtension(osmFile);
     switch (extension) {
     case NONE: // Fall through
     case OSM:

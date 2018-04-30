@@ -20,8 +20,8 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public boolean addEdge(final E edge) {
-    boolean wasAdded = mNodeToOutgoingEdges.computeIfAbsent(edge.getSource(), k -> new HashSet<>()).add(edge);
-    wasAdded |= mNodeToIncomingEdges.computeIfAbsent(edge.getDesintation(), k -> new HashSet<>()).add(edge);
+    boolean wasAdded = getNodeToOutgoingEdges().computeIfAbsent(edge.getSource(), k -> new HashSet<>()).add(edge);
+    wasAdded |= getNodeToIncomingEdges().computeIfAbsent(edge.getDestination(), k -> new HashSet<>()).add(edge);
     if (wasAdded) {
       mAmountOfEdges++;
     }
@@ -31,7 +31,7 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
   @Override
   public boolean containsEdge(final E edge) {
     // We don't check the other direction, unit tests should cover this
-    final Set<E> outgoingEdges = mNodeToOutgoingEdges.get(edge.getSource());
+    final Set<E> outgoingEdges = getNodeToOutgoingEdges().get(edge.getSource());
     return outgoingEdges != null && outgoingEdges.contains(edge);
   }
 
@@ -42,7 +42,7 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public Set<E> getIncomingEdges(final N destination) {
-    final Set<E> edges = mNodeToIncomingEdges.get(destination);
+    final Set<E> edges = getNodeToIncomingEdges().get(destination);
     if (edges == null) {
       return Collections.emptySet();
     }
@@ -51,16 +51,11 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public Set<E> getOutgoingEdges(final N source) {
-    final Set<E> edges = mNodeToOutgoingEdges.get(source);
+    final Set<E> edges = getNodeToOutgoingEdges().get(source);
     if (edges == null) {
       return Collections.emptySet();
     }
     return edges;
-  }
-
-  @Override
-  public long getSize() {
-    return getNodes().size();
   }
 
   public String getSizeInformation() {
@@ -69,8 +64,8 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
 
   @Override
   public boolean removeEdge(final E edge) {
-    boolean wasRemoved = removeEdgeFromMap(edge, edge.getSource(), mNodeToOutgoingEdges);
-    wasRemoved |= removeEdgeFromMap(edge, edge.getDesintation(), mNodeToIncomingEdges);
+    boolean wasRemoved = removeEdgeFromMap(edge, edge.getSource(), getNodeToOutgoingEdges());
+    wasRemoved |= removeEdgeFromMap(edge, edge.getDestination(), getNodeToIncomingEdges());
     if (wasRemoved) {
       mAmountOfEdges--;
     }
@@ -78,9 +73,14 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
   }
 
   @Override
+  public long size() {
+    return getNodes().size();
+  }
+
+  @Override
   public String toString() {
     final StringJoiner sj = new StringJoiner(", ", getClass().getSimpleName() + "[", "]");
-    sj.add("nodes=" + getSize());
+    sj.add("nodes=" + size());
     sj.add("edges=" + getAmountOfEdges());
     return sj.toString();
   }
@@ -95,5 +95,13 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
       return wasRemoved;
     }
     return false;
+  }
+
+  protected Map<N, Set<E>> getNodeToIncomingEdges() {
+    return mNodeToIncomingEdges;
+  }
+
+  protected Map<N, Set<E>> getNodeToOutgoingEdges() {
+    return mNodeToOutgoingEdges;
   }
 }

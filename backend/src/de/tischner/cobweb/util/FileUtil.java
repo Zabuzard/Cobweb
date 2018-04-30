@@ -3,13 +3,13 @@ package de.tischner.cobweb.util;
 import java.io.File;
 import java.nio.file.Path;
 
-public final class FileUtils {
+public final class FileUtil {
   public static FileExtension getFileExtension(final File file) {
-    return FileUtils.getFileExtension(file.getName());
+    return FileUtil.getFileExtension(file.getName());
   }
 
   public static FileExtension getFileExtension(final Path file) {
-    return FileUtils.getFileExtension(file.getFileName().toString());
+    return FileUtil.getFileExtension(file.getFileName().toString());
   }
 
   public static FileExtension getFileExtension(final String fileName) {
@@ -18,7 +18,7 @@ public final class FileUtils {
       return FileExtension.NONE;
     }
     final String extension = fileName.substring(dotIndex + 1);
-    return FileUtils.parseFileExtension(extension);
+    return FileUtil.parseFileExtension(extension);
   }
 
   private static FileExtension parseFileExtension(final String extension) {
@@ -42,7 +42,7 @@ public final class FileUtils {
   /**
    * Utility class. No implementation.
    */
-  private FileUtils() {
+  private FileUtil() {
 
   }
 }

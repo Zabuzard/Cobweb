@@ -3,11 +3,12 @@ package de.tischner.cobweb.routing.model.graph.road;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdge<N>, IHasId {
+public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdge<N>, IHasId, IReversedConsumer {
 
   private final double mCost;
   private final N mDestination;
   private final long mId;
+  private IReversedProvider mReversedProvider;
   private final N mSource;
 
   public RoadEdge(final long id, final N source, final N destination, final double cost) {
@@ -30,10 +31,13 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdg
   /*
    * (non-Javadoc)
    *
-   * @see de.tischner.cobweb.model.graph.IEdge#getDesintation()
+   * @see de.tischner.cobweb.routing.model.graph.IEdge#getDestination()
    */
   @Override
-  public N getDesintation() {
+  public N getDestination() {
+    if (mReversedProvider != null && mReversedProvider.isReversed()) {
+      return mSource;
+    }
     return mDestination;
   }
 
@@ -54,7 +58,15 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdg
    */
   @Override
   public N getSource() {
+    if (mReversedProvider != null && mReversedProvider.isReversed()) {
+      return mDestination;
+    }
     return mSource;
+  }
+
+  @Override
+  public void setReversedProvider(final IReversedProvider provider) {
+    mReversedProvider = provider;
   }
 
   /*
@@ -68,11 +80,11 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdg
     builder.append("RoadEdge [id=");
     builder.append(mId);
     builder.append(", ");
-    builder.append(mSource.getId());
+    builder.append(getSource().getId());
     builder.append(" -(");
     builder.append(mCost);
     builder.append(")-> ");
-    builder.append(mDestination.getId());
+    builder.append(getDestination().getId());
     builder.append("]");
     return builder.toString();
   }
