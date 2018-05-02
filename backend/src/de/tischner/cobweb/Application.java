@@ -20,6 +20,12 @@ import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
+import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
+import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
+import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
+import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
+import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
+import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.AStar;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
@@ -32,6 +38,7 @@ import de.tischner.cobweb.routing.server.RoutingServer;
 public final class Application {
   private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
   private final String[] mArgs;
+  private IShortestPathComputation<RoadNode, RoadEdge<RoadNode>> mComputation;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
   private ExternalDatabase mDatabase;
@@ -67,13 +74,13 @@ public final class Application {
   }
 
   public void shutdown() {
+    // TODO Make sure this is always called
     mLogger.info("Shutting down application");
     try {
-      // TODO Make sure this is always called
-      // TODO Implement something
+      mRoutingServer.shutdown();
       mDatabase.shutdown();
     } catch (final Throwable e) {
-      mLogger.error("Error while shutting down application", e);
+      mLogger.error("Error while shutting down database", e);
       throw e;
     }
   }
@@ -82,6 +89,7 @@ public final class Application {
     try {
       mLogger.info("Starting application");
       // TODO Do something, based on arguments
+      mRoutingServer.start();
     } catch (final Throwable e) {
       mLogger.error("Error while starting application", e);
       throw e;
@@ -143,8 +151,13 @@ public final class Application {
 
   private void initializeRouting() {
     mLogger.info("Initializing routing");
-    // TODO Pass some algorithm
-    mRoutingServer = new RoutingServer<>(mConfig, mGraph, mDatabase);
+
+    // Create the shortest path algorithm
+    final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
+    final IMetric<RoadNode> metric = new LandmarkMetric<>(50, mGraph, landmarkProvider);
+    mComputation = new AStar<>(mGraph, metric);
+
+    mRoutingServer = new RoutingServer<>(mConfig, mGraph, mComputation, mDatabase);
     mRoutingServer.initialize();
   }
 
