@@ -91,6 +91,7 @@ public final class WebUtil {
     answer.append("HTTP/1.0 " + statusNumber + " " + statusToUse + nextLine);
     answer.append("Content-Length: " + answerRawToUse.length + nextLine);
     answer.append("Content-Type: " + contentTypeText + "; charset=" + charset + nextLine);
+    answer.append("Access-Control-Allow-Origin: *" + nextLine);
     answer.append("Connection: close" + nextLine);
     answer.append(nextLine);
 

@@ -64,7 +64,7 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
       // Collect the value, it is at the desired index
       landmarks.add(nodeIter.next());
       // Prepare the next round
-      indexBefore = index;
+      indexBefore = index + 1;
     }
 
     return landmarks;

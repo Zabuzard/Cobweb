@@ -50,9 +50,23 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     try {
       // Handle the client
       try (InputStream is = mClient.getInputStream()) {
-        final Iterator<String> lines = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines()
-            .iterator();
-        handleRequest(lines);
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+
+        // TODO Debug problems with headers/body and end of stream
+        // Read in all lines until an empty line or end of stream.
+        // Do not wait for the end of the stream because that means the client has timed
+        // out.
+        final ArrayList<String> lines = new ArrayList<>();
+        while (true) {
+          final String line = reader.readLine();
+          System.out.println("Read: " + line);
+          if (line == null || line.isEmpty()) {
+            break;
+          }
+          lines.add(line);
+        }
+
+        handleRequest(lines.iterator());
       }
     } catch (final Throwable e) {
       // Log every error
