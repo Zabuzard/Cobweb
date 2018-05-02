@@ -6,7 +6,7 @@
  *
  */
 
-var routeRequestServer = 'http://localhost:835/route';
+var routeRequestServer = 'http://localhost:845/route';
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
 var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
 var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
@@ -84,7 +84,6 @@ function initMap() {
 }
 
 function sendRequestToServer(request) {
-	/*
 	$.ajax({
 		url: routeRequestServer,
 		method: 'POST',
@@ -99,7 +98,6 @@ function sendRequestToServer(request) {
 			handleRouteServerError(textStatus, errorThrown);
 		}
 	});
-	*/
-	// TODO Activate AJAX call and deactive mock
-	handleRouteServerResponse(mockServerResponse());
+	// TODO Remove mock if not needed anymore
+	//handleRouteServerResponse(mockServerResponse());
 }

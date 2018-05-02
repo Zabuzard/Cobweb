@@ -4,38 +4,38 @@ import java.io.File;
 import java.nio.file.Path;
 
 public final class FileUtil {
-  public static FileExtension getFileExtension(final File file) {
+  public static EFileExtension getFileExtension(final File file) {
     return FileUtil.getFileExtension(file.getName());
   }
 
-  public static FileExtension getFileExtension(final Path file) {
+  public static EFileExtension getFileExtension(final Path file) {
     return FileUtil.getFileExtension(file.getFileName().toString());
   }
 
-  public static FileExtension getFileExtension(final String fileName) {
+  public static EFileExtension getFileExtension(final String fileName) {
     final int dotIndex = fileName.lastIndexOf('.');
     if (dotIndex == -1) {
-      return FileExtension.NONE;
+      return EFileExtension.NONE;
     }
     final String extension = fileName.substring(dotIndex + 1);
     return FileUtil.parseFileExtension(extension);
   }
 
-  private static FileExtension parseFileExtension(final String extension) {
+  private static EFileExtension parseFileExtension(final String extension) {
     final String extensionLowered = extension.toLowerCase();
     switch (extensionLowered) {
     case "":
-      return FileExtension.NONE;
+      return EFileExtension.NONE;
     case "bz2":
-      return FileExtension.B_ZIP_TWO;
+      return EFileExtension.B_ZIP_TWO;
     case "gz":
-      return FileExtension.G_ZIP;
+      return EFileExtension.G_ZIP;
     case "xz":
-      return FileExtension.XZ;
+      return EFileExtension.XZ;
     case "osm":
-      return FileExtension.OSM;
+      return EFileExtension.OSM;
     default:
-      return FileExtension.UNKNOWN;
+      return EFileExtension.UNKNOWN;
     }
   }
 

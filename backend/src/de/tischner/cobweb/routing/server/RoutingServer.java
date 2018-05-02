@@ -64,8 +64,6 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     while (mShouldRun) {
       try {
         requestId++;
-        // TODO Remove debug print
-        System.out.println("Waiting...");
 
         // Accept a client, the handler will close it
         @SuppressWarnings("resource")

@@ -1,15 +1,8 @@
 package de.tischner.cobweb.routing.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +15,10 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
-import de.tischner.cobweb.util.EHttpContentType;
-import de.tischner.cobweb.util.EHttpStatus;
-import de.tischner.cobweb.util.WebUtil;
+import de.tischner.cobweb.util.http.EHttpStatus;
+import de.tischner.cobweb.util.http.HttpRequest;
+import de.tischner.cobweb.util.http.HttpResponseBuilder;
+import de.tischner.cobweb.util.http.HttpUtil;
 
 public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements Runnable {
@@ -49,24 +43,8 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   public void run() {
     try {
       // Handle the client
-      try (InputStream is = mClient.getInputStream()) {
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-
-        // TODO Debug problems with headers/body and end of stream
-        // Read in all lines until an empty line or end of stream.
-        // Do not wait for the end of the stream because that means the client has timed
-        // out.
-        final ArrayList<String> lines = new ArrayList<>();
-        while (true) {
-          final String line = reader.readLine();
-          System.out.println("Read: " + line);
-          if (line == null || line.isEmpty()) {
-            break;
-          }
-          lines.add(line);
-        }
-
-        handleRequest(lines.iterator());
+      try (InputStream input = mClient.getInputStream()) {
+        handleRequest(HttpUtil.parseRequest(input));
       }
     } catch (final Throwable e) {
       // Log every error
@@ -81,37 +59,38 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     }
   }
 
-  private void handleRequest(final Iterator<String> lines) throws IOException {
-    // Reject if empty
-    if (!lines.hasNext()) {
-      WebUtil.sendHttpAnswer(EHttpStatus.BAD_REQUEST, mClient);
+  private void handleRequest(final HttpRequest request) throws IOException {
+    // Method not allowed
+    final String type = request.getType().toUpperCase();
+    if (!type.equals("OPTIONS") && !type.equals("POST")) {
+      HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.METHOD_NOT_ALLOWED)
+          .putHeader("Allow", "OPTIONS, POST").build(), mClient);
       return;
     }
 
-    final String request = lines.next().trim();
-
-    // Reject if request is empty
-    if (request.isEmpty()) {
-      WebUtil.sendHttpAnswer(EHttpStatus.BAD_REQUEST, mClient);
+    if (type.equals("OPTIONS")) {
+      serveOptionsRequest(request);
       return;
     }
 
-    final ArrayList<String> body = new ArrayList<>();
-    lines.forEachRemaining(body::add);
+    // Type is a post request
+    servePost(request);
+  }
 
-    // Reject if empty body
-    if (body.isEmpty()) {
-      WebUtil.sendHttpAnswer(EHttpStatus.BAD_REQUEST, mClient);
-      return;
-    }
+  private void serveOptionsRequest(final HttpRequest request) throws IOException {
+    // Send back the supported methods
+    HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.OK)
+        .putHeader("Access-Control-Allow-Methods", "POST").putHeader("Access-Control-Allow-Headers", "Content-Type")
+        .putHeader("Access-Control-Max-Age", String.valueOf(86400)).putHeader("Connection", "Keep-Alive")
+        .putHeader("Keep-Alive", "timeout=5, max=100").build(), mClient);
+  }
 
+  private void servePost(final HttpRequest request) throws IOException {
     // TODO Implement something meaningful
-    final Instant handleRequestStart = Instant.now();
-    System.out.println("Request is: " + request);
-    System.out.println("Body is: " + body);
-    final Instant handleRequestEnd = Instant.now();
-    WebUtil.sendHttpAnswer("Looks good, took " + Duration.between(handleRequestEnd, handleRequestStart),
-        EHttpContentType.TEXT, EHttpStatus.OK, mClient);
+    System.out.println(request);
+
+    HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.OK).setContent("Hello world").build(),
+        mClient);
   }
 
 }

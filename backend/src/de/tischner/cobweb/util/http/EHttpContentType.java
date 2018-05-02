@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.http;
 
 /**
  * Enumeration of valid HTTP/1.0 content types, also known as MIME types.
@@ -10,29 +10,39 @@ public enum EHttpContentType {
   /**
    * Type used for CSS stylesheet files.
    */
-  CSS,
+  CSS("text/css"),
   /**
    * Type used for HTML files.
    */
-  HTML,
+  HTML("text/html"),
   /**
    * Type for JPG image files.
    */
-  JPG,
+  JPG("image/jpeg"),
   /**
    * Type used for javascript files.
    */
-  JS,
+  JS("application/javascript"),
   /**
    * Type used for json objects.
    */
-  JSON,
+  JSON("application/json"),
   /**
    * Type used for PNG image files.
    */
-  PNG,
+  PNG("image/png"),
   /**
    * Type for regular text files.
    */
-  TEXT
+  TEXT("text/plain");
+
+  private final String mTextValue;
+
+  private EHttpContentType(final String textValue) {
+    mTextValue = textValue;
+  }
+
+  public String getTextValue() {
+    return mTextValue;
+  }
 }
