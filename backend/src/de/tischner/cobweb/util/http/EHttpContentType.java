@@ -37,7 +37,12 @@ public enum EHttpContentType {
   TEXT("text/plain");
 
   public static EHttpContentType fromTextValue(final String textValue) {
-    return EHttpContentType.valueOf(textValue);
+    for (final EHttpContentType contentType : EHttpContentType.values()) {
+      if (contentType.getTextValue().equals(textValue)) {
+        return contentType;
+      }
+    }
+    return null;
   }
 
   private final String mTextValue;

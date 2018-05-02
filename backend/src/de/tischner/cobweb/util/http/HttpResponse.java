@@ -38,13 +38,13 @@ public final class HttpResponse {
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("HttpResponse [status=");
-    builder.append(this.mStatus);
+    builder.append(mStatus);
     builder.append(", contentType=");
-    builder.append(this.mContentType);
+    builder.append(mContentType);
     builder.append(", headers=");
-    builder.append(this.mHeaders);
+    builder.append(mHeaders);
     builder.append(", content=");
-    builder.append(this.mContent);
+    builder.append(mContent);
     builder.append("]");
     return builder.toString();
   }

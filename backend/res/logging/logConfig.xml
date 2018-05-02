@@ -3,11 +3,17 @@
   <property name="LOGGING_HOME" value="backend/res/logging" />
 
   <shutdownHook/>
-
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+  
+  <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOGGING_HOME}/cobweb.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        <maxFileSize>10MB</maxFileSize>    
+        <maxHistory>30</maxHistory>
+        <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
     <encoder>
-      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
     </encoder>
   </appender>
 
@@ -18,7 +24,7 @@
   </appender>
 
   <root level="${LEVEL}">
-    <appender-ref ref="FILE" />
+    <appender-ref ref="ROLLING" />
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

@@ -42,15 +42,15 @@ public final class HttpRequest {
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("HttpRequest [type=");
-    builder.append(this.mType);
+    builder.append(mType);
     builder.append(", resource=");
-    builder.append(this.mResource);
+    builder.append(mResource);
     builder.append(", protocol=");
-    builder.append(this.mProtocol);
+    builder.append(mProtocol);
     builder.append(", headers=");
-    builder.append(this.mHeaders);
+    builder.append(mHeaders);
     builder.append(", content=");
-    builder.append(this.mContent);
+    builder.append(mContent);
     builder.append("]");
     return builder.toString();
   }

@@ -7,6 +7,10 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.model.graph.IEdge;
@@ -15,6 +19,8 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.routing.server.model.RoutingRequest;
+import de.tischner.cobweb.util.MemberFieldNamingStrategy;
 import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.EHttpStatus;
 import de.tischner.cobweb.util.http.HttpRequest;
@@ -89,9 +95,6 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   }
 
   private void servePost(final HttpRequest request) throws IOException {
-    // TODO Remove debug print
-    System.out.println(request);
-
     if (!request.getResource().equals(API_RESOURCE)) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.NOT_IMPLEMENTED).build(), mClient);
       return;
@@ -103,10 +106,15 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
       return;
     }
 
-    // Parse the JSON request
-
-    HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.OK).setContent("Hello world").build(),
-        mClient);
+    // Parse the JSON request and handle it
+    final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
+    try {
+      final RoutingRequest routingRequest = gson.fromJson(request.getContent(), RoutingRequest.class);
+      final RequestHandler<N, E, G> handler = new RequestHandler<>(mClient, gson, mGraph, mComputation, mDatabase);
+      handler.handleRequest(routingRequest);
+    } catch (final JsonSyntaxException e) {
+      HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);
+      return;
+    }
   }
-
 }
