@@ -16,6 +16,14 @@ public final class HttpUtil {
   private static final String HTTP_NEW_LINE = "\r\n";
   private static final Charset STANDARD_CHARSET = StandardCharsets.UTF_8;
 
+  public static EHttpContentType parseContentType(final String value) {
+    if (value == null) {
+      return null;
+    }
+    final String[] data = value.split("; ", 2);
+    return EHttpContentType.fromTextValue(data[0]);
+  }
+
   public static HttpRequest parseRequest(final InputStream input) throws IOException {
     // Read the request
     String request;

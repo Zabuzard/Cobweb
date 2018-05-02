@@ -15,6 +15,7 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.EHttpStatus;
 import de.tischner.cobweb.util.http.HttpRequest;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
@@ -23,11 +24,13 @@ import de.tischner.cobweb.util.http.HttpUtil;
 public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements Runnable {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
+  private static final String API_RESOURCE = "/route";
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
   private final Socket mClient;
   private final IShortestPathComputation<N, E> mComputation;
   private final IRoutingDatabase mDatabase;
   private final G mGraph;
+
   private final int mId;
 
   public ClientHandler(final int id, final Socket client, final G graph,
@@ -86,8 +89,21 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   }
 
   private void servePost(final HttpRequest request) throws IOException {
-    // TODO Implement something meaningful
+    // TODO Remove debug print
     System.out.println(request);
+
+    if (!request.getResource().equals(API_RESOURCE)) {
+      HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.NOT_IMPLEMENTED).build(), mClient);
+      return;
+    }
+
+    final EHttpContentType contentType = HttpUtil.parseContentType(request.getHeaders().get("Content-Type"));
+    if (contentType == null || contentType != EHttpContentType.JSON) {
+      HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);
+      return;
+    }
+
+    // Parse the JSON request
 
     HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.OK).setContent("Hello world").build(),
         mClient);
