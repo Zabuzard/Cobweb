@@ -10,11 +10,15 @@ import de.topobyte.osm4j.core.model.iface.OsmEntity;
 public interface IRoutingDatabase {
   Optional<Long> getNodeByName(String name);
 
+  Optional<String> getNodeName(long id);
+
   Collection<SpatialNodeData> getSpatialNodeData(Iterable<Long> nodeIds, int size);
 
   Collection<SpatialNodeData> getSpatialNodeData(LongStream nodeIds, int size);
 
-  Optional<Long> getWayIdByName(String name);
+  Optional<Long> getWayByName(String name);
+
+  Optional<String> getWayName(long id);
 
   void offerOsmEntities(Iterable<OsmEntity> entities, int size);
 

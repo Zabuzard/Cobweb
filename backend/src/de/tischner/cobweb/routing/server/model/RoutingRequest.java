@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.tischner.cobweb.routing.server.ETransportationMode;
-
 public final class RoutingRequest {
   private long mDepTime;
   private long mFrom;

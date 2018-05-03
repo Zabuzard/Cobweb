@@ -16,11 +16,13 @@ public final class DatabaseUtil {
   static final String QUERY_INSERT_NODE = "REPLACE INTO osm_nodes (id, latitude, longitude) VALUES (?, ?, ?)";
   static final String QUERY_INSERT_NODE_TAGS = "REPLACE INTO osm_node_tags (id, name, highway) VALUES (?, ?, ?)";
   static final String QUERY_INSERT_WAY_TAGS = "REPLACE INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
+  static final String QUERY_NODE_ID_BY_NAME = "SELECT name FROM osm_node_tags WHERE id = ?";
   static final String QUERY_NODE_NAME_BY_ID = "SELECT id FROM osm_node_tags WHERE name = ?";
   static final String QUERY_PLACEHOLDER = "?";
   static final String QUERY_SPATIAL_NODE_DATA_DELIMITER = ", ";
   static final String QUERY_SPATIAL_NODE_DATA_PREFIX = "SELECT id, latitude, longitude FROM osm_nodes WHERE id IN (";
   static final String QUERY_SPATIAL_NODE_DATA_SUFFIX = ")";
+  static final String QUERY_WAY_ID_BY_NAME = "SELECT name FROM osm_way_tags WHERE id = ?";
   static final String QUERY_WAY_NAME_BY_ID = "SELECT id FROM osm_way_tags WHERE name = ?";
 
   static Integer parseMaxSpeed(final String maxSpeedText) {

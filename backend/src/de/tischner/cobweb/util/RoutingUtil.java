@@ -8,6 +8,7 @@ public final class RoutingUtil {
   private static final int HALF_CIRCLE_DEG = 180;
   private static final double MAXIMAL_ROAD_SPEED = 200.0;
   private static final double MS_TO_KMH = 3.6;
+  private static final int SECONDS_TO_MILLIS = 1_000;
 
   public static double degToRad(final double deg) {
     return deg * Math.PI / HALF_CIRCLE_DEG;
@@ -40,6 +41,10 @@ public final class RoutingUtil {
 
   public static double radToDeg(final double rad) {
     return rad * HALF_CIRCLE_DEG / Math.PI;
+  }
+
+  public static double secondsToMilliseconds(final double seconds) {
+    return seconds * SECONDS_TO_MILLIS;
   }
 
   public static double travelTime(final double distance, final double speed) {

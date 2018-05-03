@@ -1,7 +1,7 @@
 package de.tischner.cobweb.routing.server.model;
 
 public enum ERouteElementType {
-  EDGE(1), NODE(0);
+  NODE(0), PATH(1);
 
   public static ERouteElementType fromValue(final int value) {
     for (final ERouteElementType type : ERouteElementType.values()) {

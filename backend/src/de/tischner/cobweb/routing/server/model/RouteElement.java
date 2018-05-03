@@ -2,8 +2,6 @@ package de.tischner.cobweb.routing.server.model;
 
 import java.util.List;
 
-import de.tischner.cobweb.routing.server.ETransportationMode;
-
 public final class RouteElement {
 
   private List<double[]> mGeom;
@@ -18,6 +16,14 @@ public final class RouteElement {
 
     setType(type);
     setMode(mode);
+  }
+
+  public RouteElement(final ERouteElementType type, final String name, final List<double[]> geom) {
+    mName = name;
+    mGeom = geom;
+
+    setType(type);
+    setMode(ETransportationMode.IRRELEVANT);
   }
 
   private RouteElement() {

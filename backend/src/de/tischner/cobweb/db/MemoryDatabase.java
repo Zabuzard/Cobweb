@@ -23,12 +23,16 @@ public class MemoryDatabase implements IRoutingDatabase {
   private final static Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
   private final Map<String, Long> mNameToNode;
   private final Map<String, Long> mNameToWay;
+  private final Map<Long, String> mNodeToName;
   private final Map<Long, SpatialNodeData> mNodeToSpatialData;
+  private final Map<Long, String> mWayToName;
 
   public MemoryDatabase() {
     mNameToNode = new HashMap<>();
     mNodeToSpatialData = new HashMap<>();
     mNameToWay = new HashMap<>();
+    mNodeToName = new HashMap<>();
+    mWayToName = new HashMap<>();
   }
 
   @Override
@@ -37,6 +41,12 @@ public class MemoryDatabase implements IRoutingDatabase {
       LOGGER.debug("Getting node by name {}", name);
     }
     return Optional.ofNullable(mNameToNode.get(name));
+  }
+
+  @Override
+  public Optional<String> getNodeName(final long id) {
+
+    return null;
   }
 
   @Override
@@ -55,11 +65,17 @@ public class MemoryDatabase implements IRoutingDatabase {
   }
 
   @Override
-  public Optional<Long> getWayIdByName(final String name) {
+  public Optional<Long> getWayByName(final String name) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Getting way by name {}", name);
     }
     return Optional.ofNullable(mNameToWay.get(name));
+  }
+
+  @Override
+  public Optional<String> getWayName(final long id) {
+
+    return null;
   }
 
   @Override
@@ -96,6 +112,7 @@ public class MemoryDatabase implements IRoutingDatabase {
     // Insert tag data
     if (name != null) {
       mNameToNode.put(name, id);
+      mNodeToName.put(id, name);
     }
   }
 
@@ -108,6 +125,7 @@ public class MemoryDatabase implements IRoutingDatabase {
     // Insert tag data
     if (name != null) {
       mNameToWay.put(name, id);
+      mWayToName.put(id, name);
     }
   }
 

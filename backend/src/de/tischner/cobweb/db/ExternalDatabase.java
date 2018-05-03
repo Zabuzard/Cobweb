@@ -59,6 +59,27 @@ public final class ExternalDatabase implements IRoutingDatabase {
   }
 
   @Override
+  public Optional<String> getNodeName(final long id) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting node name by id: {}", id);
+    }
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_ID_BY_NAME)) {
+        statement.setLong(1, id);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getString(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting node name by id: {}", id, e);
+      return Optional.empty();
+    }
+  }
+
+  @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
     return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
   }
@@ -105,7 +126,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
   }
 
   @Override
-  public Optional<Long> getWayIdByName(final String name) {
+  public Optional<Long> getWayByName(final String name) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Getting way by name: {}", name);
     }
@@ -121,6 +142,27 @@ public final class ExternalDatabase implements IRoutingDatabase {
       }
     } catch (final SQLException e) {
       LOGGER.error("Error getting way by name: {}", name, e);
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public Optional<String> getWayName(final long id) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting way name by id: {}", id);
+    }
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_ID_BY_NAME)) {
+        statement.setLong(1, id);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getString(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting way name by id: {}", id, e);
       return Optional.empty();
     }
   }
