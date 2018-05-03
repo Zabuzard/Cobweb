@@ -69,6 +69,9 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   }
 
   private void handleRequest(final HttpRequest request) throws IOException {
+    // TODO Maybe don't log always
+    LOGGER.info("Handling HTTP request with id: {}", mId);
+
     // Method not allowed
     final String type = request.getType().toUpperCase();
     if (!type.equals("OPTIONS") && !type.equals("POST")) {

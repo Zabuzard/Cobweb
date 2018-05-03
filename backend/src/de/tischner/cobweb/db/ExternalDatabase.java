@@ -17,25 +17,69 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IDatabaseConfigProvider;
+import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
-public final class ExternalDatabase implements IRoutingDatabase {
+public final class ExternalDatabase extends ARoutingDatabase {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
   private final IDatabaseConfigProvider mConfig;
 
   public ExternalDatabase(final IDatabaseConfigProvider config) {
     mConfig = config;
+  }
+
+  @Override
+  public Collection<HighwayData> getHighwayData(final LongStream wayIds, final int size) {
+    // Build the query
+    final StringJoiner queryBuilder = new StringJoiner(DatabaseUtil.QUERY_DATA_DELIMITER,
+        DatabaseUtil.QUERY_HIGHWAY_DATA_PREFIX, DatabaseUtil.QUERY_INSERT_SUFFIX);
+    IntStream.range(0, size).forEach(i -> queryBuilder.add(DatabaseUtil.QUERY_PLACEHOLDER));
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting highway data for {} ways", size);
+    }
+    final List<HighwayData> wayData = new ArrayList<>(size);
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
+        // Fill the statement
+        final AtomicInteger counter = new AtomicInteger();
+        wayIds.forEach(id -> {
+          try {
+            statement.setLong(counter.incrementAndGet(), id);
+          } catch (final SQLException e) {
+            LOGGER.error("Error getting highway data for {} ways, can not set parameter {} with way id {}", size,
+                counter.get(), id, e);
+          }
+        });
+
+        // Execute the statement and collect the result
+        try (ResultSet result = statement.executeQuery()) {
+          while (result.next()) {
+            final long id = result.getLong(1);
+            final String highway = result.getString(2);
+            int maxSpeed = result.getInt(3);
+            if (maxSpeed == 0) {
+              maxSpeed = -1;
+            }
+            wayData.add(new HighwayData(id, EHighwayType.fromName(highway), maxSpeed));
+          }
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting highway data for {} ways, current result is {}", size, wayData, e);
+    }
+
+    return wayData;
   }
 
   @Override
@@ -69,7 +113,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
         statement.setLong(1, id);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
-            return Optional.of(result.getString(1));
+            return Optional.ofNullable(result.getString(1));
           }
           return Optional.empty();
         }
@@ -81,15 +125,10 @@ public final class ExternalDatabase implements IRoutingDatabase {
   }
 
   @Override
-  public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
-    return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
-  }
-
-  @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
     // Build the query
-    final StringJoiner queryBuilder = new StringJoiner(DatabaseUtil.QUERY_SPATIAL_NODE_DATA_DELIMITER,
-        DatabaseUtil.QUERY_SPATIAL_NODE_DATA_PREFIX, DatabaseUtil.QUERY_SPATIAL_NODE_DATA_SUFFIX);
+    final StringJoiner queryBuilder = new StringJoiner(DatabaseUtil.QUERY_DATA_DELIMITER,
+        DatabaseUtil.QUERY_SPATIAL_NODE_DATA_PREFIX, DatabaseUtil.QUERY_INSERT_SUFFIX);
     IntStream.range(0, size).forEach(i -> queryBuilder.add(DatabaseUtil.QUERY_PLACEHOLDER));
 
     if (LOGGER.isDebugEnabled()) {
@@ -157,7 +196,7 @@ public final class ExternalDatabase implements IRoutingDatabase {
         statement.setLong(1, id);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
-            return Optional.of(result.getString(1));
+            return Optional.ofNullable(result.getString(1));
           }
           return Optional.empty();
         }
@@ -175,11 +214,6 @@ public final class ExternalDatabase implements IRoutingDatabase {
     // Create database tables if they don't exist already
     final Path initDbScript = mConfig.getInitDbScript();
     ScriptExecutor.executeScript(initDbScript, createConnection());
-  }
-
-  @Override
-  public void offerOsmEntities(final Iterable<OsmEntity> entities, final int size) {
-    offerOsmEntities(StreamSupport.stream(entities.spliterator(), false), size);
   }
 
   @Override
@@ -252,7 +286,10 @@ public final class ExternalDatabase implements IRoutingDatabase {
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
     final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
-    final Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
+    Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
+    if (maxSpeed == -1) {
+      maxSpeed = null;
+    }
 
     // Insert tag data
     try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_WAY_TAGS)) {

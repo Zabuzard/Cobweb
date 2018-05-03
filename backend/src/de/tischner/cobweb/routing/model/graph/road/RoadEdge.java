@@ -1,21 +1,27 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
+import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
+import de.tischner.cobweb.util.RoutingUtil;
 
 public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdge<N>, IHasId, IReversedConsumer {
 
-  private final double mCost;
+  private double mCost;
   private final N mDestination;
   private final long mId;
+  private final int mMaxSpeed;
   private IReversedProvider mReversedProvider;
   private final N mSource;
+  private final EHighwayType mType;
 
-  public RoadEdge(final long id, final N source, final N destination, final double cost) {
+  public RoadEdge(final long id, final N source, final N destination, final EHighwayType type, final int maxSpeed) {
     mId = id;
     mSource = source;
     mDestination = destination;
-    mCost = cost;
+    mType = type;
+    mMaxSpeed = maxSpeed;
+    updateCost();
   }
 
   /*
@@ -87,6 +93,12 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial> implements IEdg
     builder.append(getDestination().getId());
     builder.append("]");
     return builder.toString();
+  }
+
+  public void updateCost() {
+    final double speed = RoutingUtil.getSpeedOfHighway(mType, mMaxSpeed);
+    final double distance = RoutingUtil.distanceEquiRect(mSource, mDestination);
+    mCost = RoutingUtil.travelTime(distance, speed);
   }
 
 }

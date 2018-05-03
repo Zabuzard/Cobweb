@@ -1,6 +1,8 @@
 package de.tischner.cobweb.routing.server.model;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class RouteElement {
 
@@ -56,7 +58,7 @@ public final class RouteElement {
     builder.append(", name=");
     builder.append(mName);
     builder.append(", geom=");
-    builder.append(mGeom);
+    builder.append(mGeom.stream().map(Arrays::toString).collect(Collectors.joining(", ", "[", "]")));
     builder.append("]");
     return builder.toString();
   }

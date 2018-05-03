@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
+import de.tischner.cobweb.config.ConfigLoader;
+import de.tischner.cobweb.config.ConfigStore;
+import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.topobyte.osm4j.core.access.OsmIterator;
 import de.topobyte.osm4j.core.access.OsmOutputStream;
 import de.topobyte.osm4j.core.model.iface.EntityContainer;
@@ -25,7 +28,6 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmRelationMember;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 import de.topobyte.osm4j.xml.dynsax.OsmXmlIterator;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
@@ -43,11 +45,22 @@ public final class OsmReducer {
     final Path input = Paths.get("backend", "res", "input", "osm", "freiburg-regbez-latest.osm");
     final Path output = Paths.get("backend", "res", "input", "osm", "reduced_freiburg-regbez-latest.osm");
 
-    final boolean testReduce = false;
-    if (testReduce) {
-      final OsmReducer reducer = new OsmReducer(input);
+    final ConfigStore config = new ConfigStore();
+    final ConfigLoader configLoader = new ConfigLoader();
+    configLoader.loadConfig(config);
+
+    final IOsmFilter filter = new OsmRoadFilter(config);
+
+    final boolean reduceOrTest = true;
+    final boolean heavyReduce = true;
+    if (reduceOrTest) {
+      final OsmReducer reducer = new OsmReducer(filter, input);
       reducer.readData();
-      reducer.reduceToRoadOnly(0.1, true);
+      if (heavyReduce) {
+        reducer.reduceToRoadOnly(0.1, true);
+      } else {
+        reducer.reduceToRoadOnly(1.0, false);
+      }
       reducer.writeToPath(output);
     } else {
       OsmReducer.checkIfOsmIsValid(output);
@@ -74,15 +87,15 @@ public final class OsmReducer {
   }
 
   private OsmBounds mBounds;
+  private final IOsmFilter mFilter;
   private LinkedHashMap<Long, OsmNode> mIdToNode;
   private LinkedHashMap<Long, OsmRelation> mIdToRelation;
-
   private LinkedHashMap<Long, OsmWay> mIdToWay;
-
   private final Path mInputPath;
 
-  public OsmReducer(final Path inputPath) {
-    // TODO Apply filter etc, rewrite, currently its just in a test state
+  public OsmReducer(final IOsmFilter filter, final Path inputPath) {
+    // TODO Rewrite, currently its just in a test state
+    mFilter = filter;
     mInputPath = inputPath;
     mIdToNode = new LinkedHashMap<>();
     mIdToWay = new LinkedHashMap<>();
@@ -141,7 +154,8 @@ public final class OsmReducer {
       }
 
       final OsmWay way = mIdToWay.get(wayId);
-      if (!OsmModelUtil.getTagsAsMap(way).containsKey("highway")) {
+      // Skip if filter does not accept
+      if (!mFilter.filter(way)) {
         continue;
       }
       // Skip short ways if set

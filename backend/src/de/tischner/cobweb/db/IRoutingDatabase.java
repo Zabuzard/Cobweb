@@ -8,6 +8,10 @@ import java.util.stream.Stream;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 
 public interface IRoutingDatabase {
+  Collection<HighwayData> getHighwayData(Iterable<Long> wayIds, int size);
+
+  Collection<HighwayData> getHighwayData(LongStream wayIds, int size);
+
   Optional<Long> getNodeByName(String name);
 
   Optional<String> getNodeName(long id);

@@ -71,6 +71,7 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   public void complete() throws IOException {
     // Submit buffer
     submitBufferedRequests();
+    mBuilder.complete();
   }
 
   /*

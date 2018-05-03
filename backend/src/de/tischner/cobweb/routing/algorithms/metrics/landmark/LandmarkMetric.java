@@ -28,12 +28,20 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
 
   @Override
   public double distance(final N first, final N second) {
-    double greatestDistance = 0;
+    double greatestDistance = 0.0;
     for (final N landmark : mLandmarks) {
-      final double landmarkBehindDestination = mNodeToLandmarkDistance.get(first, landmark)
-          - mNodeToLandmarkDistance.get(second, landmark);
-      final double landmarkBeforeSource = mLandmarkToNodeDistance.get(landmark, second)
-          - mLandmarkToNodeDistance.get(landmark, first);
+      final Double firstToLandmark = mNodeToLandmarkDistance.get(first, landmark);
+      final Double secondToLandmark = mNodeToLandmarkDistance.get(second, landmark);
+      final Double landmarkToSecond = mLandmarkToNodeDistance.get(landmark, second);
+      final Double landmarkToFirst = mLandmarkToNodeDistance.get(landmark, first);
+
+      // Ignore the landmark if anyone can not reach it
+      if (firstToLandmark == null || secondToLandmark == null || landmarkToSecond == null || landmarkToFirst == null) {
+        continue;
+      }
+
+      final double landmarkBehindDestination = firstToLandmark - secondToLandmark;
+      final double landmarkBeforeSource = landmarkToSecond - landmarkToFirst;
       final double distance = Math.max(landmarkBehindDestination, landmarkBeforeSource);
       if (distance > greatestDistance) {
         greatestDistance = distance;
@@ -60,10 +68,9 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
     for (final N landmark : mLandmarks) {
       final Map<N, ? extends IHasPathCost> nodeToDistance = computation.computeShortestPathCostsReachable(landmark);
       for (final Entry<N, ? extends IHasPathCost> entry : nodeToDistance.entrySet()) {
-        mLandmarkToNodeDistance.put(entry.getKey(), landmark, entry.getValue().getPathCost());
+        mNodeToLandmarkDistance.put(entry.getKey(), landmark, entry.getValue().getPathCost());
       }
     }
     graph.reverse();
   }
-
 }

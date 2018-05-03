@@ -29,6 +29,7 @@ import de.tischner.cobweb.routing.server.model.RouteElement;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
 import de.tischner.cobweb.routing.server.model.RoutingResponse;
 import de.tischner.cobweb.util.RoutingUtil;
+import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
 
@@ -51,6 +52,9 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   }
 
   public void handleRequest(final RoutingRequest request) throws IOException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Handling request: {}", request);
+    }
     // Get the source and destination
     final Optional<N> sourceOptional = mGraph.getNodeById(request.getFrom());
     if (!sourceOptional.isPresent()) {
@@ -121,7 +125,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     mDatabase.getNodeName(source.getId()).ifPresent(nameJoiner::add);
 
     // Add all edge destinations
-    final long lastWayId = -1;
+    long lastWayId = -1;
     for (final E edge : path) {
       final N edgeDestination = edge.getDestination();
       geom.add(new double[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
@@ -130,6 +134,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
       if (wayId != lastWayId) {
         mDatabase.getWayName(wayId).ifPresent(nameJoiner::add);
       }
+      lastWayId = wayId;
     }
 
     return new RouteElement(ERouteElementType.PATH, ETransportationMode.CAR, nameJoiner.toString(), geom);
@@ -141,7 +146,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   }
 
   private void sendResponse(final RoutingResponse response) throws IOException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Sending response: {}", response);
+    }
     final String content = mGson.toJson(response);
-    HttpUtil.sendHttpResponse(new HttpResponseBuilder().setContent(content).build(), mClient);
+    HttpUtil.sendHttpResponse(
+        new HttpResponseBuilder().setContentType(EHttpContentType.JSON).setContent(content).build(), mClient);
   }
 }

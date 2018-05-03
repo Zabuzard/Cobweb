@@ -16,9 +16,9 @@ public final class OsmParseUtil {
     return EHighwayType.fromName(highwayText);
   }
 
-  public static Integer parseMaxSpeed(final String maxSpeedText) {
+  public static int parseMaxSpeed(final String maxSpeedText) {
     if (maxSpeedText == null) {
-      return null;
+      return -1;
     }
     // "none" means there is no speed limit, use a default value
     if (maxSpeedText.equals("none")) {

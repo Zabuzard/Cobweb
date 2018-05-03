@@ -1,11 +1,13 @@
 package de.tischner.cobweb.routing.model.graph;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGraph<N, E> {
   private long mAmountOfEdges;
@@ -38,6 +40,11 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
   @Override
   public long getAmountOfEdges() {
     return mAmountOfEdges;
+  }
+
+  @Override
+  public Stream<E> getEdges() {
+    return mNodeToOutgoingEdges.values().stream().flatMap(Collection::stream);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package de.tischner.cobweb.util;
 
+import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
 
 public final class RoutingUtil {
@@ -24,6 +25,21 @@ public final class RoutingUtil {
     final double x = (secondLong - firstLong) * Math.cos((firstLat + secondLat) / 2);
     final double y = secondLat - firstLat;
     return Math.sqrt(x * x + y * y) * EARTH_RADIUS_MEAN;
+  }
+
+  public static double getSpeedOfHighway(final EHighwayType type, final int maxSpeed) {
+    // Use the max speed property if present
+    if (maxSpeed != -1) {
+      return maxSpeed;
+    }
+
+    // Use the highway type if present
+    if (type != null) {
+      return type.getAverageSpeed();
+    }
+
+    // Use a default speed value
+    return EHighwayType.RESIDENTIAL.getAverageSpeed();
   }
 
   public static double kmhToMs(final double kmh) {

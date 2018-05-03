@@ -9,32 +9,12 @@ import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
-import de.tischner.cobweb.util.RoutingUtil;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
 public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & ICanGetNodeById<RoadNode>>
     implements IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> {
-
-  private static double getSpeedOfWay(final OsmWay way) {
-    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-
-    // Use the max speed property if present
-    final Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
-    if (maxSpeed != null) {
-      return maxSpeed;
-    }
-
-    // Use the highway type if present
-    final EHighwayType type = OsmParseUtil.parseHighwayType(tagToValue.get(OsmParseUtil.HIGHWAY_TAG));
-    if (type != null) {
-      return type.getAverageSpeed();
-    }
-
-    // Use a default speed value
-    return EHighwayType.RESIDENTIAL.getAverageSpeed();
-  }
 
   private final G mGraph;
 
@@ -55,12 +35,12 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
     final RoadNode source = mGraph.getNodeById(sourceId).orElseThrow(() -> new ParseException());
     final RoadNode destination = mGraph.getNodeById(destinationId).orElseThrow(() -> new ParseException());
 
-    // Compute the cost
-    final double speed = OsmRoadBuilder.getSpeedOfWay(way);
-    final double distance = RoutingUtil.distanceEquiRect(source, destination);
-    final double cost = RoutingUtil.travelTime(distance, speed);
+    // Get information about the highway type
+    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
+    final EHighwayType type = OsmParseUtil.parseHighwayType(tagToValue.get(OsmParseUtil.HIGHWAY_TAG));
+    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
 
-    return new RoadEdge<>(way.getId(), source, destination, cost);
+    return new RoadEdge<>(way.getId(), source, destination, type, maxSpeed);
   }
 
   /*
@@ -73,6 +53,12 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   @Override
   public RoadNode buildNode(final OsmNode node) {
     return new RoadNode(node.getId(), node.getLatitude(), node.getLongitude());
+  }
+
+  @Override
+  public void complete() {
+    // Spatial data of nodes are now known, update all edge costs
+    mGraph.getEdges().forEach(RoadEdge::updateCost);
   }
 
 }

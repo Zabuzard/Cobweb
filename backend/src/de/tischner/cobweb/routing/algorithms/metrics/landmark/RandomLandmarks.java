@@ -3,6 +3,7 @@ package de.tischner.cobweb.routing.algorithms.metrics.landmark;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -34,20 +35,23 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
     final Collection<N> nodes = mGraph.getNodes();
     final int amountOfNodes = nodes.size();
 
+    // Designate random indices
+    final HashSet<Integer> indicesSet = new HashSet<>(amountToUse);
+    while (indicesSet.size() < amountToUse) {
+      indicesSet.add(mRandom.nextInt(amountOfNodes));
+    }
+
     // If the nodes support RandomAccess, fetch them directly
     if (nodes instanceof RandomAccess && nodes instanceof List) {
       final List<N> nodesAsList = (List<N>) nodes;
-      for (int i = 0; i < amountToUse; i++) {
-        landmarks.add(nodesAsList.get(mRandom.nextInt(amountOfNodes)));
+      for (final int index : indicesSet) {
+        landmarks.add(nodesAsList.get(index));
       }
       return landmarks;
     }
 
-    // Pick random indices and sort them
-    final int[] indices = new int[amountToUse];
-    for (int i = 0; i < amountToUse; i++) {
-      indices[i] = mRandom.nextInt(amountOfNodes);
-    }
+    // Sort the indices
+    final int[] indices = indicesSet.stream().mapToInt(Integer::intValue).toArray();
     Arrays.sort(indices);
 
     // Iterate to each index and collect the node

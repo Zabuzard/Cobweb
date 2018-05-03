@@ -9,23 +9,24 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
-public class MemoryDatabase implements IRoutingDatabase {
+public class MemoryDatabase extends ARoutingDatabase {
   private final static Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
   private final Map<String, Long> mNameToNode;
   private final Map<String, Long> mNameToWay;
   private final Map<Long, String> mNodeToName;
   private final Map<Long, SpatialNodeData> mNodeToSpatialData;
+  private final Map<Long, HighwayData> mWayToHighwayData;
   private final Map<Long, String> mWayToName;
 
   public MemoryDatabase() {
@@ -34,6 +35,17 @@ public class MemoryDatabase implements IRoutingDatabase {
     mNameToWay = new HashMap<>();
     mNodeToName = new HashMap<>();
     mWayToName = new HashMap<>();
+    mWayToHighwayData = new HashMap<>();
+  }
+
+  @Override
+  public Collection<HighwayData> getHighwayData(final LongStream wayIds, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting highway data for {} ways", size);
+    }
+    final List<HighwayData> result = new ArrayList<>(size);
+    wayIds.mapToObj(mWayToHighwayData::get).filter(data -> !Objects.isNull(data)).forEach(result::add);
+    return result;
   }
 
   @Override
@@ -46,13 +58,7 @@ public class MemoryDatabase implements IRoutingDatabase {
 
   @Override
   public Optional<String> getNodeName(final long id) {
-
-    return null;
-  }
-
-  @Override
-  public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
-    return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
+    return Optional.ofNullable(mNodeToName.get(id));
   }
 
   @Override
@@ -75,13 +81,7 @@ public class MemoryDatabase implements IRoutingDatabase {
 
   @Override
   public Optional<String> getWayName(final long id) {
-
-    return null;
-  }
-
-  @Override
-  public void offerOsmEntities(final Iterable<OsmEntity> entities, final int size) {
-    offerOsmEntities(StreamSupport.stream(entities.spliterator(), false), size);
+    return Optional.ofNullable(mWayToName.get(id));
   }
 
   @Override
@@ -122,12 +122,15 @@ public class MemoryDatabase implements IRoutingDatabase {
     final long id = way.getId();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
+    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
+    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
 
     // Insert tag data
     if (name != null) {
       mNameToWay.put(name, id);
       mWayToName.put(id, name);
     }
+    mWayToHighwayData.put(id, new HighwayData(id, EHighwayType.fromName(highway), maxSpeed));
   }
 
 }

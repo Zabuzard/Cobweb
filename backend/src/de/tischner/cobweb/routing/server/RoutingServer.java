@@ -63,13 +63,12 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
     while (mShouldRun) {
       try {
-        requestId++;
-
         // Accept a client, the handler will close it
         @SuppressWarnings("resource")
         final Socket client = mServerSocket.accept();
 
         // Handle the client
+        requestId++;
         final ClientHandler<N, E, G> handler = new ClientHandler<>(requestId, client, mGraph, mComputation, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {

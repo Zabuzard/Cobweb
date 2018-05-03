@@ -2,6 +2,7 @@ package de.tischner.cobweb.routing.model.graph;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public interface IGraph<N extends INode, E extends IEdge<N>> {
   boolean addEdge(E edge);
@@ -11,6 +12,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
   boolean containsEdge(E edge);
 
   long getAmountOfEdges();
+
+  Stream<E> getEdges();
 
   Set<E> getIncomingEdges(N destination);
 

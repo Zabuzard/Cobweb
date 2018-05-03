@@ -154,7 +154,8 @@ public final class Application {
 
     // Create the shortest path algorithm
     final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
-    final IMetric<RoadNode> metric = new LandmarkMetric<>(50, mGraph, landmarkProvider);
+    // TODO Adjust the amount of landmarks
+    final IMetric<RoadNode> metric = new LandmarkMetric<>(100, mGraph, landmarkProvider);
     mComputation = new AStar<>(mGraph, metric);
 
     mRoutingServer = new RoutingServer<>(mConfig, mGraph, mComputation, mDatabase);

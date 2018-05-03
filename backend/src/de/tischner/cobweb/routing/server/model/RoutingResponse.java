@@ -4,13 +4,13 @@ import java.util.List;
 
 public final class RoutingResponse {
   private long mFrom;
-  private List<Journey> mJournes;
+  private List<Journey> mJourneys;
   private long mTo;
 
   public RoutingResponse(final long from, final long to, final List<Journey> journeys) {
     mFrom = from;
     mTo = to;
-    mJournes = journeys;
+    mJourneys = journeys;
   }
 
   private RoutingResponse() {
@@ -22,7 +22,7 @@ public final class RoutingResponse {
   }
 
   public List<Journey> getJourneys() {
-    return mJournes;
+    return mJourneys;
   }
 
   public long getTo() {
@@ -36,8 +36,8 @@ public final class RoutingResponse {
     builder.append(mFrom);
     builder.append(", to=");
     builder.append(mTo);
-    builder.append(", journes=");
-    builder.append(mJournes);
+    builder.append(", journeys=");
+    builder.append(mJourneys);
     builder.append("]");
     return builder.toString();
   }

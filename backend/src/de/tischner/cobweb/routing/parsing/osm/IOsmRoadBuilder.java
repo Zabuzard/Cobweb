@@ -11,4 +11,6 @@ public interface IOsmRoadBuilder<N extends INode & IHasId & ISpatial, E extends 
   E buildEdge(OsmWay way, long sourceId, long destinationId);
 
   N buildNode(OsmNode node);
+
+  void complete();
 }
