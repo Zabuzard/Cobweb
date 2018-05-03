@@ -98,10 +98,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
 
     // Build the route
     route.add(buildNode(path.getSource()));
-    // TODO Add nodes if transportation mode changes
-    route.add(buildPath(path));
-    // Add destination if the path is not empty
+
+    // Only add path and destination if the path is not empty
     if (path.length() != 0) {
+      // TODO Add nodes if transportation mode changes
+      route.add(buildPath(path));
       route.add(buildNode(path.getDestination()));
     }
 

@@ -98,6 +98,4 @@ function sendRequestToServer(request) {
 			handleRouteServerError(textStatus, errorThrown);
 		}
 	});
-	// TODO Remove mock if not needed anymore
-	//handleRouteServerResponse(mockServerResponse());
 }

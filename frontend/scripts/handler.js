@@ -41,8 +41,8 @@ function planRouteFromHashHandler() {
 }
 
 function planRouteHandler() {
-	// Clear any previous error messages
-	clearErrorMessage();
+	// Clear any previous messages
+	clearMessages();
 	// Delete any previous routes
 	clearMapRouteMarker();
 	
@@ -60,7 +60,7 @@ function handleInvalidRequest(request) {
 }
 
 function handleValidRequest(request) {
-	clearErrorMessage();
+	clearMessages();
 	
 	setUrlToRequest(request);
 	
@@ -75,6 +75,13 @@ function handleRouteServerError(status, error) {
 }
 
 function handleRouteServerResponse(response) {
+	// If no path could be computed
+	if (response.journeys.length == 0) {
+		var text = "Not reachable";
+		setInfoMessage(text);
+		return;
+	}
+	
 	// Iterate all journeys
 	for (var i = 0; i < response.journeys.length; i++) {
 		handleJourney(response.journeys[i]);

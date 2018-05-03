@@ -37,7 +37,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
       // Destination is the last entry
       destinationIndex = mEdges.size() - 1;
     }
-    return mEdges.get(destinationIndex).getSource();
+    return mEdges.get(destinationIndex).getDestination();
   }
 
   @Override
