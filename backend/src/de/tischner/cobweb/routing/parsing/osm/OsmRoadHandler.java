@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.db.SpatialNodeData;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
+import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
@@ -24,6 +26,7 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
+import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
 public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements IOsmFileHandler {
@@ -125,6 +128,10 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
       return;
     }
 
+    // Determine way direction
+    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
+    final int wayDirection = OsmParseUtil.getWayDirection(tagToValue);
+
     // Iterate all nodes
     long sourceId = -1;
     for (int i = 0; i < way.getNumberOfNodes(); i++) {
@@ -144,7 +151,12 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
       }
 
       // Create an edge
-      mGraph.addEdge(mBuilder.buildEdge(way, sourceId, destinationId));
+      if (wayDirection == 0 || wayDirection == 1) {
+        mGraph.addEdge(mBuilder.buildEdge(way, sourceId, destinationId));
+      }
+      if (wayDirection == 0 || wayDirection == -1) {
+        mGraph.addEdge(mBuilder.buildEdge(way, destinationId, sourceId));
+      }
 
       // Update for the next iteration
       sourceId = destinationId;

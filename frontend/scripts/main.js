@@ -13,7 +13,7 @@ var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">Open
 var mapMaxZoom = 20;
 var mapDefaultLat = 49.23299;
 var mapDefaultLong = 6.97633;
-var mapDefaultZoom = 10;
+var mapDefaultZoom = 6;
 var map;
 var mapStreetLayer;
 var mapSatelliteLayer;

@@ -1,5 +1,7 @@
 package de.tischner.cobweb.parsing.osm;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,16 +9,35 @@ public final class OsmParseUtil {
   public static final String HIGHWAY_TAG = "highway";
   public static final String MAXSPEED_TAG = "maxspeed";
   public static final String NAME_TAG = "name";
+  public static final String ONEWAY_TAG = "oneway";
   private final static Logger LOGGER = LoggerFactory.getLogger(OsmParseUtil.class);
 
-  public static EHighwayType parseHighwayType(final String highwayText) {
+  public static int getWayDirection(final Map<String, String> tagToValue) {
+    final String onewayText = tagToValue.get(ONEWAY_TAG);
+    if (onewayText == null || onewayText.isEmpty() || onewayText.equals("no") || onewayText.equals("false")
+        || onewayText.equals("0")) {
+      return 0;
+    }
+    if (onewayText.equals("yes") || onewayText.equals("true") || onewayText.equals("1")) {
+      return 1;
+    }
+    if (onewayText.equals("-1") || onewayText.equals("reverse")) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  public static EHighwayType parseHighwayType(final Map<String, String> tagToValue) {
+    final String highwayText = tagToValue.get(HIGHWAY_TAG);
     if (highwayText == null) {
       return null;
     }
     return EHighwayType.fromName(highwayText);
   }
 
-  public static int parseMaxSpeed(final String maxSpeedText) {
+  public static int parseMaxSpeed(final Map<String, String> tagToValue) {
+    final String maxSpeedText = tagToValue.get(MAXSPEED_TAG);
     if (maxSpeedText == null) {
       return -1;
     }

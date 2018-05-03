@@ -122,15 +122,15 @@ public class MemoryDatabase extends ARoutingDatabase {
     final long id = way.getId();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
-    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
-    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
+    final EHighwayType highway = OsmParseUtil.parseHighwayType(tagToValue);
+    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
 
     // Insert tag data
     if (name != null) {
       mNameToWay.put(name, id);
       mWayToName.put(id, name);
     }
-    mWayToHighwayData.put(id, new HighwayData(id, EHighwayType.fromName(highway), maxSpeed));
+    mWayToHighwayData.put(id, new HighwayData(id, highway, maxSpeed));
   }
 
 }

@@ -286,7 +286,7 @@ public final class ExternalDatabase extends ARoutingDatabase {
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
     final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
-    Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
+    Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
     if (maxSpeed == -1) {
       maxSpeed = null;
     }

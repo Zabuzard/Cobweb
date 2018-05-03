@@ -37,8 +37,8 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
 
     // Get information about the highway type
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-    final EHighwayType type = OsmParseUtil.parseHighwayType(tagToValue.get(OsmParseUtil.HIGHWAY_TAG));
-    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
+    final EHighwayType type = OsmParseUtil.parseHighwayType(tagToValue);
+    final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
 
     return new RoadEdge<>(way.getId(), source, destination, type, maxSpeed);
   }

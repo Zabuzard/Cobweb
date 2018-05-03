@@ -45,7 +45,7 @@
 }
 
 #mapLayerChanger {
-  position: relative;
+  position: absolute;
   left: 10px;
   top: 92%;
   top: calc(100% - 2.25rem - 10px);
