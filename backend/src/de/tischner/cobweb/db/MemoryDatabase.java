@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
@@ -104,7 +105,7 @@ public class MemoryDatabase implements IRoutingDatabase {
     final double latitude = node.getLatitude();
     final double longitude = node.getLongitude();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
-    final String name = tagToValue.get(DatabaseUtil.NAME_TAG);
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
 
     // Insert node data
     mNodeToSpatialData.put(id, new SpatialNodeData(id, latitude, longitude));
@@ -120,7 +121,7 @@ public class MemoryDatabase implements IRoutingDatabase {
     // Retrieve information
     final long id = way.getId();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-    final String name = tagToValue.get(DatabaseUtil.NAME_TAG);
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
 
     // Insert tag data
     if (name != null) {

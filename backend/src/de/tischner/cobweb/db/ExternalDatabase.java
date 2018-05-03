@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IDatabaseConfigProvider;
+import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
@@ -225,8 +226,8 @@ public final class ExternalDatabase implements IRoutingDatabase {
     final double latitude = node.getLatitude();
     final double longitude = node.getLongitude();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
-    final String name = tagToValue.get(DatabaseUtil.NAME_TAG);
-    final String highway = tagToValue.get(DatabaseUtil.HIGHWAY_TAG);
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
+    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
 
     // Insert node data
     try (PreparedStatement nodeStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE)) {
@@ -249,9 +250,9 @@ public final class ExternalDatabase implements IRoutingDatabase {
     // Retrieve information
     final long wayId = way.getId();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-    final String name = tagToValue.get(DatabaseUtil.NAME_TAG);
-    final String highway = tagToValue.get(DatabaseUtil.HIGHWAY_TAG);
-    final Integer maxSpeed = DatabaseUtil.parseMaxSpeed(tagToValue.get(DatabaseUtil.MAXSPEED_TAG));
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
+    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
+    final Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue.get(OsmParseUtil.MAXSPEED_TAG));
 
     // Insert tag data
     try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_WAY_TAGS)) {
