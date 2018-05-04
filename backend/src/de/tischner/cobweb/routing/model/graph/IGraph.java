@@ -27,5 +27,5 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
 
   void reverse();
 
-  long size();
+  int size();
 }

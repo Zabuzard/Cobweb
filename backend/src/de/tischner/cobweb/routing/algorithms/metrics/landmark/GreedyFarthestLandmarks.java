@@ -33,7 +33,7 @@ public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, 
   public Collection<N> getLandmarks(final int amount) {
     int amountToUse = amount;
     if (amount > mGraph.size()) {
-      amountToUse = (int) mGraph.size();
+      amountToUse = mGraph.size();
     }
 
     final Collection<N> landmarks = new ArrayList<>(amountToUse);

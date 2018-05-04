@@ -28,7 +28,7 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
   public Collection<N> getLandmarks(final int amount) {
     int amountToUse = amount;
     if (amount > mGraph.size()) {
-      amountToUse = (int) mGraph.size();
+      amountToUse = mGraph.size();
     }
 
     final Collection<N> landmarks = new ArrayList<>(amountToUse);

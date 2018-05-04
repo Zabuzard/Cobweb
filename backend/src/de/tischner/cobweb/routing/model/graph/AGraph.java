@@ -80,7 +80,7 @@ public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGr
   }
 
   @Override
-  public long size() {
+  public int size() {
     return getNodes().size();
   }
 
