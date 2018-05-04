@@ -61,6 +61,7 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     final ExecutorService executor = Executors.newCachedThreadPool();
     int requestId = -1;
 
+    LOGGER.info("Server ready and waiting for clients");
     while (mShouldRun) {
       try {
         // Accept a client, the handler will close it

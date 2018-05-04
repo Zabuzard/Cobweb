@@ -7,6 +7,8 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tischner.cobweb.config.IDatabaseConfigProvider;
+import de.tischner.cobweb.parsing.RecentHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.topobyte.osm4j.core.model.iface.OsmBounds;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
@@ -20,28 +22,41 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   private int mBufferIndex;
   private final IRoutingDatabase mDatabase;
   private final OsmEntity[] mEntityBuffer;
+  private final RecentHandler mRecentHandler;
+  private final boolean mUseExternalDb;
 
-  public OsmDatabaseHandler(final IRoutingDatabase database) {
+  public OsmDatabaseHandler(final IRoutingDatabase database, final IDatabaseConfigProvider config) throws IOException {
     mEntityBuffer = new OsmEntity[BUFFER_SIZE];
     mDatabase = database;
-    mBufferIndex = 0;
+
+    mUseExternalDb = config.useExternalDb();
+    if (mUseExternalDb) {
+      mRecentHandler = new RecentHandler(config.getDbInfo());
+    } else {
+      mRecentHandler = null;
+    }
   }
 
   @Override
   public boolean acceptFile(final Path file) {
-    // TODO Check cache to see which files are needed
-    // We are interested in all OSM files
-    final boolean accept = true;
-    if (accept) {
-      LOGGER.info("Accepts file {}", file);
+    // Check if the files content is not already included in the database
+    if (mUseExternalDb && !mRecentHandler.acceptFile(file)) {
+      return false;
     }
-    return accept;
+
+    // Accept all OSM files
+    LOGGER.info("Accepts file {}", file);
+    return true;
   }
 
   @Override
   public void complete() throws IOException {
     // Submit buffer
     offerBuffer();
+
+    if (mUseExternalDb) {
+      mRecentHandler.updateInfo();
+    }
   }
 
   @Override

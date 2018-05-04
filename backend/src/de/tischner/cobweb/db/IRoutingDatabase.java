@@ -24,7 +24,11 @@ public interface IRoutingDatabase {
 
   Optional<String> getWayName(long id);
 
+  void initialize();
+
   void offerOsmEntities(Iterable<OsmEntity> entities, int size);
 
   void offerOsmEntities(Stream<OsmEntity> entities, int size);
+
+  void shutdown();
 }

@@ -27,8 +27,18 @@ public final class ConfigStore
   }
 
   @Override
+  public Path getDbInfo() {
+    return Paths.get(getSetting(ConfigUtil.KEY_DB_INFO));
+  }
+
+  @Override
   public Path getGraphCache() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE));
+  }
+
+  @Override
+  public Path getGraphCacheInfo() {
+    return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE_INFO));
   }
 
   @Override
@@ -81,6 +91,11 @@ public final class ConfigStore
   }
 
   @Override
+  public boolean useExternalDb() {
+    return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_EXTERNAL_DB));
+  }
+
+  @Override
   public boolean useGraphCache() {
     return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_GRAPH_CACHE));
   }
@@ -96,6 +111,8 @@ public final class ConfigStore
     // Database settings
     mDefaultSettings.put(ConfigUtil.KEY_JDBC_URL, ConfigUtil.VALUE_JDBC_URL);
     mDefaultSettings.put(ConfigUtil.KEY_INIT_DB_SCRIPT, ConfigUtil.VALUE_INIT_DB_SCRIPT.toString());
+    mDefaultSettings.put(ConfigUtil.KEY_USE_EXTERNAL_DB, String.valueOf(ConfigUtil.VALUE_USE_EXTERNAL_DB));
+    mDefaultSettings.put(ConfigUtil.KEY_DB_INFO, ConfigUtil.VALUE_DB_INFO.toString());
 
     // Parse settings
     mDefaultSettings.put(ConfigUtil.KEY_OSM_DIRECTORY, ConfigUtil.VALUE_OSM_DIRECTORY.toString());
@@ -104,6 +121,7 @@ public final class ConfigStore
     // Routing settings
     mDefaultSettings.put(ConfigUtil.KEY_GRAPH_CACHE, ConfigUtil.VALUE_GRAPH_CACHE.toString());
     mDefaultSettings.put(ConfigUtil.KEY_USE_GRAPH_CACHE, String.valueOf(ConfigUtil.VALUE_USE_GRAPH_CACHE));
+    mDefaultSettings.put(ConfigUtil.KEY_GRAPH_CACHE_INFO, ConfigUtil.VALUE_GRAPH_CACHE_INFO.toString());
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_SERVER_PORT, String.valueOf(ConfigUtil.VALUE_ROUTING_SERVER_PORT));
     mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
   }

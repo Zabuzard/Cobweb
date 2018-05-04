@@ -10,8 +10,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.db.SpatialNodeData;
+import de.tischner.cobweb.parsing.RecentHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
@@ -38,15 +40,23 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   private final IRoutingDatabase mDatabase;
   private final IOsmFilter mFilter;
   private final G mGraph;
+  private final RecentHandler mRecentHandler;
+  private final boolean mUseGraphCache;
 
   public OsmRoadHandler(final G graph, final IOsmFilter filter, final IOsmRoadBuilder<N, E> builder,
-      final IRoutingDatabase database) {
+      final IRoutingDatabase database, final IRoutingConfigProvider config) throws IOException {
     mGraph = graph;
     mFilter = filter;
     mBuilder = builder;
     mDatabase = database;
     mBufferedRequests = new long[BUFFER_SIZE];
-    mBufferIndex = 0;
+
+    mUseGraphCache = config.useGraphCache();
+    if (mUseGraphCache) {
+      mRecentHandler = new RecentHandler(config.getGraphCacheInfo());
+    } else {
+      mRecentHandler = null;
+    }
   }
 
   /*
@@ -56,13 +66,14 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    */
   @Override
   public boolean acceptFile(final Path file) {
-    // TODO Check cache to see which files are needed
-    // We are interested in all OSM files
-    final boolean accept = true;
-    if (accept) {
-      LOGGER.info("Accepts file {}", file);
+    // Check if the files content is not already included in the cache
+    if (mUseGraphCache && !mRecentHandler.acceptFile(file)) {
+      return false;
     }
-    return accept;
+
+    // Accept all OSM files
+    LOGGER.info("Accepts file {}", file);
+    return true;
   }
 
   /*
@@ -74,7 +85,11 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   public void complete() throws IOException {
     // Submit buffer
     submitBufferedRequests();
+
     mBuilder.complete();
+    if (mUseGraphCache) {
+      mRecentHandler.updateInfo();
+    }
   }
 
   /*

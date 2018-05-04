@@ -53,7 +53,7 @@ public final class OsmParser {
     }
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("OSM files were {}, only considering {}", allPaths, pathsToConsider);
+      LOGGER.debug("OSM files are {}, only considering {}", allPaths, pathsToConsider);
     }
     return pathsToConsider;
   }

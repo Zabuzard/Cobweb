@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IDatabaseConfigProvider;
+import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
@@ -207,13 +208,18 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
-  public void initialize() throws SQLException, IOException {
+  @Override
+  public void initialize() throws ParseException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Ensuring database has correct layout.");
     }
     // Create database tables if they don't exist already
     final Path initDbScript = mConfig.getInitDbScript();
-    ScriptExecutor.executeScript(initDbScript, createConnection());
+    try {
+      ScriptExecutor.executeScript(initDbScript, createConnection());
+    } catch (SQLException | IOException e) {
+      throw new ParseException(e);
+    }
   }
 
   @Override
@@ -245,6 +251,7 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  @Override
   public void shutdown() {
     LOGGER.info("Shutting down database");
     // TODO Implement something

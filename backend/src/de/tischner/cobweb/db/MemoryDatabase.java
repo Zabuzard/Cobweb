@@ -85,6 +85,11 @@ public class MemoryDatabase extends ARoutingDatabase {
   }
 
   @Override
+  public void initialize() {
+    // Do nothing
+  }
+
+  @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Offering {} nodes to the database", size);
@@ -97,6 +102,12 @@ public class MemoryDatabase extends ARoutingDatabase {
         addOsmWay((OsmWay) entity);
       }
     });
+  }
+
+  @Override
+  public void shutdown() {
+    LOGGER.info("Shutting down database");
+    // Do nothing
   }
 
   private void addOsmNode(final OsmNode node) {

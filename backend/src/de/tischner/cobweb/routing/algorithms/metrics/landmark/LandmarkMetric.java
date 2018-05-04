@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra;
@@ -15,6 +18,7 @@ import de.tischner.cobweb.util.NestedMap;
 
 public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends IGraph<N, E>> implements IMetric<N> {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(LandmarkMetric.class);
   private Collection<N> mLandmarks;
   private final NestedMap<N, N, Double> mLandmarkToNodeDistance;
   private final NestedMap<N, N, Double> mNodeToLandmarkDistance;
@@ -53,9 +57,15 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
 
   private void initialize(final int amount, final G graph, final ILandmarkProvider<N> landmarkProvider,
       final IShortestPathComputation<N, E> computation) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Computing landmarks");
+    }
     mLandmarks = landmarkProvider.getLandmarks(amount);
 
     // Compute distances from landmarks to all other nodes
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Computing distances from {} landmarks to {} nodes", mLandmarks.size(), graph.size());
+    }
     for (final N landmark : mLandmarks) {
       final Map<N, ? extends IHasPathCost> nodeToDistance = computation.computeShortestPathCostsReachable(landmark);
       for (final Entry<N, ? extends IHasPathCost> entry : nodeToDistance.entrySet()) {
@@ -64,6 +74,9 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
     }
 
     // Compute distances from all nodes to landmarks
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Computing distances from {} nodes to {} landmarks", graph.size(), mLandmarks.size());
+    }
     graph.reverse();
     for (final N landmark : mLandmarks) {
       final Map<N, ? extends IHasPathCost> nodeToDistance = computation.computeShortestPathCostsReachable(landmark);

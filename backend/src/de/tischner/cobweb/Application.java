@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
@@ -16,6 +15,8 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
 import de.tischner.cobweb.db.ExternalDatabase;
+import de.tischner.cobweb.db.IRoutingDatabase;
+import de.tischner.cobweb.db.MemoryDatabase;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
@@ -43,7 +44,7 @@ public final class Application {
   private IShortestPathComputation<RoadNode, RoadEdge<RoadNode>> mComputation;
   private ConfigStore mConfig;
   private ConfigLoader mConfigLoader;
-  private ExternalDatabase mDatabase;
+  private IRoutingDatabase mDatabase;
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
   private Logger mLogger;
 
@@ -99,23 +100,34 @@ public final class Application {
   }
 
   private Iterable<IOsmFileHandler> createOsmDatabaseHandler() {
-    final IOsmFileHandler databaseHandler = new OsmDatabaseHandler(mDatabase);
-    return Collections.singletonList(databaseHandler);
+    try {
+      final IOsmFileHandler databaseHandler = new OsmDatabaseHandler(mDatabase, mConfig);
+      return Collections.singletonList(databaseHandler);
+    } catch (final IOException e) {
+      throw new ParseException(e);
+    }
   }
 
   private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
     final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph);
     final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
-    final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder, mDatabase);
-    return Collections.singletonList(roadHandler);
+    try {
+      final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder, mDatabase, mConfig);
+      return Collections.singletonList(roadHandler);
+    } catch (final IOException e) {
+      throw new ParseException(e);
+    }
   }
 
   private void initializeApi() throws ParseException {
+    final Instant initAPIStartTime = Instant.now();
+
     initializeDatabase();
     initializeGraph();
 
-    // TODO Decide if parsing is needed by checking caches and setting up file
-    // filter
+    final int graphSizeBefore = mGraph.size();
+
+    // Prepare data parsing
     final DataParser dataParser = new DataParser(mConfig);
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
@@ -126,22 +138,26 @@ public final class Application {
     final Instant parseEndTime = Instant.now();
     mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
 
-    // TODO Only do that if the graph had handler at all, i.e. did change
-    serializeGraphIfDesired();
+    serializeGraphIfDesired(graphSizeBefore);
 
     mLogger.info("Graph size: {}", mGraph.getSizeInformation());
 
     initializeRouting();
+
+    final Instant initEndTime = Instant.now();
+    mLogger.info("Initialization of API took: {}", Duration.between(initAPIStartTime, initEndTime));
   }
 
   private void initializeDatabase() throws ParseException {
     mLogger.info("Initializing database");
-    mDatabase = new ExternalDatabase(mConfig);
-    try {
-      mDatabase.initialize();
-    } catch (SQLException | IOException e) {
-      throw new ParseException(e);
+
+    if (mConfig.useExternalDb()) {
+      mDatabase = new ExternalDatabase(mConfig);
+    } else {
+      mDatabase = new MemoryDatabase();
     }
+
+    mDatabase.initialize();
   }
 
   private void initializeGraph() throws ParseException {
@@ -171,18 +187,21 @@ public final class Application {
   private void initializeRouting() {
     mLogger.info("Initializing routing");
 
+    final Instant preCompTimeStart = Instant.now();
     // Create the shortest path algorithm
     final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
     // TODO Adjust the amount of landmarks, use some constant
-    final IMetric<RoadNode> metric = new LandmarkMetric<>(100, mGraph, landmarkProvider);
+    final IMetric<RoadNode> metric = new LandmarkMetric<>(50, mGraph, landmarkProvider);
     mComputation = new AStar<>(mGraph, metric);
+    final Instant preCompTimeEnd = Instant.now();
+    mLogger.info("Precomputation took: {}", Duration.between(preCompTimeStart, preCompTimeEnd));
 
     mRoutingServer = new RoutingServer<>(mConfig, mGraph, mComputation, mDatabase);
     mRoutingServer.initialize();
   }
 
-  private void serializeGraphIfDesired() throws ParseException {
-    if (!mConfig.useGraphCache()) {
+  private void serializeGraphIfDesired(final int graphSizeBefore) throws ParseException {
+    if (!mConfig.useGraphCache() || mGraph.size() == graphSizeBefore) {
       return;
     }
 
