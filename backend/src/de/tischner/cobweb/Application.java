@@ -1,6 +1,7 @@
 package de.tischner.cobweb;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
+import de.tischner.cobweb.util.SerializationUtil;
 
 public final class Application {
   private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
@@ -112,7 +114,8 @@ public final class Application {
     initializeDatabase();
     initializeGraph();
 
-    // TODO Decide if parsing is need by checking caches and setting up file filter
+    // TODO Decide if parsing is needed by checking caches and setting up file
+    // filter
     final DataParser dataParser = new DataParser(mConfig);
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
@@ -122,6 +125,9 @@ public final class Application {
     dataParser.parseData();
     final Instant parseEndTime = Instant.now();
     mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
+
+    // TODO Only do that if the graph had handler at all, i.e. did change
+    serializeGraphIfDesired();
 
     mLogger.info("Graph size: {}", mGraph.getSizeInformation());
 
@@ -138,10 +144,23 @@ public final class Application {
     }
   }
 
-  private void initializeGraph() {
+  private void initializeGraph() throws ParseException {
     mLogger.info("Initializing graph");
-    // TODO Check cache and deserialize
-    mGraph = new RoadGraph<>();
+
+    final Path graphCache = mConfig.getGraphCache();
+    if (!mConfig.useGraphCache() || !Files.isRegularFile(graphCache)) {
+      mGraph = new RoadGraph<>();
+      return;
+    }
+
+    // Deserialize graph
+    mLogger.info("Deserializing graph from: {}", graphCache);
+    final SerializationUtil<RoadGraph<RoadNode, RoadEdge<RoadNode>>> serializationUtil = new SerializationUtil<>();
+    try {
+      mGraph = serializationUtil.deserialize(graphCache);
+    } catch (ClassNotFoundException | ClassCastException | IOException e) {
+      throw new ParseException(e);
+    }
   }
 
   private void initializeLogger() {
@@ -154,12 +173,27 @@ public final class Application {
 
     // Create the shortest path algorithm
     final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
-    // TODO Adjust the amount of landmarks
+    // TODO Adjust the amount of landmarks, use some constant
     final IMetric<RoadNode> metric = new LandmarkMetric<>(100, mGraph, landmarkProvider);
     mComputation = new AStar<>(mGraph, metric);
 
     mRoutingServer = new RoutingServer<>(mConfig, mGraph, mComputation, mDatabase);
     mRoutingServer.initialize();
+  }
+
+  private void serializeGraphIfDesired() throws ParseException {
+    if (!mConfig.useGraphCache()) {
+      return;
+    }
+
+    final Path graphCache = mConfig.getGraphCache();
+    mLogger.info("Serializing graph to: {}", graphCache);
+    final SerializationUtil<RoadGraph<RoadNode, RoadEdge<RoadNode>>> serializationUtil = new SerializationUtil<>();
+    try {
+      serializationUtil.serialize(mGraph, graphCache);
+    } catch (final IOException e) {
+      throw new ParseException(e);
+    }
   }
 
 }

@@ -1,5 +1,7 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
-public interface IReversedProvider {
+import java.io.Serializable;
+
+public interface IReversedProvider extends Serializable {
   boolean isReversed();
 }

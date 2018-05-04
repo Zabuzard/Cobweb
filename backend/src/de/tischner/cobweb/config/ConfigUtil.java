@@ -12,7 +12,7 @@ final class ConfigUtil {
   final static String KEY_OSM_ROAD_FILTER = "osmRoadFilter";
   final static String KEY_ROUTING_SERVER_PORT = "routingServerPort";
   final static String KEY_USE_GRAPH_CACHE = "useGraphCache";
-  final static Path VALUE_GRAPH_CACHE = Paths.get("backend", "res", "cache");
+  final static Path VALUE_GRAPH_CACHE = Paths.get("backend", "res", "cache", "graph.ser");
   final static Path VALUE_GTFS_DIRECTORY = Paths.get("backend", "res", "input", "gtfs");
   final static Path VALUE_INIT_DB_SCRIPT = Paths.get("backend", "res", "db", "initDb.sql");
   final static String VALUE_JDBC_URL = "jdbc:sqlite:backend/res/db/routing.db";

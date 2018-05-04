@@ -4,7 +4,7 @@ package de.tischner.cobweb.routing.algorithms.scc.tarjan;
  * Tasks a {@link TarjanTaskElement} of Tarjans algorithm for SCC computation
  * wanders through until completion.
  *
- * @author Zabuza {@literal <zabuza.dev@gmail.com>}
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public enum ETarjanTask {

@@ -3,7 +3,7 @@ package de.tischner.cobweb.util;
 /**
  * Object for generic triples which hold three objects of given types.
  *
- * @author Zabuza {@literal <zabuza.dev@gmail.com>}
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  * @param <E1> First type
  * @param <E2> Second type

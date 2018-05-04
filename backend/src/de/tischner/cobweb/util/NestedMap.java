@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Nested hash map which uses two keys in a nested structure for storing values.
  *
- * @author Zabuza {@literal <zabuza.dev@gmail.com>}
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  * @param <K1> Type of the first key
  * @param <K2> Type of the second key

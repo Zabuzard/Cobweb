@@ -1,5 +1,6 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +11,9 @@ import de.tischner.cobweb.routing.model.graph.AGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class RoadGraph<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId & IReversedConsumer>
+public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable, E extends IEdge<N> & IHasId & IReversedConsumer & Serializable>
     extends AGraph<N, E> implements ICanGetNodeById<N>, IReversedProvider {
+  private static final long serialVersionUID = 1L;
   private final Map<Long, N> mIdToNode;
   private boolean mIsReversed;
 

@@ -3,7 +3,7 @@ package de.tischner.cobweb.util.http;
 /**
  * Enumeration of valid HTTP/1.0 states.
  *
- * @author Zabuza {@literal <zabuza.dev@gmail.com>}
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public enum EHttpStatus {

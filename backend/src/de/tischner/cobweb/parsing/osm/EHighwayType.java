@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Types of highways.
  *
- * @author Zabuza {@literal <zabuza.dev@gmail.com>}
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public enum EHighwayType {

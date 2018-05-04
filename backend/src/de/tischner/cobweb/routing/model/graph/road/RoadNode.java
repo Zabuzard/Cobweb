@@ -1,9 +1,12 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
+import java.io.Serializable;
+
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class RoadNode implements INode, IHasId, ISpatial {
+public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
+  private static final long serialVersionUID = 1L;
   private final long mId;
   private double mLatitude;
   private double mLongitude;

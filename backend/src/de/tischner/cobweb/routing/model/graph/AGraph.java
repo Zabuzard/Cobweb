@@ -1,5 +1,6 @@
 package de.tischner.cobweb.routing.model.graph;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +10,9 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
-public abstract class AGraph<N extends INode, E extends IEdge<N>> implements IGraph<N, E> {
+public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> & Serializable>
+    implements IGraph<N, E>, Serializable {
+  private static final long serialVersionUID = 1L;
   private long mAmountOfEdges;
   private final Map<N, Set<E>> mNodeToIncomingEdges;
   private final Map<N, Set<E>> mNodeToOutgoingEdges;
