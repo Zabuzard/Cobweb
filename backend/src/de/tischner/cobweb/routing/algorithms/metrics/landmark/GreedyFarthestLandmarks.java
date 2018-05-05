@@ -16,19 +16,56 @@ import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
 
+/**
+ * Implementation of a landmark provider that greedily selects landmarks that
+ * are farthest away from each other.<br>
+ * <br>
+ * The resulting set of landmarks is thus distributed well along the graph.
+ * Distances are computed by using a {@link IShortestPathComputation} on the
+ * whole graph for every landmark. Thus, depending on the graph size and the
+ * amount of landmarks, the landmark selection might take a while.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the nodes and landmarks
+ * @param <E> Type of the edges
+ * @param <G> Type of the graph
+ */
 public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, G extends IGraph<N, E>>
     implements ILandmarkProvider<N> {
-
+  /**
+   * Algorithm to use for computing distances between nodes.
+   */
   private final IShortestPathComputation<N, E> mComputation;
+  /**
+   * The graph to operate on.
+   */
   private final G mGraph;
+  /**
+   * The random number generator to use for selection of the first landmark.
+   */
   private final Random mRandom;
 
+  /**
+   * Creates a new landmark provider which generates landmarks on the given graph.
+   *
+   * @param graph The graph to select landmarks from
+   */
   public GreedyFarthestLandmarks(final G graph) {
     mGraph = graph;
     mRandom = new Random();
     mComputation = new Dijkstra<>(graph);
   }
 
+  /**
+   * Greedily selects nodes from the graph as landmarks that are farthest away
+   * from each other.<br>
+   * <br>
+   * The resulting collection of landmarks is thus distributed well along the
+   * graph. Distances are computed by using a {@link IShortestPathComputation} on
+   * the whole graph for every landmark. Thus, depending on the graph size and the
+   * amount of landmarks, the landmark selection might take a while.
+   */
   @Override
   public Collection<N> getLandmarks(final int amount) {
     int amountToUse = amount;
