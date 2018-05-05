@@ -12,13 +12,44 @@ import java.util.StringJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class that is able to execute SQL script files on a given database
+ * connection.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class ScriptExecutor {
-
+  /**
+   * Logger used for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
+
+  /**
+   * Separator used in a SQL query to separate single parts of a statement. Used
+   * for converting a multi-line statement into an one-line statement.
+   */
   private static final String QUERY_SEPARATOR = " ";
+  /**
+   * Prefix used in SQL to indicate a comment. Lines that start with this prefix
+   * will be ignored.
+   */
   private static final String SQL_COMMENT = "--";
+  /**
+   * Symbol that acts as a delimiter of statements.
+   */
   private static final String STATEMENT_DELIMITER = ";";
 
+  /**
+   * Executes the given SQL script on the given database connection.
+   *
+   * @param script     Path to the SQL script to execute
+   * @param connection Database connection to execute the script on
+   * @throws SQLException If an SQL exception occurred while executing the
+   *                      statements
+   * @throws IOException  If an I/O exception occurred while reading the SQL
+   *                      script
+   */
   public static void executeScript(final Path script, final Connection connection) throws SQLException, IOException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Parsing script: {}", script);
@@ -73,6 +104,13 @@ public final class ScriptExecutor {
       }
       connection.setAutoCommit(autoCommitBefore);
     }
+  }
+
+  /**
+   * Utility class. No implementation.
+   */
+  private ScriptExecutor() {
+
   }
 
 }

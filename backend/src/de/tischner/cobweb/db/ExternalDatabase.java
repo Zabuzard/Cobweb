@@ -30,15 +30,121 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
+/**
+ * Implementation of a {@link IRoutingDatabase} which connects to an external
+ * database by using JDBC.<br>
+ * <br>
+ * Settings are provided by a {@link IDatabaseConfigProvider} that is passed to
+ * a constructor. Use {@link #initialize()} before using the database and
+ * {@link #shutdown()} when finished using the it.<br>
+ * <br>
+ * Push data to the database by using {@link #offerOsmEntities(Iterable, int)}
+ * and similar methods.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class ExternalDatabase extends ARoutingDatabase {
-
+  /**
+   * The logger to use for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
+
+  /**
+   * Pushes the given OSM node to the database if not already contained.<br>
+   * <br>
+   * In case multiple nodes are to be pushed, auto-commit should be set to
+   * <tt>false</tt> before calling the method. The method will not force a commit
+   * on its own.
+   *
+   * @param node       The node to push to the database
+   * @param connection The connection to the database
+   * @throws SQLException If an SQL exception occurred while trying to execute the
+   *                      update
+   */
+  private static void queueOsmNode(final OsmNode node, final Connection connection) throws SQLException {
+    // Retrieve information
+    final long id = node.getId();
+    final double latitude = node.getLatitude();
+    final double longitude = node.getLongitude();
+    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
+    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
+
+    // Insert node data
+    try (PreparedStatement nodeStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE)) {
+      nodeStatement.setLong(1, id);
+      nodeStatement.setDouble(2, latitude);
+      nodeStatement.setDouble(3, longitude);
+      nodeStatement.executeUpdate();
+    }
+
+    // Insert tag data
+    try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE_TAGS)) {
+      tagStatement.setLong(1, id);
+      DatabaseUtil.setStringOrNull(2, name, tagStatement);
+      DatabaseUtil.setStringOrNull(3, highway, tagStatement);
+      tagStatement.executeUpdate();
+    }
+  }
+
+  /**
+   * Pushes the given OSM way to the database if not already contained.<br>
+   * <br>
+   * In case multiple ways are to be pushed, auto-commit should be set to
+   * <tt>false</tt> before calling the method. The method will not force a commit
+   * on its own.
+   *
+   * @param way        The way to push to the database
+   * @param connection The connection to the database
+   * @throws SQLException If an SQL exception occurred while trying to execute the
+   *                      update
+   */
+  private static void queueOsmWay(final OsmWay way, final Connection connection) throws SQLException {
+    // Retrieve information
+    final long wayId = way.getId();
+    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
+    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
+    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
+    Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
+    if (maxSpeed == -1) {
+      maxSpeed = null;
+    }
+
+    // Insert tag data
+    try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_WAY_TAGS)) {
+      tagStatement.setLong(1, wayId);
+      DatabaseUtil.setStringOrNull(2, name, tagStatement);
+      DatabaseUtil.setStringOrNull(3, highway, tagStatement);
+      DatabaseUtil.setIntOrNull(4, maxSpeed, tagStatement);
+      tagStatement.executeUpdate();
+    }
+  }
+
+  /**
+   * The configuration provider.
+   */
   private final IDatabaseConfigProvider mConfig;
 
+  /**
+   * Creates a new external database object which uses the configuration given by
+   * the provider.<br>
+   * <br>
+   * Use {@link #initialize()} before using the database and {@link #shutdown()}
+   * when finished using it.
+   *
+   * @param config The configuration provider
+   */
   public ExternalDatabase(final IDatabaseConfigProvider config) {
     mConfig = config;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
+   * LongStream, int)
+   */
   @Override
   public Collection<HighwayData> getHighwayData(final LongStream wayIds, final int size) {
     // Build the query
@@ -83,10 +189,15 @@ public final class ExternalDatabase extends ARoutingDatabase {
     return wayData;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
+   */
   @Override
   public Optional<Long> getNodeByName(final String name) {
     try (Connection connection = createConnection()) {
-      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_NAME_BY_ID)) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_ID_BY_NAME)) {
         statement.setString(1, name);
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Getting node by name {}, query is: {}", name, statement);
@@ -104,13 +215,18 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeName(long)
+   */
   @Override
   public Optional<String> getNodeName(final long id) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Getting node name by id: {}", id);
     }
     try (Connection connection = createConnection()) {
-      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_ID_BY_NAME)) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_NAME_BY_ID)) {
         statement.setLong(1, id);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
@@ -125,6 +241,13 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
+   * LongStream, int)
+   */
   @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
     // Build the query
@@ -166,13 +289,18 @@ public final class ExternalDatabase extends ARoutingDatabase {
     return nodeData;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getWayByName(java.lang.String)
+   */
   @Override
   public Optional<Long> getWayByName(final String name) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Getting way by name: {}", name);
     }
     try (Connection connection = createConnection()) {
-      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_NAME_BY_ID)) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_ID_BY_NAME)) {
         statement.setString(1, name);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
@@ -187,13 +315,18 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getWayName(long)
+   */
   @Override
   public Optional<String> getWayName(final long id) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Getting way name by id: {}", id);
     }
     try (Connection connection = createConnection()) {
-      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_ID_BY_NAME)) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_NAME_BY_ID)) {
         statement.setLong(1, id);
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
@@ -208,6 +341,11 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#initialize()
+   */
   @Override
   public void initialize() throws ParseException {
     if (LOGGER.isDebugEnabled()) {
@@ -222,6 +360,13 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#offerOsmEntities(java.util.stream.
+   * Stream, int)
+   */
   @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
     if (LOGGER.isDebugEnabled()) {
@@ -234,9 +379,9 @@ public final class ExternalDatabase extends ARoutingDatabase {
       entities.forEach(entity -> {
         try {
           if (entity instanceof OsmNode) {
-            queueOsmNode((OsmNode) entity, connection);
+            ExternalDatabase.queueOsmNode((OsmNode) entity, connection);
           } else if (entity instanceof OsmWay) {
-            queueOsmWay((OsmWay) entity, connection);
+            ExternalDatabase.queueOsmWay((OsmWay) entity, connection);
           }
         } catch (final SQLException e) {
           LOGGER.error("Error queueing entity for database insertion: {}", entity, e);
@@ -251,61 +396,28 @@ public final class ExternalDatabase extends ARoutingDatabase {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#shutdown()
+   */
   @Override
   public void shutdown() {
     LOGGER.info("Shutting down database");
     // TODO Implement something
   }
 
+  /**
+   * Creates a connection to the external database by using the JDBC URL provided
+   * by the configuration provider.
+   *
+   * @return The connection to the external database
+   * @throws SQLException If an SQL exception occurred while trying to connect to
+   *                      the external database. For example if the JDB URL was
+   *                      invalid.
+   */
   private Connection createConnection() throws SQLException {
     return DriverManager.getConnection(mConfig.getJDBCUrl());
-  }
-
-  private void queueOsmNode(final OsmNode node, final Connection connection) throws SQLException {
-    // Retrieve information
-    final long id = node.getId();
-    final double latitude = node.getLatitude();
-    final double longitude = node.getLongitude();
-    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
-    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
-    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
-
-    // Insert node data
-    try (PreparedStatement nodeStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE)) {
-      nodeStatement.setLong(1, id);
-      nodeStatement.setDouble(2, latitude);
-      nodeStatement.setDouble(3, longitude);
-      nodeStatement.executeUpdate();
-    }
-
-    // Insert tag data
-    try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE_TAGS)) {
-      tagStatement.setLong(1, id);
-      DatabaseUtil.setStringOrNull(2, name, tagStatement);
-      DatabaseUtil.setStringOrNull(3, highway, tagStatement);
-      tagStatement.executeUpdate();
-    }
-  }
-
-  private void queueOsmWay(final OsmWay way, final Connection connection) throws SQLException {
-    // Retrieve information
-    final long wayId = way.getId();
-    final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-    final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
-    final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
-    Integer maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
-    if (maxSpeed == -1) {
-      maxSpeed = null;
-    }
-
-    // Insert tag data
-    try (PreparedStatement tagStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_WAY_TAGS)) {
-      tagStatement.setLong(1, wayId);
-      DatabaseUtil.setStringOrNull(2, name, tagStatement);
-      DatabaseUtil.setStringOrNull(3, highway, tagStatement);
-      DatabaseUtil.setIntOrNull(4, maxSpeed, tagStatement);
-      tagStatement.executeUpdate();
-    }
   }
 
 }

@@ -22,21 +22,7 @@ public final class FileUtil {
   }
 
   private static EFileExtension parseFileExtension(final String extension) {
-    final String extensionLowered = extension.toLowerCase();
-    switch (extensionLowered) {
-    case "":
-      return EFileExtension.NONE;
-    case "bz2":
-      return EFileExtension.B_ZIP_TWO;
-    case "gz":
-      return EFileExtension.G_ZIP;
-    case "xz":
-      return EFileExtension.XZ;
-    case "osm":
-      return EFileExtension.OSM;
-    default:
-      return EFileExtension.UNKNOWN;
-    }
+    return EFileExtension.fromName(extension.toLowerCase());
   }
 
   /**

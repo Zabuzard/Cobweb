@@ -8,12 +8,34 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Stores configuration properties for the application. Used together with
+ * {@link ConfigLoader} to load and save the configuration from and to a
+ * file.<br>
+ * <br>
+ * The store provides default configuration values for all properties.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class ConfigStore
     implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider, IDatabaseConfigProvider {
+  /**
+   * The logger to use for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(ConfigStore.class);
+  /**
+   * The default settings as key-value pair.
+   */
   private final Map<String, String> mDefaultSettings;
+  /**
+   * The current settings as key-value pair.
+   */
   private final Map<String, String> mSettings;
 
+  /**
+   * Creates a configuration store that is initialized with default values.
+   */
   public ConfigStore() {
     mDefaultSettings = new HashMap<>();
     setupDefaultSettings();
@@ -21,56 +43,111 @@ public final class ConfigStore
     mSettings = new HashMap<>(mDefaultSettings);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IConfigProvider#getAllSettings()
+   */
   @Override
   public Map<String, String> getAllSettings() {
     return mSettings;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getDbInfo()
+   */
   @Override
   public Path getDbInfo() {
     return Paths.get(getSetting(ConfigUtil.KEY_DB_INFO));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCache()
+   */
   @Override
   public Path getGraphCache() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCacheInfo()
+   */
   @Override
   public Path getGraphCacheInfo() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE_INFO));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IParseConfigProvider#getGtfsDirectory()
+   */
   @Override
   public Path getGtfsDirectory() {
     return Paths.get(getSetting(ConfigUtil.KEY_GTFS_DIRECTORY));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getInitDbScript()
+   */
   @Override
   public Path getInitDbScript() {
     return Paths.get(getSetting(ConfigUtil.KEY_INIT_DB_SCRIPT));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getJDBCUrl()
+   */
   @Override
   public String getJDBCUrl() {
     return getSetting(ConfigUtil.KEY_JDBC_URL);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IParseConfigProvider#getOsmDirectory()
+   */
   @Override
   public Path getOsmDirectory() {
     return Paths.get(getSetting(ConfigUtil.KEY_OSM_DIRECTORY));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getOsmRoadFilter()
+   */
   @Override
   public Path getOsmRoadFilter() {
     return Paths.get(getSetting(ConfigUtil.KEY_OSM_ROAD_FILTER));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getRoutingServerPort()
+   */
   @Override
   public int getRoutingServerPort() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_ROUTING_SERVER_PORT));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IConfigProvider#getSetting(java.lang.String)
+   */
   @Override
   public String getSetting(final String key) {
     final String value = mSettings.get(key);
@@ -80,30 +157,59 @@ public final class ConfigStore
     return value;
   }
 
+  /**
+   * Resets all settings of the store to their default values.
+   */
   public void resetToDefaultValues() {
     mSettings.clear();
     mSettings.putAll(mDefaultSettings);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IConfigProvider#setSetting(java.lang.String,
+   * java.lang.String)
+   */
   @Override
   public void setSetting(final String key, final String value) {
     mSettings.put(key, value);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#useExternalDb()
+   */
   @Override
   public boolean useExternalDb() {
     return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_EXTERNAL_DB));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.config.IRoutingConfigProvider#useGraphCache()
+   */
   @Override
   public boolean useGraphCache() {
     return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_GRAPH_CACHE));
   }
 
+  /**
+   * Gets the default value stored for the given key or <tt>null</tt> if there is
+   * no.
+   *
+   * @param key The key to get the default value for
+   * @return The default value or <tt>null</tt>
+   */
   private String getDefaultValue(final String key) {
     return mDefaultSettings.get(key);
   }
 
+  /**
+   * Initializes the map that holds all default values.
+   */
   private void setupDefaultSettings() {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Loading default settings");

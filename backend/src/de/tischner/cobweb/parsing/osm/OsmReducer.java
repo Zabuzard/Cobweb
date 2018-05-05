@@ -31,16 +31,9 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.xml.dynsax.OsmXmlIterator;
 import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 
-/**
- *
- * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
- */
+// TODO Rewrite the whole class, currently its just in a test state
 public final class OsmReducer {
-  /**
-   *
-   * @param args Not supported
-   */
+
   public static void main(final String[] args) {
     final Path input = Paths.get("backend", "res", "input", "osm", "freiburg-regbez-latest.osm");
     final Path output = Paths.get("backend", "res", "input", "osm", "reduced_freiburg-regbez-latest.osm");
@@ -94,7 +87,6 @@ public final class OsmReducer {
   private final Path mInputPath;
 
   public OsmReducer(final IOsmFilter filter, final Path inputPath) {
-    // TODO Rewrite, currently its just in a test state
     mFilter = filter;
     mInputPath = inputPath;
     mIdToNode = new LinkedHashMap<>();

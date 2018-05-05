@@ -20,15 +20,56 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
+/**
+ * Implementation of a {@link IRoutingDatabase} which operates on an internal
+ * in-memory database. Depending on the size of the database the memory
+ * consumption can be quite high.<br>
+ * <br>
+ * Use {@link #initialize()} before using the database and {@link #shutdown()}
+ * when finished using the it.<br>
+ * <br>
+ * Push data to the database by using {@link #offerOsmEntities(Iterable, int)}
+ * and similar methods.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public class MemoryDatabase extends ARoutingDatabase {
+  /**
+   * The logger to use for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
+  /**
+   * Map connecting node names to their unique OSM IDs.
+   */
   private final Map<String, Long> mNameToNode;
+  /**
+   * Map connecting way names to their unique OSM IDs.
+   */
   private final Map<String, Long> mNameToWay;
+  /**
+   * Map connecting nodes IDs to their OSM name.
+   */
   private final Map<Long, String> mNodeToName;
+  /**
+   * Map connecting node IDs to their spatial data.
+   */
   private final Map<Long, SpatialNodeData> mNodeToSpatialData;
+  /**
+   * Map connecting way IDs to their highway data.
+   */
   private final Map<Long, HighwayData> mWayToHighwayData;
+  /**
+   * Map connecting way IDs to their OSM names.
+   */
   private final Map<Long, String> mWayToName;
 
+  /**
+   * Creates a new empty database.<br>
+   * <br>
+   * Use {@link #initialize()} before using the database and {@link #shutdown()}
+   * when finished using it.
+   */
   public MemoryDatabase() {
     mNameToNode = new HashMap<>();
     mNodeToSpatialData = new HashMap<>();
@@ -38,6 +79,12 @@ public class MemoryDatabase extends ARoutingDatabase {
     mWayToHighwayData = new HashMap<>();
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
+   * LongStream, int)
+   */
   @Override
   public Collection<HighwayData> getHighwayData(final LongStream wayIds, final int size) {
     if (LOGGER.isDebugEnabled()) {
@@ -48,6 +95,11 @@ public class MemoryDatabase extends ARoutingDatabase {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
+   */
   @Override
   public Optional<Long> getNodeByName(final String name) {
     if (LOGGER.isDebugEnabled()) {
@@ -56,11 +108,23 @@ public class MemoryDatabase extends ARoutingDatabase {
     return Optional.ofNullable(mNameToNode.get(name));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeName(long)
+   */
   @Override
   public Optional<String> getNodeName(final long id) {
     return Optional.ofNullable(mNodeToName.get(id));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
+   * LongStream, int)
+   */
   @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final LongStream nodeIds, final int size) {
     if (LOGGER.isDebugEnabled()) {
@@ -71,6 +135,11 @@ public class MemoryDatabase extends ARoutingDatabase {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getWayByName(java.lang.String)
+   */
   @Override
   public Optional<Long> getWayByName(final String name) {
     if (LOGGER.isDebugEnabled()) {
@@ -79,16 +148,33 @@ public class MemoryDatabase extends ARoutingDatabase {
     return Optional.ofNullable(mNameToWay.get(name));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getWayName(long)
+   */
   @Override
   public Optional<String> getWayName(final long id) {
     return Optional.ofNullable(mWayToName.get(id));
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#initialize()
+   */
   @Override
   public void initialize() {
     // Do nothing
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#offerOsmEntities(java.util.stream.
+   * Stream, int)
+   */
   @Override
   public void offerOsmEntities(final Stream<OsmEntity> entities, final int size) {
     if (LOGGER.isDebugEnabled()) {
@@ -104,12 +190,22 @@ public class MemoryDatabase extends ARoutingDatabase {
     });
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.db.IRoutingDatabase#shutdown()
+   */
   @Override
   public void shutdown() {
     LOGGER.info("Shutting down database");
     // Do nothing
   }
 
+  /**
+   * Adds the given OSM node to the database if not already contained.
+   *
+   * @param node The node to add to the database
+   */
   private void addOsmNode(final OsmNode node) {
     // Retrieve information
     final long id = node.getId();
@@ -128,6 +224,11 @@ public class MemoryDatabase extends ARoutingDatabase {
     }
   }
 
+  /**
+   * Adds the given OSM way to the database if not already contained.
+   *
+   * @param way The way to add to the database
+   */
   private void addOsmWay(final OsmWay way) {
     // Retrieve information
     final long id = way.getId();

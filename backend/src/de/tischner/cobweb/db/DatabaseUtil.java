@@ -4,25 +4,87 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * Utility class that provides common methods and values used by databases. Such
+ * as SQL query templates or methods used to parse database results.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class DatabaseUtil {
-  private final static Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
-
+  /**
+   * Delimiter used in SQL insert statements to separate the data that is to be
+   * inserted.
+   */
   static final String QUERY_DATA_DELIMITER = ", ";
+  /**
+   * Prefix of the SQL query to fetch highway data for given way IDs.
+   */
   static final String QUERY_HIGHWAY_DATA_PREFIX = "SELECT id, highway, maxspeed FROM osm_way_tags WHERE id IN (";
+  /**
+   * SQL query to insert a node. Contains placeholder values for the node ID,
+   * latitude and longitude.
+   */
   static final String QUERY_INSERT_NODE = "REPLACE INTO osm_nodes (id, latitude, longitude) VALUES (?, ?, ?)";
+  /**
+   * SQL query to insert node tag data. Contains placeholder values for the node
+   * ID, name and highway tags.
+   */
   static final String QUERY_INSERT_NODE_TAGS = "REPLACE INTO osm_node_tags (id, name, highway) VALUES (?, ?, ?)";
+  /**
+   * Suffix for a SQL insert query. Used right after the data that is to be
+   * inserted.
+   */
   static final String QUERY_INSERT_SUFFIX = ")";
+  /**
+   * SQL query to insert way tag data. Contains placeholder values for the way ID,
+   * name, highway and maxspeed tags.
+   */
   static final String QUERY_INSERT_WAY_TAGS = "REPLACE INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
-  static final String QUERY_NODE_ID_BY_NAME = "SELECT name FROM osm_node_tags WHERE id = ?";
-  static final String QUERY_NODE_NAME_BY_ID = "SELECT id FROM osm_node_tags WHERE name = ?";
+  /**
+   * SQL query to fetch the ID of a node by its name. Contains a placeholder value
+   * for the node name.
+   */
+  static final String QUERY_NODE_ID_BY_NAME = "SELECT id FROM osm_node_tags WHERE name = ?";
+  /**
+   * SQL query to fetch the name of a node by its ID. Contains a placeholder value
+   * for the node ID.
+   */
+  static final String QUERY_NODE_NAME_BY_ID = "SELECT name FROM osm_node_tags WHERE id = ?";
+  /**
+   * Placeholder value to use for prepared SQL statements.
+   */
   static final String QUERY_PLACEHOLDER = "?";
+  /**
+   * Prefix of the SQL query to fetch spatial node data for given node IDs.
+   */
   static final String QUERY_SPATIAL_NODE_DATA_PREFIX = "SELECT id, latitude, longitude FROM osm_nodes WHERE id IN (";
-  static final String QUERY_WAY_ID_BY_NAME = "SELECT name FROM osm_way_tags WHERE id = ?";
-  static final String QUERY_WAY_NAME_BY_ID = "SELECT id FROM osm_way_tags WHERE name = ?";
+  /**
+   * SQL query to fetch the id of a way by its name. Contains a placeholder value
+   * for the way name.
+   */
+  static final String QUERY_WAY_ID_BY_NAME = "SELECT id FROM osm_way_tags WHERE name = ?";
+  /**
+   * SQL query to fetch the name of a way by its ID. Contains a placeholder value
+   * for the way ID.
+   */
+  static final String QUERY_WAY_NAME_BY_ID = "SELECT name FROM osm_way_tags WHERE id = ?";
 
+  /**
+   * Sets the given value to the given index position of the statement or
+   * <tt>SQL NULL</tt> if the value is <tt>null</tt>.<br>
+   * <br>
+   * The implementation is equivalent to calling
+   * {@code statement.setNull(index, Types.INTEGER)} if <tt>value</tt> is
+   * <tt>null</tt> or {@code statement.setInt(index, value)} otherwise.
+   *
+   * @param index     The index position of the statement to set the value to
+   * @param value     The value to set or <tt>null</tt> if it should be set to
+   *                  <tt>SQL NULL</tt>
+   * @param statement The statement to set the value for
+   * @throws SQLException If an SQLException occurred while setting the value,
+   *                      like an invalid index
+   */
   static void setIntOrNull(final int index, final Integer value, final PreparedStatement statement)
       throws SQLException {
     if (value == null) {
@@ -32,6 +94,21 @@ public final class DatabaseUtil {
     }
   }
 
+  /**
+   * Sets the given value to the given index position of the statement or
+   * <tt>SQL NULL</tt> if the value is <tt>null</tt>.<br>
+   * <br>
+   * The implementation is equivalent to calling
+   * {@code statement.setNull(index, Types.VARCHAR)} if <tt>value</tt> is
+   * <tt>null</tt> or {@code statement.setString(index, value)} otherwise.
+   *
+   * @param index     The index position of the statement to set the value to
+   * @param value     The value to set or <tt>null</tt> if it should be set to
+   *                  <tt>SQL NULL</tt>
+   * @param statement The statement to set the value for
+   * @throws SQLException If an SQLException occurred while setting the value,
+   *                      like an invalid index
+   */
   static void setStringOrNull(final int index, final String value, final PreparedStatement statement)
       throws SQLException {
     if (value == null) {

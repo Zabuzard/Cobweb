@@ -38,22 +38,83 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
 import de.tischner.cobweb.util.SerializationUtil;
 
+/**
+ * The whole application. Supports various commands, see the documentation of
+ * the constructors for detail.<br>
+ * <br>
+ * Use {@link #initialize()} after creation. The application can then be
+ * operated using {@link #start()} and {@link #shutdown()}.<br>
+ * <br>
+ * The application consists of a routing server which offers a REST API, a
+ * database that stores meta information and a search server used as utility
+ * which offers a REST API too.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class Application {
+  /**
+   * Path to the configuration of the logger.
+   */
   private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
+  /**
+   * Provided arguments that are used to determine the commands to use.
+   */
   private final String[] mArgs;
+  /**
+   * Algorithm to use for shortest path computation.
+   */
   private IShortestPathComputation<RoadNode, RoadEdge<RoadNode>> mComputation;
+  /**
+   * Provides the configuration of the application.
+   */
   private ConfigStore mConfig;
+  /**
+   * Utility used to load and save the configuration.
+   */
   private ConfigLoader mConfigLoader;
+  /**
+   * Database to use for storing routing meta data.
+   */
   private IRoutingDatabase mDatabase;
+  /**
+   * Graph to route on.
+   */
   private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
+  /**
+   * Logger to use for logging.
+   */
   private Logger mLogger;
-
+  /**
+   * Server to use for responding to routing requests. Offers a REST API.
+   */
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
 
+  /**
+   * Creates a new application using the given arguments. After creation use
+   * {@link #initialize()} and then {@link #start()} and {@link #shutdown()} to
+   * control the application.<br>
+   * <br>
+   * Supported commands are
+   * <ul>
+   * <li><b><tt>empty</tt></b> or <b><tt>args[0] = start</tt></b>: Starts the
+   * default service which answers routing requests over a REST API.</li>
+   * <li><b><tt>args[0] = reduce</tt></b>: Reduces all input data such that the
+   * default service will run faster.</li>
+   * <li><b><tt>args[0] = clear</tt></b>: Clears the database and all cached and
+   * serialized data.</li>
+   * <ul>
+   *
+   * @param args The arguments that specify which command to use.
+   */
   public Application(final String[] args) {
     mArgs = args;
   }
 
+  /**
+   * Initializes the application. Use this method after construction and before
+   * using {@link #start()}.
+   */
   public void initialize() {
     initializeLogger();
     mLogger.info("Initializing application");
@@ -76,6 +137,11 @@ public final class Application {
     }
   }
 
+  /**
+   * Shuts the application down. Use this method after {@link #start()} has been
+   * called. The application should not be used anymore after this method. Instead
+   * create a new one.
+   */
   public void shutdown() {
     // TODO Make sure this is always called
     mLogger.info("Shutting down application");
@@ -88,6 +154,14 @@ public final class Application {
     }
   }
 
+  /**
+   * Starts the application and the service set at construction. Use this method
+   * after {@link #initialize()}. The method {@link #shutdown()} can be used to
+   * shut the application down after this method has been used.<br>
+   * <br>
+   * The method should not be used to start an application again after
+   * {@link #shutdown()} has been used.
+   */
   public void start() {
     try {
       mLogger.info("Starting application");
@@ -99,6 +173,13 @@ public final class Application {
     }
   }
 
+  /**
+   * Creates file handler that handle OSM files for the database. If they are
+   * notified when parsing OSM data, they will adjust the database accordingly.
+   *
+   * @return An iterable consisting of all OSM file handlers that adjust the
+   *         database
+   */
   private Iterable<IOsmFileHandler> createOsmDatabaseHandler() {
     try {
       final IOsmFileHandler databaseHandler = new OsmDatabaseHandler(mDatabase, mConfig);
@@ -108,6 +189,16 @@ public final class Application {
     }
   }
 
+  /**
+   * Creates file handler that handle OSM files for routing. If they are notified
+   * when parsing OSM data, they will adjust models used for routing like the
+   * graph accordingly.
+   *
+   * @return An iterable consisting of all routing file handlers that adjust
+   *         routing models
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files
+   */
   private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
     final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph);
     final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
@@ -119,6 +210,13 @@ public final class Application {
     }
   }
 
+  /**
+   * Initializes the API of the application. This consists of the routing server,
+   * the database, the search server and all corresponding utilities and models.
+   *
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files
+   */
   private void initializeApi() throws ParseException {
     final Instant initAPIStartTime = Instant.now();
 
@@ -148,6 +246,16 @@ public final class Application {
     mLogger.info("Initialization of API took: {}", Duration.between(initAPIStartTime, initEndTime));
   }
 
+  /**
+   * Initializes the database which stores meta data used for routing. Depending
+   * on the configuration this may create tables in an external database or create
+   * an internal in-memory database.
+   *
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files. Or when a problem with an
+   *                        external database occurred like passing invalid SQL or
+   *                        if a connection could not be established.
+   */
   private void initializeDatabase() throws ParseException {
     mLogger.info("Initializing database");
 
@@ -160,6 +268,15 @@ public final class Application {
     mDatabase.initialize();
   }
 
+  /**
+   * Initializes the graph model to use for routing. Depending on the
+   * configuration this may deserialize a previous serialized graph. If the
+   * deserialized graph is big this method may take a while.
+   *
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files or if the graph to deserialize is
+   *                        invalid.
+   */
   private void initializeGraph() throws ParseException {
     mLogger.info("Initializing graph");
 
@@ -179,11 +296,22 @@ public final class Application {
     }
   }
 
+  /**
+   * Initializes the logger to use for logging. This sets system wide properties
+   * such that all subsequent calls to {@link LoggerFactory} are affected. As
+   * such, it should be used <b>as soon as possible</b> to ensure the logger is
+   * ready to be used in.
+   */
   private void initializeLogger() {
     System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, LOGGER_CONFIG.toString());
     mLogger = LoggerFactory.getLogger(Application.class);
   }
 
+  /**
+   * Initializes the routing server and algorithms used to answer routing
+   * requests. Depending on the size of the graph and the used algorithms this
+   * method may take a while for all precomputations to finish.
+   */
   private void initializeRouting() {
     mLogger.info("Initializing routing");
 
@@ -200,6 +328,17 @@ public final class Application {
     mRoutingServer.initialize();
   }
 
+  /**
+   * Serializes the graph model if desired. That is, if the size of the graph has
+   * changed and the configuration contains the property to use the graph cache.
+   *
+   * @param graphSizeBefore The size of the graph after it was deserialized. Used
+   *                        to determine if the current graph has changed compared
+   *                        to the serialized version.
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files or if an exception at
+   *                        serialization occurred
+   */
   private void serializeGraphIfDesired(final int graphSizeBefore) throws ParseException {
     if (!mConfig.useGraphCache() || mGraph.size() == graphSizeBefore) {
       return;

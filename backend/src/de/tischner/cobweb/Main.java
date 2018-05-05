@@ -4,15 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The entry class of the application.
+ * The entry class of the application. Contains a {@link #main(String[])} method
+ * which starts the {@link Application}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Main {
   /**
+   * Starts the {@link Application}.
    *
-   * @param args Not supported
+   * @param args Command line arguments to use. They are directly passed to
+   *             {@link Application#Application(String[])}, see the
+   *             {@link Application} class for details.
    */
   public static void main(final String[] args) {
     try {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Types of highways.
+ * Types of highways. Use {@link #ROAD} for an unknown highway type.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
@@ -71,12 +71,28 @@ public enum EHighwayType {
    */
   UNSURFACED("unsurfaced", 30);
 
+  /**
+   * Map that connects highway tag names to their type.
+   */
   private static final Map<String, EHighwayType> NAME_TO_TYPE = EHighwayType.constructLookupTable();
 
+  /**
+   * Gets the highway type corresponding to the given tag name or <tt>null</tt> if
+   * there is no. The method runs in <tt>O(1)</tt>.
+   *
+   * @param name The tag name of the highway type to get
+   * @return The corresponding highway type or <tt>null</tt>
+   */
   public static EHighwayType fromName(final String name) {
     return NAME_TO_TYPE.get(name);
   }
 
+  /**
+   * Constructs a map that connects highway tag names to their type for a fast
+   * lookup.
+   *
+   * @return A map that connects highway tag names to their types
+   */
   private static Map<String, EHighwayType> constructLookupTable() {
     final HashMap<String, EHighwayType> nameToType = new HashMap<>();
 
@@ -87,19 +103,40 @@ public enum EHighwayType {
     return nameToType;
   }
 
+  /**
+   * The average speed for this highway type in <tt>km/h</tt>.
+   */
   private final int mAverageSpeed;
-
+  /**
+   * The tag name of the highway type.
+   */
   private final String mName;
 
+  /**
+   * Creates a new highway type with the given tag name and average speed.
+   *
+   * @param textValue    The tag name
+   * @param averageSpeed The average speed in <tt>km/h</tt>
+   */
   private EHighwayType(final String textValue, final int averageSpeed) {
     mName = textValue;
     mAverageSpeed = averageSpeed;
   }
 
+  /**
+   * Gets the average speed of this highway type, in <tt>km/h</tt>.
+   *
+   * @return The average speed of this highway type, in <tt>km/h</tt>
+   */
   public int getAverageSpeed() {
     return mAverageSpeed;
   }
 
+  /**
+   * Gets the tag name of this highway type.
+   *
+   * @return The tag name to get
+   */
   public String getName() {
     return mName;
   }

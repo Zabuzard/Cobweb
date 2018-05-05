@@ -62,23 +62,6 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   /*
    * (non-Javadoc)
    *
-   * @see de.tischner.cobweb.parsing.IFileHandler#acceptFile(java.nio.file.Path)
-   */
-  @Override
-  public boolean acceptFile(final Path file) {
-    // Check if the files content is not already included in the cache
-    if (mUseGraphCache && !mRecentHandler.acceptFile(file)) {
-      return false;
-    }
-
-    // Accept all OSM files
-    LOGGER.info("Accepts file {}", file);
-    return true;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
    * @see de.topobyte.osm4j.core.access.OsmHandler#complete()
    */
   @Override
@@ -145,7 +128,7 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
     // Determine way direction
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
-    final int wayDirection = OsmParseUtil.getWayDirection(tagToValue);
+    final int wayDirection = OsmParseUtil.parseWayDirection(tagToValue);
 
     // Iterate all nodes
     long sourceId = -1;
@@ -166,16 +149,33 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
       }
 
       // Create an edge
-      if (wayDirection == 0 || wayDirection == 1) {
+      if (wayDirection >= 0) {
         mGraph.addEdge(mBuilder.buildEdge(way, sourceId, destinationId));
       }
-      if (wayDirection == 0 || wayDirection == -1) {
+      if (wayDirection <= 0) {
         mGraph.addEdge(mBuilder.buildEdge(way, destinationId, sourceId));
       }
 
       // Update for the next iteration
       sourceId = destinationId;
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.tischner.cobweb.parsing.IFileHandler#acceptFile(java.nio.file.Path)
+   */
+  @Override
+  public boolean isAcceptingFile(final Path file) {
+    // Check if the files content is not already included in the cache
+    if (mUseGraphCache && !mRecentHandler.isAcceptingFile(file)) {
+      return false;
+    }
+
+    // Accept all OSM files
+    LOGGER.info("Accepts file {}", file);
+    return true;
   }
 
   private void insertSpatialData(final SpatialNodeData data) {
