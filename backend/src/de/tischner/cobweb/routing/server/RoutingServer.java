@@ -20,20 +20,97 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.routing.server.model.RoutingRequest;
+import de.tischner.cobweb.routing.server.model.RoutingResponse;
 
+/**
+ * A server which offers a REST API that is able to answer routing requests.<br>
+ * <br>
+ * After construction the {@link #initialize()} method should be called.
+ * Afterwards it can be started by using {@link #start()}. Request the server to
+ * shutdown by using {@link #shutdown()}, the current status can be checked with
+ * {@link #isRunning()}. Once a server was shutdown it should not be used
+ * anymore, instead create a new one.<br>
+ * <br>
+ * A request may consist of departure time, source and destination nodes and
+ * meta-data like desired transportation modes. A response consists of departure
+ * and arrival time, together with possible routes.<br>
+ * <br>
+ * The REST API communicates over HTTP by sending and receiving JSON objects.
+ * Requests are parsed into {@link RoutingRequest} and responses into
+ * {@link RoutingResponse}. Accepted HTTP methods are <tt>POST</tt> and
+ * <tt>OPTIONS</tt>. The server will send <tt>BAD REQUEST</tt> to invalid
+ * requests.<br>
+ * <br>
+ * The server itself handles clients in parallel using a cached thread pool. For
+ * construction it wants a configuration, a graph to route on, an algorithm to
+ * compute shortest paths with and a database for retrieving meta-data.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the node
+ * @param <E> Type of the edge
+ * @param <G> Type of the graph
+ */
 public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements Runnable {
-
+  /**
+   * Logger used for logging.
+   */
   private static final Logger LOGGER = LoggerFactory.getLogger(RoutingServer.class);
+  /**
+   * The timeout used when waiting for a client to connect, in milliseconds. The
+   * server status is checked after each timeout.
+   */
   private static final int SOCKET_TIMEOUT = 2_000;
+  /**
+   * The algorithm to use for shortest path computation.
+   */
   private final IShortestPathComputation<N, E> mComputation;
+  /**
+   * Configuration provider which provides the port that should be used by the
+   * server.
+   */
   private final IRoutingConfigProvider mConfig;
+  /**
+   * Database used for retrieving meta-data about graph objects like nodes and
+   * edges.
+   */
   private final IRoutingDatabase mDatabase;
+  /**
+   * The graph to route on.
+   */
   private final G mGraph;
+  /**
+   * The server socket to use for communication.
+   */
   private ServerSocket mServerSocket;
+  /**
+   * The thread to run this server on.
+   */
   private Thread mServerThread;
+  /**
+   * Whether or not the server thread should run.
+   */
   private volatile boolean mShouldRun;
 
+  /**
+   * Creates a new routing server with the given configuration that works with the
+   * given tools.<br>
+   * <br>
+   * After construction the {@link #initialize()} method should be called.
+   * Afterwards it can be started by using {@link #start()}. Request the server to
+   * shutdown by using {@link #shutdown()}, the current status can be checked with
+   * {@link #isRunning()}. Once a server was shutdown it should not be used
+   * anymore, instead create a new one.
+   *
+   * @param config      Configuration provider which provides the port that should
+   *                    be used by the server
+   * @param graph       The graph to route on
+   * @param computation The algorithm to use for shortest path computation
+   * @param database    Database used for retrieving meta-data about graph objects
+   *                    like nodes and edges
+   */
   public RoutingServer(final IRoutingConfigProvider config, final G graph,
       final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
     mConfig = config;
@@ -42,6 +119,13 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     mDatabase = database;
   }
 
+  /**
+   * Initializes the server. Call this method prior to starting the server with
+   * {@link #start()}. Do not call it again afterwards.
+   *
+   * @throws UncheckedIOException If an I/O exception occurred while creating the
+   *                              server socket.
+   */
   public void initialize() throws UncheckedIOException {
     mServerThread = new Thread(this);
     try {
@@ -52,10 +136,22 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     }
   }
 
+  /**
+   * Whether or not the server is currently running.<br>
+   * <br>
+   * A request to shutdown can be send using {@link #shutdown()}.
+   *
+   * @return <tt>True</tt> if the server is running, <tt>false</tt> otherwise
+   */
   public boolean isRunning() {
     return mServerThread.isAlive();
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.lang.Runnable#run()
+   */
   @Override
   public void run() {
     final ExecutorService executor = Executors.newCachedThreadPool();
@@ -85,11 +181,25 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     LOGGER.info("Routing server is shutting down");
   }
 
+  /**
+   * Requests the server to shutdown.<br>
+   * <br>
+   * The current status can be checked with {@link #isRunning()}. Once a server
+   * was shutdown it should not be used anymore, instead create a new one.
+   */
   public void shutdown() {
     mShouldRun = false;
     LOGGER.info("Set shutdown request to routing server");
   }
 
+  /**
+   * Starts the server.<br>
+   * <br>
+   * Make sure {@link #initialize()} is called before. Request the server to
+   * shutdown by using {@link #shutdown()}, the current status can be checked with
+   * {@link #isRunning()}. Once a server was shutdown it should not be used
+   * anymore, instead create a new one.
+   */
   public void start() {
     if (isRunning()) {
       return;

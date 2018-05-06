@@ -7,7 +7,7 @@
   <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOGGING_HOME}/cobweb.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-        <fileNamePattern>app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        <fileNamePattern>${LOGGING_HOME}/cobweb-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
         <maxFileSize>10MB</maxFileSize>    
         <maxHistory>30</maxHistory>
         <totalSizeCap>1GB</totalSizeCap>

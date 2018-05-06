@@ -20,17 +20,108 @@ import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 
+/**
+ * Implementation of a {@link IOsmFilter} which only accepts OSM ways that
+ * represent a road. Nodes and relations are rejected completely.<br>
+ * <br>
+ * The filter is configured using a configuration file. The format of the file
+ * allows two filtering modes:
+ * <ul>
+ * <li><tt>--KEEP</tt>: The following entries contain key-value pairs which
+ * every way must contain at least one of to be kept.</li>
+ * <li><tt>--DROP</tt>: The following entries contain key-value pairs which are
+ * forbidden for a way. If a way contains at least one of them, it is
+ * rejected.</li>
+ * </ul>
+ * A mode is indicated by a line containing only the above mode indicator. Modes
+ * can be switched at any time. Empty lines are ignored and lines preceded by a
+ * <tt>#</tt> are interpreted as comment and thus ignored too.<br>
+ * <br>
+ * An entry is a regular key-value pair with the key being interpreted as OSM
+ * tag and the value as its OSM tag value. A valid configuration file might look
+ * like
+ *
+ * <pre>
+ * --KEEP
+ * #highways
+ * highway=motorway
+ * highway=trunk
+ *
+ * --DROP
+ * area=yes
+ * train=yes
+ * </pre>
+ *
+ * The filter will accept only OSM ways that have a <tt>highway</tt> tag value
+ * of either <tt>motorway</tt> or <tt>trunk</tt> and not a value <tt>yes</tt>
+ * for the tag <tt>area</tt> or <tt>train</tt>.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class OsmRoadFilter implements IOsmFilter {
-
+  /**
+   * Prefix for a line that represents a comment.
+   */
   private static final String COMMENT_PREFIX = "#";
+  /**
+   * Indicator to start drop mode.
+   */
   private static final String DROP_MODE = "--DROP";
+  /**
+   * Indicator to start keep mode.
+   */
   private static final String KEEP_MODE = "--KEEP";
+  /**
+   * Logger to use for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadFilter.class);
+  /**
+   * Symbol which separates tag keys from their values.
+   */
   private static final String TAG_VALUE_SEPARATOR = "=";
+
+  /**
+   * Whether or not the given OSM tag and its value are contained in the given
+   * map.
+   *
+   * @param tag         The tag in question
+   * @param tagToValues A map connecting tag names to their values
+   * @return <tt>True</tt> if the tag and its value are contained in the given
+   *         map, <tt>false</tt> otherwise
+   */
+  private static boolean isTagInMap(final OsmTag tag, final Map<String, Set<String>> tagToValues) {
+    final Set<String> values = tagToValues.get(tag.getKey());
+    if (values == null) {
+      return false;
+    }
+    return values.contains(tag.getValue());
+  }
+
+  /**
+   * Configuration provider which provides the path to the filter configuration.
+   */
   private final IRoutingConfigProvider mConfig;
+  /**
+   * A map connecting all in drop mode registered OSM tags to their values.
+   */
   private final Map<String, Set<String>> mTagToValuesDrop;
+
+  /**
+   * A map connecting all in keep mode registered OSM tags to their values.
+   */
   private final Map<String, Set<String>> mTagToValuesKeep;
 
+  /**
+   * Creates a new OSM road filter which filters OSM entities based on the filter
+   * configuration provided by the given configuration provider.
+   *
+   * @param config The configuration provider that provides the filter
+   *               configuration
+   * @throws ParseException If an error occurred while parsing the filter
+   *                        configuration. For example if the file could not be
+   *                        found or if its syntax is invalid.
+   */
   public OsmRoadFilter(final IRoutingConfigProvider config) throws ParseException {
     mConfig = config;
     mTagToValuesKeep = new HashMap<>();
@@ -38,12 +129,11 @@ public final class OsmRoadFilter implements IOsmFilter {
     initialize();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * OSM nodes are never accepted by this filter. Nodes should be read from ways
+   * instead.
    *
-   * @see
-   * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
-   * .iface.OsmNode)
+   * @return Always <tt>false</tt>
    */
   @Override
   public boolean filter(final OsmNode node) {
@@ -52,12 +142,10 @@ public final class OsmRoadFilter implements IOsmFilter {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * OSM relations are never accepted by this filter.
    *
-   * @see
-   * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
-   * .iface.OsmRelation)
+   * @return Always <tt>false</ttt>
    */
   @Override
   public boolean filter(final OsmRelation relation) {
@@ -65,12 +153,9 @@ public final class OsmRoadFilter implements IOsmFilter {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.parsing.osm.IOsmFilter#filter(de.topobyte.osm4j.core.model
-   * .iface.OsmWay)
+  /**
+   * Whether or not the given OSM way is accepted by the filter. This is
+   * determined by the given filter configuration file.
    */
   @Override
   public boolean filter(final OsmWay way) {
@@ -91,6 +176,14 @@ public final class OsmRoadFilter implements IOsmFilter {
     return hasOneKeepTag;
   }
 
+  /**
+   * Initializes this OSM road filter. Therefore, it reads and parses the given
+   * filter configuration file
+   *
+   * @throws ParseException If an error occurred while parsing the filter
+   *                        configuration. For example if the file could not be
+   *                        found or if its syntax is invalid.
+   */
   private void initialize() throws ParseException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Initializing OSM road filter");
@@ -138,20 +231,26 @@ public final class OsmRoadFilter implements IOsmFilter {
     }
   }
 
+  /**
+   * Whether or not the given OSM tag and its value were registered in drop mode.
+   *
+   * @param tag The tag in question
+   * @return <tt>True</tt> if the tag and its value were registered in drop mode,
+   *         <tt>false</tt> otherwise
+   */
   private boolean isDropTag(final OsmTag tag) {
-    return isTagInMap(tag, mTagToValuesDrop);
+    return OsmRoadFilter.isTagInMap(tag, mTagToValuesDrop);
   }
 
+  /**
+   * Whether or not the given OSM tag and its value were registered in keep mode.
+   *
+   * @param tag The tag in question
+   * @return <tt>True</tt> if the tag and its value were registered in keep mode,
+   *         <tt>false</tt> otherwise
+   */
   private boolean isKeepTag(final OsmTag tag) {
-    return isTagInMap(tag, mTagToValuesKeep);
-  }
-
-  private boolean isTagInMap(final OsmTag tag, final Map<String, Set<String>> tagToValues) {
-    final Set<String> values = tagToValues.get(tag.getKey());
-    if (values == null) {
-      return false;
-    }
-    return values.contains(tag.getValue());
+    return OsmRoadFilter.isTagInMap(tag, mTagToValuesKeep);
   }
 
 }

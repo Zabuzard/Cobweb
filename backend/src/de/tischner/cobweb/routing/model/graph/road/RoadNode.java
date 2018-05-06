@@ -4,13 +4,38 @@ import java.io.Serializable;
 
 import de.tischner.cobweb.routing.model.graph.INode;
 
+/**
+ * Implementation of an {@link INode} which represents a node on a road. As such
+ * it has spatial data and a unique ID.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
-
+  /**
+   * The serial version UID.
+   */
   private static final long serialVersionUID = 1L;
+  /**
+   * The unique ID of this node.
+   */
   private final long mId;
+  /**
+   * The latitude of this node, in degrees.
+   */
   private double mLatitude;
+  /**
+   * The longitude of this node, in degrees.
+   */
   private double mLongitude;
 
+  /**
+   * Creates a new road node with the given ID and spatial data.
+   *
+   * @param id        The unique ID of this node
+   * @param latitude  The latitude of this node, in degrees
+   * @param longitude The longitude of this node, in degrees
+   */
   public RoadNode(final long id, final double latitude, final double longitude) {
     mId = id;
     mLatitude = latitude;
@@ -40,10 +65,8 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.tischner.cobweb.model.graph.road.IHasId#getId()
+  /**
+   * Gets the unique ID of this node.
    */
   @Override
   public long getId() {

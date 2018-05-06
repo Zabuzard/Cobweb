@@ -30,19 +30,93 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
+/**
+ * Implementation of an {@link IOsmFileHandler} which constructs a graph that
+ * consists of road nodes and edges out of the given OSM data.<br>
+ * <br>
+ * The graph can be cached, then the handler will only parse files that provide
+ * data the graph does not already contain. The handler will only parse OSM ways
+ * which are accepted by a given road filter, nodes and relations are rejected.
+ * Nodes will be constructed from ways instead and meta data of nodes will be
+ * fetched from a given database. The node and edge instances itself are created
+ * using a given builder.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the node
+ * @param <E> Type of the edge
+ * @param <G> Type of the graph
+ */
 public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements IOsmFileHandler {
+  /**
+   * The size of the node ID buffer. If the buffer reaches the limit spatial node
+   * data from all buffered node IDs is requested from the database.
+   */
   private static final int BUFFER_SIZE = 100_000;
+  /**
+   * Logger used for logging.
+   */
   private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadHandler.class);
+  /**
+   * The buffer to use for buffering node IDs for which spatial node data is to be
+   * requested from the database. The buffer is used to avoid requesting data for
+   * every node in a single connection to the database.
+   */
   private final long[] mBufferedRequests;
+  /**
+   * The current index to use in the node ID buffer. It points to the index where
+   * the next node ID can be inserted. So it is always one greater than the index
+   * of the last inserted node ID. By that it represents the current size of the
+   * buffer.
+   */
   private int mBufferIndex;
+  /**
+   * Builder to use for constructing edges and nodes that are to be inserted into
+   * the graph.
+   */
   private final IOsmRoadBuilder<N, E> mBuilder;
+  /**
+   * The database used for requesting spatial node data.
+   */
   private final IRoutingDatabase mDatabase;
+  /**
+   * The OSM filter used to filter road ways.
+   */
   private final IOsmFilter mFilter;
+  /**
+   * The graph to insert parsed nodes and edges into.
+   */
   private final G mGraph;
+  /**
+   * The handler to use which determines the OSM files that contain more recent or
+   * new data than the data already stored in the graph. Will only be used if the
+   * configuration has set the use of a graph cache.
+   */
   private final RecentHandler mRecentHandler;
+  /**
+   * Whether or not a graph cache is to be used. This determines if OSM files
+   * should be filtered by a {@link RecentHandler} or not.
+   */
   private final boolean mUseGraphCache;
 
+  /**
+   * Creates a new OSM road handler which operates on the given graph using the
+   * given configuration.<br>
+   * <br>
+   * The filter is used to filter OSM road ways. The builder will be used to
+   * construct the nodes and edges that are to be inserted into the graph. The
+   * database offers spatial node data for nodes.
+   *
+   * @param graph    The graph to insert nodes and edges into
+   * @param filter   The OSM filter used to filter road ways
+   * @param builder  Builder to use for constructing edges and nodes that are to
+   *                 be inserted into the graph.
+   * @param database The database used for requesting spatial node data.
+   * @param config   Configuration provider which provides graph cache information
+   * @throws IOException If an I/O exception occurred while reading the graph
+   *                     cache information
+   */
   public OsmRoadHandler(final G graph, final IOsmFilter filter, final IOsmRoadBuilder<N, E> builder,
       final IRoutingDatabase database, final IRoutingConfigProvider config) throws IOException {
     mGraph = graph;
@@ -178,6 +252,14 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     return true;
   }
 
+  /**
+   * Inserts the given spatial node data into the graph. That is, it finds the
+   * node and updates its spatial data according to the given data.<br>
+   * <br>
+   * The node represented by the data must exist in the graph.
+   *
+   * @param data The data to insert
+   */
   private void insertSpatialData(final SpatialNodeData data) {
     final Optional<N> possibleNode = mGraph.getNodeById(data.getId());
     // Node must be present since we added it before requesting
@@ -190,6 +272,12 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     node.setLongitude(data.getLongitude());
   }
 
+  /**
+   * Queues a spatial node data request for the given node. The request is
+   * buffered and the buffer is submitted using {@link #submitBufferedRequests()}.
+   *
+   * @param nodeId The unique ID of the node to queue a request for
+   */
   private void queueSpatialNodeRequest(final long nodeId) {
     // If buffer is full, submit it
     if (mBufferIndex >= mBufferedRequests.length) {
@@ -203,6 +291,14 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     mBufferIndex++;
   }
 
+  /**
+   * Submits the buffered requests. The requests are send to the given database
+   * and the spatial node data are inserted into the graph using
+   * {@link #insertSpatialData(SpatialNodeData)}.<br>
+   * <br>
+   * Afterwards, the buffer index is reset to implicitly clear the buffer.
+   * Ideally, this method is only used when the buffer is full.
+   */
   private void submitBufferedRequests() {
     // Send all buffered requests up to the current index
     final int size = mBufferIndex;

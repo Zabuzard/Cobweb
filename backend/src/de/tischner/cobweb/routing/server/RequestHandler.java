@@ -33,15 +33,57 @@ import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
 
+/**
+ * Class that handles a routing request. It parses the request, computes
+ * corresponding shortest paths and builds and sends a proper response.<br>
+ * <br>
+ * To handle a request call {@link #handleRequest(RoutingRequest)}.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the node
+ * @param <E> Type of the edge
+ * @param <G> Type of the graph
+ */
 public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>> {
-
+  /**
+   * Logger used for logging
+   */
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
+  /**
+   * The client whose request to handle.
+   */
   private final Socket mClient;
+  /**
+   * The algorithm to use for computing shortest path requests.
+   */
   private final IShortestPathComputation<N, E> mComputation;
+  /**
+   * The database to use for fetching meta data for nodes and edges.
+   */
   private final IRoutingDatabase mDatabase;
+  /**
+   * The graph used for shortest path computation.
+   */
   private final G mGraph;
+  /**
+   * The GSON object used to format JSON responses.
+   */
   private final Gson mGson;
 
+  /**
+   * Creates a new handler which handles requests of the given client using the
+   * given tools.<br>
+   * <br>
+   * To handle a request call {@link #handleRequest(RoutingRequest)}.
+   *
+   * @param client      The client whose request to handle
+   * @param gson        The GSON object used to format JSON responses
+   * @param graph       The graph used for shortest path computation
+   * @param computation The algorithm to use for computing shortest path requests
+   * @param database    The database to use for fetching meta data for nodes and
+   *                    edges
+   */
   public RequestHandler(final Socket client, final Gson gson, final G graph,
       final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
     mClient = client;
@@ -51,6 +93,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     mDatabase = database;
   }
 
+  /**
+   * Handles the given routing request. It computes shortest paths and constructs
+   * and sends a proper response.
+   *
+   * @param request The request to handle
+   * @throws IOException If an I/O exception occurred while sending a response
+   */
   public void handleRequest(final RoutingRequest request) throws IOException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Handling request: {}", request);
@@ -87,6 +136,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     sendResponse(response);
   }
 
+  /**
+   * Builds a journey object which represents the given path.
+   *
+   * @param request The request the journey belongs to
+   * @param path    The path the journey represents
+   * @return The resulting journey
+   */
   private Journey buildJourney(final RoutingRequest request, final IPath<N, E> path) {
     final long depTime = request.getDepTime();
     final long duration = (long) Math.ceil(RoutingUtil.secondsToMilliseconds(path.getTotalCost()));
@@ -109,12 +165,24 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     return new Journey(depTime, arrTime, route);
   }
 
+  /**
+   * Builds a route element which represents the given node.
+   *
+   * @param node The node to represent
+   * @return The resulting route element
+   */
   private RouteElement buildNode(final N node) {
     final String name = mDatabase.getNodeName(node.getId()).orElse("");
     final double[] coordinates = new double[] { node.getLatitude(), node.getLongitude() };
     return new RouteElement(ERouteElementType.NODE, name, Collections.singletonList(coordinates));
   }
 
+  /**
+   * Builds a route element which represents the given path.
+   *
+   * @param path The path to represent
+   * @return The resulting route element
+   */
   private RouteElement buildPath(final IPath<N, E> path) {
     // TODO The current way of constructing a name may be inappropriate
     final StringJoiner nameJoiner = new StringJoiner(", ");
@@ -141,11 +209,24 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     return new RouteElement(ERouteElementType.PATH, ETransportationMode.CAR, nameJoiner.toString(), geom);
   }
 
+  /**
+   * Sends an empty routing response. This is usually used if no shortest path
+   * could be found.
+   *
+   * @param request The request to respond to
+   * @throws IOException If an I/O exception occurred while sending the response
+   */
   private void sendEmptyResponse(final RoutingRequest request) throws IOException {
     final RoutingResponse response = new RoutingResponse(request.getFrom(), request.getTo(), Collections.emptyList());
     sendResponse(response);
   }
 
+  /**
+   * Sends the given routing response.
+   *
+   * @param response The response to send
+   * @throws IOException If an I/O exception occurred while sending the response
+   */
   private void sendResponse(final RoutingResponse response) throws IOException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Sending response: {}", response);

@@ -27,18 +27,68 @@ import de.tischner.cobweb.util.http.HttpRequest;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
 
+/**
+ * Class that handles a routing client. It is designed to communicate with a
+ * client via HTTP and serve routing requests.<br>
+ * <br>
+ * To handle the client call {@link #run()}. The method should only be called
+ * once, the object should not be used anymore after the method has
+ * finished.<br>
+ * <br>
+ * The client handler will close the client on its own. So it should not be
+ * closed outside.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the node
+ * @param <E> Type of the edge
+ * @param <G> Type of the graph
+ */
 public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
     implements Runnable {
-
+  /**
+   * Resource that is to be requested from a client if he submits a routing query.
+   */
   private static final String API_RESOURCE = "/route";
+  /**
+   * Logger used for logging.
+   */
   private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
+  /**
+   * The client to handle.
+   */
   private final Socket mClient;
+  /**
+   * The algorithm to use for computing shortest path requests.
+   */
   private final IShortestPathComputation<N, E> mComputation;
+  /**
+   * The database to use for fetching meta data for nodes and edges.
+   */
   private final IRoutingDatabase mDatabase;
+  /**
+   * The graph used for shortest path computation.
+   */
   private final G mGraph;
-
+  /**
+   * The unique ID of this client request.
+   */
   private final int mId;
 
+  /**
+   * Creates a new handler which handles the given client using the given
+   * tools.<br>
+   * <br>
+   * To handle the client call {@link #run()}. The method should only be called
+   * once, the object should not be used anymore after the method has finished.
+   *
+   * @param id          The unique ID of this client request
+   * @param client      The client to handle
+   * @param graph       The graph used for shortest path computation
+   * @param computation The algorithm to use for computing shortest path requests
+   * @param database    The database to use for fetching meta data for nodes and
+   *                    edges
+   */
   public ClientHandler(final int id, final Socket client, final G graph,
       final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
     mId = id;
@@ -48,6 +98,16 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     mDatabase = database;
   }
 
+  /**
+   * Handles the clients request.<br>
+   * <br>
+   * The method should only be called once, the object should not be used anymore
+   * after the method has finished. The method catches and logs all errors and
+   * exceptions.<br>
+   * <br>
+   * The client handler will close the client on its own. So it should not be
+   * closed outside.
+   */
   @Override
   public void run() {
     try {
@@ -68,6 +128,13 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     }
   }
 
+  /**
+   * Handles the given HTTP request.
+   *
+   * @param request The request to handle
+   * @throws IOException If an I/O exception occurred while sending the response
+   *                     to the client
+   */
   private void handleRequest(final HttpRequest request) throws IOException {
     // TODO Maybe don't log always
     LOGGER.info("Handling HTTP request with id: {}", mId);
@@ -81,7 +148,7 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     }
 
     if (type.equals("OPTIONS")) {
-      serveOptionsRequest(request);
+      serveOptionsRequest();
       return;
     }
 
@@ -89,7 +156,13 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     servePost(request);
   }
 
-  private void serveOptionsRequest(final HttpRequest request) throws IOException {
+  /**
+   * Serves a HTTP request of type <tt>OPTIONS</tt>.
+   *
+   * @throws IOException If an I/O exception occurred while sending the response
+   *                     to the client
+   */
+  private void serveOptionsRequest() throws IOException {
     // Send back the supported methods
     HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.OK)
         .putHeader("Access-Control-Allow-Methods", "POST").putHeader("Access-Control-Allow-Headers", "Content-Type")
@@ -97,6 +170,13 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
         .putHeader("Keep-Alive", "timeout=5, max=100").build(), mClient);
   }
 
+  /**
+   * Serves a HTTP request of type <tt>POST</tt>.
+   *
+   * @param request The request to serve
+   * @throws IOException If an I/O exception occurred while sending the response
+   *                     to the client
+   */
   private void servePost(final HttpRequest request) throws IOException {
     if (!request.getResource().equals(API_RESOURCE)) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.NOT_IMPLEMENTED).build(), mClient);

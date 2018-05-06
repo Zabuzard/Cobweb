@@ -15,20 +15,61 @@ import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
 
+/**
+ * Implementation of Dijkstras algorithm that is able to compute shortest paths
+ * on a given graph.<br>
+ * <br>
+ * Dijkstra has no sense of goal direction. When finishing the computation of
+ * the shortest path it has also computed all shortest paths to nodes less far
+ * away, so the <i>search space</i> is rather big.<br>
+ * <br>
+ * Subclasses can override {@link #considerEdgeForRelaxation(IEdge, INode)} and
+ * {@link #getEstimatedDistance(INode, INode)} to speedup the algorithm by
+ * giving it a sense of goal direction or exploiting precomputed knowledge.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <N> Type of the node
+ * @param <E> Type of the edge
+ * @param <G> Type of the graph
+ */
 public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E>>
     extends AShortestPathComputation<N, E> {
-
+  /**
+   * The graph to operate on.
+   */
   private final G mGraph;
 
+  /**
+   * Creates a new Dijkstra instance which operates on the given graph.
+   *
+   * @param graph The graph to operate on
+   */
   public Dijkstra(final G graph) {
     mGraph = graph;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * computeSearchSpace(java.util.Collection,
+   * de.tischner.cobweb.routing.model.graph.INode)
+   */
   @Override
   public Collection<N> computeSearchSpace(final Collection<N> sources, final N destination) {
     return computeShortestPathCostHelper(sources, null).keySet();
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * computeShortestPath(java.util.Collection,
+   * de.tischner.cobweb.routing.model.graph.INode)
+   */
   @Override
   public Optional<IPath<N, E>> computeShortestPath(final Collection<N> sources, final N destination) {
     final Map<N, TentativeDistance<N, E>> nodeToDistance = computeShortestPathCostHelper(sources, destination);
@@ -58,17 +99,49 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
     return Optional.of(path);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * computeShortestPathCost(java.util.Collection,
+   * de.tischner.cobweb.routing.model.graph.INode)
+   */
   @Override
   public Optional<Double> computeShortestPathCost(final Collection<N> sources, final N destination) {
     final Map<N, TentativeDistance<N, E>> nodeToDistance = computeShortestPathCostHelper(sources, destination);
     return Optional.ofNullable(nodeToDistance.get(destination)).map(TentativeDistance::getEstimatedDistance);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * computeShortestPathCostsReachable(java.util.Collection)
+   */
   @Override
   public Map<N, ? extends IHasPathCost> computeShortestPathCostsReachable(final Collection<N> sources) {
     return computeShortestPathCostHelper(sources, null);
   }
 
+  /**
+   * Creates a tentative distance container for the given node.<br>
+   * <br>
+   * If the <tt>pathDestination</tt> is not <tt>null</tt> the container will also
+   * include an estimated distance from the node to the destination. This is
+   * computed using {@link #getEstimatedDistance(INode, INode)}.
+   *
+   * @param node              The node to create the container for
+   * @param parentEdge        The parent edge that lead to that node, used for
+   *                          shortest path construction by backtracking
+   * @param tentativeDistance The tentative distance from the source to that node,
+   *                          i.e. the total cost of backtracking the given parent
+   *                          edges to the source
+   * @param pathDestination   The destination of the shortest path computation or
+   *                          <tt>null</tt> if not present
+   * @return A tentative distance container for the given node
+   */
   private TentativeDistance<N, E> createDistance(final N node, final E parentEdge, final double tentativeDistance,
       final N pathDestination) {
     if (pathDestination == null) {
@@ -79,6 +152,21 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
     return new TentativeDistance<>(node, parentEdge, tentativeDistance, estimatedDistance);
   }
 
+  /**
+   * Computes the shortest path from the given sources to the given destination
+   * and to all other nodes that were visited in the mean time.<br>
+   * <br>
+   * The shortest path from multiple sources is the minimal shortest path for all
+   * source nodes individually. If the destination is <tt>null</tt> the shortest
+   * paths to all nodes in the graph are computed.
+   *
+   * @param sources         The sources to compute the shortest path from
+   * @param pathDestination The destination to compute the shortest path to or
+   *                        <tt>null</tt> if not present
+   * @return A map connecting all visited nodes to their tentative distance
+   *         container. The container represent the shortest path from the sources
+   *         to that given node as destination.
+   */
   protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<N> sources,
       final N pathDestination) {
     // NOTE If RAM allows, the maps could be exchanged by arrays after mapping the
@@ -164,12 +252,35 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
     return nodeToSettledDistance;
   }
 
+  /**
+   * Whether or not the given edge should be considered for relaxation. The
+   * algorithm will ignore the edge and not follow it if this method returns
+   * <tt>false</tt>.
+   *
+   * @param edge            The edge in question
+   * @param pathDestination The destination of the shortest path computation or
+   *                        <tt>null</tt> if not present
+   * @return <tt>True</tt> if the edge should be considered, <tt>false</tt>
+   *         otherwise
+   */
+  @SuppressWarnings("unused")
   protected boolean considerEdgeForRelaxation(final E edge, final N pathDestination) {
     // Dijkstras algorithm considers every outgoing edge.
     // This method may be used by extending classes to improve performance.
     return true;
   }
 
+  /**
+   * Gets an estimate about the shortest path distance from the given node to the
+   * destination of the shortest path computation.<br>
+   * <br>
+   * The estimate must be <i>monotone</i> and <i>admissible</i>.
+   *
+   * @param node            The node to estimate the distance from
+   * @param pathDestination The destination to estimate the distance to
+   * @return An estimate about the shortest path distance
+   */
+  @SuppressWarnings("unused")
   protected double getEstimatedDistance(final N node, final N pathDestination) {
     // Dijkstras algorithm does not use estimations. It makes the worst possible
     // guess of 0 for every node.

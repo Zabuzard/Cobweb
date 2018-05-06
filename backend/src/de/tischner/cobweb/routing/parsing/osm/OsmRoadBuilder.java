@@ -13,21 +13,39 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 
+/**
+ * Implementation of an {@link IOsmRoadBuilder} which builds instances of
+ * {@link RoadNode}s and {@link RoadEdge}s.<br>
+ * <br>
+ * Edges are build incomplete at first and are updated once {@link #complete()}
+ * is called.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ * @param <G> The type of the graph which must be able to get nodes by their ID
+ */
 public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & ICanGetNodeById<RoadNode>>
     implements IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> {
-
+  /**
+   * The graph to operate on.
+   */
   private final G mGraph;
 
+  /**
+   * Creates a new OSM road builder which operates on the given graph.
+   *
+   * @param graph The graph to operate on
+   */
   public OsmRoadBuilder(final G graph) {
     mGraph = graph;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.parsing.osm.IRoadBuilder#buildEdge(de.topobyte.
-   * osm4j.core.model.iface.OsmWay, long, long)
+  /**
+   * Builds an edge which connects the source and destination nodes with the given
+   * unique IDs.<br>
+   * <br>
+   * The edge is build incomplete at first and are updated once
+   * {@link #complete()} is called.
    */
   @Override
   public RoadEdge<RoadNode> buildEdge(final OsmWay way, final long sourceId, final long destinationId)
@@ -47,7 +65,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    * (non-Javadoc)
    *
    * @see
-   * de.tischner.cobweb.routing.parsing.osm.IRoadBuilder#buildNode(de.topobyte.
+   * de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder#buildNode(de.topobyte.
    * osm4j.core.model.iface.OsmNode)
    */
   @Override
@@ -55,6 +73,11 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
     return new RoadNode(node.getId(), node.getLatitude(), node.getLongitude());
   }
 
+  /**
+   * Callback to be used once construction has been finished.<br>
+   * <br>
+   * Will update all constructed edges since they are build incomplete at first.
+   */
   @Override
   public void complete() {
     // Spatial data of nodes are now known, update all edge costs
