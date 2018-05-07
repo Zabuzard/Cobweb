@@ -41,12 +41,25 @@ public enum EHttpStatus {
    */
   OK(200);
 
+  /**
+   * The status code of the HTTP status.
+   */
   private final int mStatusCode;
 
+  /**
+   * Creates a new HTTP status with the given status code.
+   *
+   * @param statusCode The status code of the HTTP status
+   */
   private EHttpStatus(final int statusCode) {
     mStatusCode = statusCode;
   }
 
+  /**
+   * Gets the status code of this HTTP status.
+   *
+   * @return The status code of this HTTP status
+   */
   public int getStatusCode() {
     return mStatusCode;
   }

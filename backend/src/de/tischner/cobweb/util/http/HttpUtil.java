@@ -12,10 +12,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * Utility class which provides methods related to HTTP communication.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ *
+ */
 public final class HttpUtil {
+  /**
+   * Symbol used for new lines in the HTTP standard.
+   */
   private static final String HTTP_NEW_LINE = "\r\n";
+
+  /**
+   * Standard charset to use for encoding and decoding of content.
+   */
   private static final Charset STANDARD_CHARSET = StandardCharsets.UTF_8;
 
+  /**
+   * Parses the content type out of the header value.
+   *
+   * @param value The header value of the content type header
+   * @return The content type
+   */
   public static EHttpContentType parseContentType(final String value) {
     if (value == null) {
       return null;
@@ -24,6 +43,14 @@ public final class HttpUtil {
     return EHttpContentType.fromTextValue(data[0]);
   }
 
+  /**
+   * Parses a HTTP request from the given input stream.
+   *
+   * @param input The stream that contains the HTTP request
+   * @return The parsed HTTP request
+   * @throws IOException If an I/O exception occurred while reading from the
+   *                     stream
+   */
   public static HttpRequest parseRequest(final InputStream input) throws IOException {
     // Read the request
     String request;
@@ -103,6 +130,23 @@ public final class HttpUtil {
     }
   }
 
+  /**
+   * Reads the content of the given input stream.<br>
+   * <br>
+   * The stream must already be advanced to the point where the content begins.
+   * The method will make sure that only the given amount of bytes is read from
+   * the stream. In particular, it will not read more than desired for buffering
+   * purpose.
+   *
+   * @param contentLength The length of the content in amount of bytes
+   * @param input         The input stream from which to read. The stream must
+   *                      already be advanced to the point where the content
+   *                      begins.
+   * @return The read content, interpreted as string in the standard charset
+   *         represented by {@link #STANDARD_CHARSET}
+   * @throws IOException If an I/O exception occurred while reading from the
+   *                     stream
+   */
   private static String readHttpContent(final int contentLength, final InputStream input) throws IOException {
     final byte[] contentRawBuffer = new byte[contentLength];
     final int amountRead = input.read(contentRawBuffer);
@@ -113,6 +157,18 @@ public final class HttpUtil {
     return new String(contentRaw, STANDARD_CHARSET);
   }
 
+  /**
+   * Reads one line of the given HTTP stream.<br>
+   * <br>
+   * The method only reads exactly one line. In particular, it does not read more
+   * than desired for buffering purpose.
+   *
+   * @param input The input stream to read from
+   * @return The read line, interpreted as string in the standard charset
+   *         represented by {@link #STANDARD_CHARSET}
+   * @throws IOException If an I/O exception occurred while reading from the
+   *                     stream
+   */
   private static String readHttpLine(final InputStream input) throws IOException {
     final ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
 
@@ -134,5 +190,12 @@ public final class HttpUtil {
     }
 
     return byteArrayOutput.toString(STANDARD_CHARSET.name());
+  }
+
+  /**
+   * Utility class. No implementation.
+   */
+  private HttpUtil() {
+
   }
 }

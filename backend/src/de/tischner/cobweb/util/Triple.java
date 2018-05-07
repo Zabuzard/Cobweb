@@ -5,9 +5,9 @@ package de.tischner.cobweb.util;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
- * @param <E1> First type
- * @param <E2> Second type
- * @param <E3> Third type
+ * @param <E1> Type of the first element
+ * @param <E2> Type of the second element
+ * @param <E3> Type of the third element
  */
 public final class Triple<E1, E2, E3> {
   /**
