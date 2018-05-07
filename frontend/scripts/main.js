@@ -2,31 +2,45 @@
  * Main handling of all site functionality, as well as communication
  * with REST API server.
  *
+ * @module
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 
+ /** The URL of the routing server which offers the REST API. */
 var routeRequestServer = 'http://localhost:845/route';
+/**The access-token of the Mapbox API to use. */
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
+/** The URL of the Mapbox server. */
 var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
-var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+/** The attribution text to display on the map. */
+var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+/** The maximal allowed zoom for the map. */
 var mapMaxZoom = 20;
+/** The default latitude to center the map view at. */
 var mapDefaultLat = 49.23299;
+/** The default longitude to center the map view at. */
 var mapDefaultLong = 6.97633;
+/** The default zoom to start the map view at */
 var mapDefaultZoom = 6;
+/** The map to use. */
 var map;
+/** The layer which displays streets. */
 var mapStreetLayer;
+/** The layer which displays a satellite image. */
 var mapSatelliteLayer;
+/** Whether or not the map currently displays the street layer. */
 var isMapLayerStreet;
+/** An array consisting of all route markers currently placed on the map. */
 var mapRouteMarkerGroup = [];
-
+/** A map connecting transportation mode strings to their corresponding IDs. */
 var transModeToId = {
 	"carMode" : 0,
 	"tramMode" : 1,
 	"footMode" : 2,
 	"bikeMode" : 3
 }
-
+/** A map connecting transportation mode IDs to their corresponding strings. */
 var transIdToMode = {
 	0 : "carMode",
 	1 : "tramMode",
@@ -34,55 +48,72 @@ var transIdToMode = {
 	3 : "bikeMode"
 }
 
+// Starts the init function when the document is loaded.
 $(document).ready(init);
  
+/**
+ * Initializes the site functionality. That is, it initializes the UI and the map.<br>
+ *<br>
+ * If the site hash already has a request , it will be parsed and submitted.
+ */
 function init() {
 	initUI();
 	initMap();
-	
+
 	if (hasHash()) {
 		planRouteFromHashHandler();
 	}
 }
 
+/**
+ * Initializes the user interface of the site.
+ */
 function initUI() {
 	// Departure date and time
 	$('#departureDate').datepicker().datepicker("setDate", new Date());
 	$('#departureTime').timepicker({'scrollDefault' : 'now', 'timeFormat' : 'H:i'});
 	$('#departureTime').timepicker('setTime', new Date());
-	
+
 	// Transportation modes
 	$('#carMode').addClass('transportationModeSelected');
 	$('.transportationMode').click(transportationModeClickHandler);
-	
+
 	// Plan route
 	$('#planRoute').click(planRouteHandler);
-	
+
 	// Layer changer
 	$('#mapLayerChanger').click(layerChangeHandler);
 }
 
+/**
+ * Initializes the map.
+ */
 function initMap() {
 	map = L.map('mapContainer').setView([mapDefaultLat, mapDefaultLong], mapDefaultZoom);
-	
+
 	mapStreetLayer = L.tileLayer(mapboxUrl, {
 		attribution: mapboxAttribution,
     	maxZoom: mapMaxZoom,
     	id: 'mapbox.streets',
     	accessToken: mapboxToken
 	});
-	
+
 	mapSatelliteLayer = L.tileLayer(mapboxUrl, {
 		attribution: mapboxAttribution,
     	maxZoom: mapMaxZoom,
     	id: 'mapbox.satellite',
     	accessToken: mapboxToken
 	});
-	
+
 	map.addLayer(mapStreetLayer);
 	isMapLayerStreet = true;
 }
 
+/**
+ * Sends the given request to the routing server.
+ * @param {{depTime:number, modes:number[], from:number, to:number}} request - The request
+ * to send in the JSON format specified by the REST API
+ */
 function sendRequestToServer(request) {
 	$.ajax({
 		url: routeRequestServer,
