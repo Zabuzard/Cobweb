@@ -3,6 +3,7 @@ package de.tischner.cobweb.routing.algorithms.metrics.landmark;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +59,10 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
    */
   @Override
   public Collection<N> getLandmarks(final int amount) {
+    if (amount <= 0) {
+      return Collections.emptyList();
+    }
+
     int amountToUse = amount;
     if (amount > mGraph.size()) {
       amountToUse = mGraph.size();

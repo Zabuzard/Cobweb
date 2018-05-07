@@ -96,7 +96,8 @@ public final class OsmParseUtil {
    * @return A value greater than <tt>0</tt> if the way goes only into the
    *         direction it was declared in the OSM file. A value less than
    *         <tt>0</tt> if it goes into the opposite direction than declared in
-   *         the OSM file. Or <tt>0</tt> if the way goes into both directions.
+   *         the OSM file. Or <tt>0</tt> if the way goes into both directions or
+   *         the value was not present or could not be parsed.
    */
   public static int parseWayDirection(final Map<String, String> tagToValue) {
     final String onewayText = tagToValue.get(ONEWAY_TAG);

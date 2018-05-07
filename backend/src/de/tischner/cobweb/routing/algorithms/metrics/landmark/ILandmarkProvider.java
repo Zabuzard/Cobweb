@@ -18,7 +18,9 @@ public interface ILandmarkProvider<E> {
    * depending on the size of the graph and the amount to generate.
    *
    * @param amount The amount of landmarks to provide
-   * @return A collection consisting of the given amount of landmarks
+   * @return A collection consisting of the given amount of landmarks. If the
+   *         given amount is more than the underlying resource offers, the method
+   *         should get all the resource offers.
    */
   Collection<E> getLandmarks(int amount);
 }

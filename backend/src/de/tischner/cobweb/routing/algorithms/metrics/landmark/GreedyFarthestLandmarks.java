@@ -2,6 +2,7 @@ package de.tischner.cobweb.routing.algorithms.metrics.landmark;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,10 @@ public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, 
    */
   @Override
   public Collection<N> getLandmarks(final int amount) {
+    if (amount <= 0) {
+      return Collections.emptyList();
+    }
+
     int amountToUse = amount;
     if (amount > mGraph.size()) {
       amountToUse = mGraph.size();

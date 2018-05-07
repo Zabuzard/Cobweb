@@ -16,7 +16,7 @@ import de.tischner.cobweb.util.RoutingUtil;
  * @param <N> The type of objects the metric operates on, must implement
  *        {@link ISpatial}
  */
-public class AsTheCrowFliesMetric<N extends ISpatial> implements IMetric<N> {
+public final class AsTheCrowFliesMetric<N extends ISpatial> implements IMetric<N> {
 
   /**
    * The distance between both given objects, measured in <tt>metres</tt>.
