@@ -35,7 +35,7 @@ public final class MemoryDatabaseTest {
   private MemoryDatabase mMemoryDatabase;
 
   /**
-   * Setups a memory database instance for testing
+   * Setups a memory database instance for testing.
    */
   @Before
   public void setUp() {

@@ -51,19 +51,10 @@ public final class StronglyConnectedComponent<N> {
   /**
    * Gets the root node of this SCC.
    *
-   * @return The root node
+   * @return The root node or <tt>null</tt> if not set
    */
   public N getRootNode() {
     return mRootNode;
-  }
-
-  /**
-   * Gets the size of this SCC, i.e. the amount of contained nodes.
-   *
-   * @return The size of this SCC
-   */
-  public int getSize() {
-    return mNodes.size();
   }
 
   /**
@@ -73,6 +64,15 @@ public final class StronglyConnectedComponent<N> {
    */
   public void setRootNode(final N rootNode) {
     mRootNode = rootNode;
+  }
+
+  /**
+   * Gets the size of this SCC, i.e. the amount of contained nodes.
+   *
+   * @return The size of this SCC
+   */
+  public int size() {
+    return mNodes.size();
   }
 
   /*

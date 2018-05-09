@@ -110,7 +110,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
   @Override
   public Optional<Double> computeShortestPathCost(final Collection<N> sources, final N destination) {
     final Map<N, TentativeDistance<N, E>> nodeToDistance = computeShortestPathCostHelper(sources, destination);
-    return Optional.ofNullable(nodeToDistance.get(destination)).map(TentativeDistance::getEstimatedDistance);
+    return Optional.ofNullable(nodeToDistance.get(destination)).map(TentativeDistance::getTentativeDistance);
   }
 
   /*

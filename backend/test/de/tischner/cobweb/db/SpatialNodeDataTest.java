@@ -18,7 +18,7 @@ public final class SpatialNodeDataTest {
   private SpatialNodeData mSpatialNodeData;
 
   /**
-   * Setups a highway data instance for testing
+   * Setups a highway data instance for testing.
    */
   @Before
   public void setUp() {

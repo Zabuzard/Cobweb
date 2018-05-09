@@ -153,7 +153,7 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
     mSccs.add(scc);
 
     // Update the largest SCC
-    if (scc.getSize() > mLargestScc.getSize()) {
+    if (mLargestScc == null || scc.size() > mLargestScc.size()) {
       mLargestScc = scc;
     }
   }

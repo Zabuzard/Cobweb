@@ -20,7 +20,7 @@ public final class HighwayDataTest {
   private HighwayData mHighwayData;
 
   /**
-   * Setups a highway data instance for testing
+   * Setups a highway data instance for testing.
    */
   @Before
   public void setUp() {

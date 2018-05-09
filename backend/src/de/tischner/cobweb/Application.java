@@ -103,7 +103,7 @@ public final class Application {
    * default service will run faster.</li>
    * <li><b><tt>args[0] = clear</tt></b>: Clears the database and all cached and
    * serialized data.</li>
-   * <ul>
+   * </ul>
    *
    * @param args The arguments that specify which command to use.
    */

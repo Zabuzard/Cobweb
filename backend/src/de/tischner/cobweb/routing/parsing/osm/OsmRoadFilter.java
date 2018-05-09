@@ -145,7 +145,7 @@ public final class OsmRoadFilter implements IOsmFilter {
   /**
    * OSM relations are never accepted by this filter.
    *
-   * @return Always <tt>false</ttt>
+   * @return Always <tt>false</tt>
    */
   @Override
   public boolean filter(final OsmRelation relation) {

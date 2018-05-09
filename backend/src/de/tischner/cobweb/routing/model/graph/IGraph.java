@@ -112,8 +112,7 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * There are no requirements made on the time complexity. It is up to the
    * implementing class if this method runs fast or if it explicitly reverses each
    * edge. However, edges retrieved before the reversal still need to remain equal
-   * to the edges after the reversal, according to their
-   * {@link IEdge#equals(Object)} method.
+   * to the edges after the reversal, according to their <tt>equals</tt> method.
    */
   void reverse();
 

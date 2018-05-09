@@ -3,10 +3,9 @@ package de.tischner.cobweb.routing.algorithms.metrics.landmark;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.tischner.cobweb.parsing.osm.EHighwayType;
-import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
-import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
-import de.tischner.cobweb.routing.model.graph.road.RoadNode;
+import de.tischner.cobweb.routing.model.graph.BasicEdge;
+import de.tischner.cobweb.routing.model.graph.BasicGraph;
+import de.tischner.cobweb.routing.model.graph.BasicNode;
 
 /**
  * Test for the class {@link GreedyFarthestLandmarks}.
@@ -23,21 +22,21 @@ public final class GreedyFarthestLandmarksTest {
   @SuppressWarnings("static-method")
   @Test
   public void testGetLandmarks() {
-    final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph = new RoadGraph<>();
-    final RoadNode first = new RoadNode(1L, 10.0, 10.0);
-    final RoadNode second = new RoadNode(2L, 20.0, 20.0);
-    final RoadNode third = new RoadNode(3L, 30.0, 30.0);
-    final RoadNode fourth = new RoadNode(4L, 40.0, 40.0);
+    final BasicGraph graph = new BasicGraph();
+    final BasicNode first = new BasicNode(1L);
+    final BasicNode second = new BasicNode(2L);
+    final BasicNode third = new BasicNode(3L);
+    final BasicNode fourth = new BasicNode(4L);
     graph.addNode(first);
     graph.addNode(second);
     graph.addNode(third);
     graph.addNode(fourth);
-    graph.addEdge(new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100));
-    graph.addEdge(new RoadEdge<>(1L, second, third, EHighwayType.MOTORWAY, 100));
-    graph.addEdge(new RoadEdge<>(1L, third, fourth, EHighwayType.MOTORWAY, 100));
-    graph.addEdge(new RoadEdge<>(1L, fourth, first, EHighwayType.MOTORWAY, 100));
+    graph.addEdge(new BasicEdge<>(1L, first, second, 1.0));
+    graph.addEdge(new BasicEdge<>(1L, second, third, 1.0));
+    graph.addEdge(new BasicEdge<>(1L, third, fourth, 1.0));
+    graph.addEdge(new BasicEdge<>(1L, fourth, first, 1.0));
 
-    final GreedyFarthestLandmarks<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> landmarks = new GreedyFarthestLandmarks<>(
+    final GreedyFarthestLandmarks<BasicNode, BasicEdge<BasicNode>, BasicGraph> landmarks = new GreedyFarthestLandmarks<>(
         graph);
 
     Assert.assertEquals(0, landmarks.getLandmarks(0).size());
@@ -54,8 +53,7 @@ public final class GreedyFarthestLandmarksTest {
   @Test
   public void testGreedyFarthestLandmarks() {
     try {
-      final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph = new RoadGraph<>();
-      new GreedyFarthestLandmarks<>(graph);
+      new GreedyFarthestLandmarks<>(new BasicGraph());
     } catch (final Exception e) {
       Assert.fail();
     }

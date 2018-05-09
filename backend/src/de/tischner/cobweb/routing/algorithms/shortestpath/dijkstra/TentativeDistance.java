@@ -33,6 +33,7 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
    * The node this container wraps around.
    */
   private final N mNode;
+
   /**
    * The parent edge that lead to this node.
    */
@@ -134,6 +135,26 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
    */
   public double getTentativeDistance() {
     return mTentativeDistance;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("TentativeDistance [node=");
+    builder.append(mNode);
+    builder.append(", parentEdge=");
+    builder.append(mParentEdge);
+    builder.append(", tentativeDistance=");
+    builder.append(mTentativeDistance);
+    builder.append(", estimatedDistance=");
+    builder.append(mEstimatedDistance);
+    builder.append("]");
+    return builder.toString();
   }
 
 }
