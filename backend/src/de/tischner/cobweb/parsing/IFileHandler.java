@@ -9,6 +9,7 @@ import java.nio.file.Path;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
+@FunctionalInterface
 public interface IFileHandler {
   /**
    * Whether or not this handler accepts the given file.

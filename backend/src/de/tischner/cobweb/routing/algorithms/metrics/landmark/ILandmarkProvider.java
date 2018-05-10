@@ -12,6 +12,7 @@ import java.util.Collection;
  *
  * @param <E> The type of nodes and landmarks
  */
+@FunctionalInterface
 public interface ILandmarkProvider<E> {
   /**
    * Provides the given amount of landmarks. Landmark selection might take a while

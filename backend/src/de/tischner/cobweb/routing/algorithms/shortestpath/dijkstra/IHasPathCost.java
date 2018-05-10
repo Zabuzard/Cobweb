@@ -6,6 +6,7 @@ package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
+@FunctionalInterface
 public interface IHasPathCost {
   /**
    * Gets the path cost.
@@ -13,5 +14,4 @@ public interface IHasPathCost {
    * @return The cost of the path
    */
   double getPathCost();
-
 }

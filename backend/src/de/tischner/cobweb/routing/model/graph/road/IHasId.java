@@ -10,6 +10,7 @@ package de.tischner.cobweb.routing.model.graph.road;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
+@FunctionalInterface
 public interface IHasId {
   /**
    * Gets the ID of the object.<br>

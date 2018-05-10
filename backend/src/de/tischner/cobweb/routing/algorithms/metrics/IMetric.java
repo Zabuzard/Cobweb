@@ -7,6 +7,7 @@ package de.tischner.cobweb.routing.algorithms.metrics;
  *
  * @param <E> The type of objects the metric operates on
  */
+@FunctionalInterface
 public interface IMetric<E> {
   /**
    * Computes the distance between the two given objects accordingly to the

@@ -13,7 +13,7 @@ import de.tischner.cobweb.routing.model.graph.BasicNode;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
-public class TentativeDistanceTest {
+public final class TentativeDistanceTest {
 
   /**
    * The tentative distance used for testing.

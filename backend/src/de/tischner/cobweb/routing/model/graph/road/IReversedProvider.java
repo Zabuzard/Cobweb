@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
+@FunctionalInterface
 public interface IReversedProvider extends Serializable {
   /**
    * Whether or not the object is reversed.

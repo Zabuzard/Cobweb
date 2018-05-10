@@ -25,7 +25,7 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  *
  */
-public class DijkstraTest {
+public final class DijkstraTest {
   /**
    * The Dijkstra used for testing.
    */
@@ -34,7 +34,6 @@ public class DijkstraTest {
    * Counter used for generating unique edge IDs.
    */
   private long mEdgeIdCounter;
-
   /**
    * The graph used for testing.
    */
