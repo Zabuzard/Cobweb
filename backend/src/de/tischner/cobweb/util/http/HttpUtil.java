@@ -33,7 +33,7 @@ public final class HttpUtil {
    * Parses the content type out of the header value.
    *
    * @param value The header value of the content type header
-   * @return The content type
+   * @return The content type or <tt>null</tt> if not present
    */
   public static EHttpContentType parseContentType(final String value) {
     if (value == null) {

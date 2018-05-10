@@ -13,7 +13,6 @@ import de.tischner.cobweb.parsing.osm.EHighwayType;
  *
  */
 public final class HighwayDataTest {
-
   /**
    * The highway data used for testing.
    */

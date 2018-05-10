@@ -229,5 +229,4 @@ public final class RoadGraphTest {
     graph.addEdge(new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100));
     mEdgeIdCounter++;
   }
-
 }
