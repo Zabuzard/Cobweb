@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
  * entities.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmParseUtil {
   /**
@@ -32,7 +31,7 @@ public final class OsmParseUtil {
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(OsmParseUtil.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsmParseUtil.class);
 
   /**
    * Gets the highway type of the given OSM way.

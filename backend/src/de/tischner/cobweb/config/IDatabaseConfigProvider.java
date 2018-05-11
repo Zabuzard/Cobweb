@@ -6,13 +6,12 @@ import java.nio.file.Path;
  * Interface for classes that provide database related configuration settings.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public interface IDatabaseConfigProvider {
   /**
    * Gets the path to the database info object that stores information about the
-   * content of the database. Can be used to determine which data files need to be
-   * considered when parsing in order to avoid pushing the same data again.
+   * content of the database. Can be used to determine which data files need to
+   * be considered when parsing in order to avoid pushing the same data again.
    *
    * @return The path to the database info object
    */
@@ -31,13 +30,13 @@ public interface IDatabaseConfigProvider {
    *
    * @return The JDBC URL used to connect
    */
-  String getJDBCUrl();
+  String getJdbcUrl();
 
   /**
    * Whether an external or an internal in-memory database should be used.
    *
-   * @return <tt>True</tt> if an external database should be used, <tt>false</tt>
-   *         otherwise
+   * @return <tt>True</tt> if an external database should be used,
+   *         <tt>false</tt> otherwise
    */
   boolean useExternalDb();
 }

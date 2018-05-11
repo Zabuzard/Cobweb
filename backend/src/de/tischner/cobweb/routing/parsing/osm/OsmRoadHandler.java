@@ -42,38 +42,37 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * using a given builder.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  * @param <G> Type of the graph
  */
-public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
-    implements IOsmFileHandler {
+public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
+    G extends IGraph<N, E> & ICanGetNodeById<N>> implements IOsmFileHandler {
   /**
-   * The size of the node ID buffer. If the buffer reaches the limit spatial node
-   * data from all buffered node IDs is requested from the database.
+   * The size of the node ID buffer. If the buffer reaches the limit spatial
+   * node data from all buffered node IDs is requested from the database.
    */
   private static final int BUFFER_SIZE = 100_000;
   /**
    * Logger used for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsmRoadHandler.class);
   /**
-   * The buffer to use for buffering node IDs for which spatial node data is to be
-   * requested from the database. The buffer is used to avoid requesting data for
-   * every node in a single connection to the database.
+   * The buffer to use for buffering node IDs for which spatial node data is to
+   * be requested from the database. The buffer is used to avoid requesting data
+   * for every node in a single connection to the database.
    */
   private final long[] mBufferedRequests;
   /**
-   * The current index to use in the node ID buffer. It points to the index where
-   * the next node ID can be inserted. So it is always one greater than the index
-   * of the last inserted node ID. By that it represents the current size of the
-   * buffer.
+   * The current index to use in the node ID buffer. It points to the index
+   * where the next node ID can be inserted. So it is always one greater than
+   * the index of the last inserted node ID. By that it represents the current
+   * size of the buffer.
    */
   private int mBufferIndex;
   /**
-   * Builder to use for constructing edges and nodes that are to be inserted into
-   * the graph.
+   * Builder to use for constructing edges and nodes that are to be inserted
+   * into the graph.
    */
   private final IOsmRoadBuilder<N, E> mBuilder;
   /**
@@ -89,9 +88,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private final G mGraph;
   /**
-   * The handler to use which determines the OSM files that contain more recent or
-   * new data than the data already stored in the graph. Will only be used if the
-   * configuration has set the use of a graph cache.
+   * The handler to use which determines the OSM files that contain more recent
+   * or new data than the data already stored in the graph. Will only be used if
+   * the configuration has set the use of a graph cache.
    */
   private final RecentHandler mRecentHandler;
   /**
@@ -113,7 +112,8 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    * @param builder  Builder to use for constructing edges and nodes that are to
    *                 be inserted into the graph.
    * @param database The database used for requesting spatial node data.
-   * @param config   Configuration provider which provides graph cache information
+   * @param config   Configuration provider which provides graph cache
+   *                 information
    * @throws IOException If an I/O exception occurred while reading the graph
    *                     cache information
    */
@@ -135,7 +135,6 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see de.topobyte.osm4j.core.access.OsmHandler#complete()
    */
   @Override
@@ -151,10 +150,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmBounds)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmBounds)
    */
   @Override
   public void handle(final OsmBounds bounds) throws IOException {
@@ -163,10 +161,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmNode)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmNode)
    */
   @Override
   public void handle(final OsmNode node) throws IOException {
@@ -176,10 +173,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmRelation)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmRelation)
    */
   @Override
   public void handle(final OsmRelation relation) throws IOException {
@@ -188,10 +184,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmWay)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmWay)
    */
   @Override
   public void handle(final OsmWay way) throws IOException {
@@ -237,7 +232,6 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.parsing.IFileHandler#acceptFile(java.nio.file.Path)
    */
   @Override
@@ -274,7 +268,8 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
 
   /**
    * Queues a spatial node data request for the given node. The request is
-   * buffered and the buffer is submitted using {@link #submitBufferedRequests()}.
+   * buffered and the buffer is submitted using
+   * {@link #submitBufferedRequests()}.
    *
    * @param nodeId The unique ID of the node to queue a request for
    */
@@ -305,8 +300,8 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Submitting buffered requests of size: {}", size);
     }
-    final Collection<SpatialNodeData> nodeData = mDatabase
-        .getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size), size);
+    final Collection<SpatialNodeData> nodeData =
+        mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size), size);
     nodeData.forEach(this::insertSpatialData);
 
     // Reset index since buffer is empty again

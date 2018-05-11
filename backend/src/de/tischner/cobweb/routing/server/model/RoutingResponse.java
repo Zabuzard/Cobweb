@@ -13,7 +13,6 @@ import java.util.List;
  * send to the client.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoutingResponse {
   /**
@@ -80,7 +79,6 @@ public final class RoutingResponse {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

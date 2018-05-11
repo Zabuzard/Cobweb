@@ -40,12 +40,12 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * To handle a request call {@link #handleRequest(RoutingRequest)}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  * @param <G> Type of the graph
  */
-public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>> {
+public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
+    G extends IGraph<N, E> & ICanGetNodeById<N>> {
   /**
    * Logger used for logging
    */
@@ -80,7 +80,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param client      The client whose request to handle
    * @param gson        The GSON object used to format JSON responses
    * @param graph       The graph used for shortest path computation
-   * @param computation The algorithm to use for computing shortest path requests
+   * @param computation The algorithm to use for computing shortest path
+   *                    requests
    * @param database    The database to use for fetching meta data for nodes and
    *                    edges
    */
@@ -94,8 +95,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   }
 
   /**
-   * Handles the given routing request. It computes shortest paths and constructs
-   * and sends a proper response.
+   * Handles the given routing request. It computes shortest paths and
+   * constructs and sends a proper response.
    *
    * @param request The request to handle
    * @throws IOException If an I/O exception occurred while sending a response
@@ -131,8 +132,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final Journey journey = buildJourney(request, path);
 
     // Build and send response
-    final RoutingResponse response = new RoutingResponse(request.getFrom(), request.getTo(),
-        Collections.singletonList(journey));
+    final RoutingResponse response =
+        new RoutingResponse(request.getFrom(), request.getTo(), Collections.singletonList(journey));
     sendResponse(response);
   }
 

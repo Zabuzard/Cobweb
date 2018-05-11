@@ -12,7 +12,6 @@ import de.tischner.cobweb.routing.model.graph.IPath;
  * with no edges and only one node.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
@@ -33,7 +32,6 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getDestination()
    */
   @Override
@@ -43,7 +41,6 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getSource()
    */
   @Override
@@ -53,7 +50,6 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getTotalCost()
    */
   @Override
@@ -63,7 +59,6 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Iterable#iterator()
    */
   @Override
@@ -73,7 +68,6 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#length()
    */
   @Override

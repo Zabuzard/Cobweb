@@ -47,13 +47,12 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * compute shortest paths with and a database for retrieving meta-data.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  * @param <G> Type of the graph
  */
-public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
-    implements Runnable {
+public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
+    G extends IGraph<N, E> & ICanGetNodeById<N>> implements Runnable {
   /**
    * Logger used for logging.
    */
@@ -95,21 +94,21 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
   private volatile boolean mShouldRun;
 
   /**
-   * Creates a new routing server with the given configuration that works with the
-   * given tools.<br>
+   * Creates a new routing server with the given configuration that works with
+   * the given tools.<br>
    * <br>
    * After construction the {@link #initialize()} method should be called.
-   * Afterwards it can be started by using {@link #start()}. Request the server to
-   * shutdown by using {@link #shutdown()}, the current status can be checked with
-   * {@link #isRunning()}. Once a server was shutdown it should not be used
+   * Afterwards it can be started by using {@link #start()}. Request the server
+   * to shutdown by using {@link #shutdown()}, the current status can be checked
+   * with {@link #isRunning()}. Once a server was shutdown it should not be used
    * anymore, instead create a new one.
    *
-   * @param config      Configuration provider which provides the port that should
-   *                    be used by the server
+   * @param config      Configuration provider which provides the port that
+   *                    should be used by the server
    * @param graph       The graph to route on
    * @param computation The algorithm to use for shortest path computation
-   * @param database    Database used for retrieving meta-data about graph objects
-   *                    like nodes and edges
+   * @param database    Database used for retrieving meta-data about graph
+   *                    objects like nodes and edges
    */
   public RoutingServer(final IRoutingConfigProvider config, final G graph,
       final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
@@ -123,8 +122,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    * Initializes the server. Call this method prior to starting the server with
    * {@link #start()}. Do not call it again afterwards.
    *
-   * @throws UncheckedIOException If an I/O exception occurred while creating the
-   *                              server socket.
+   * @throws UncheckedIOException If an I/O exception occurred while creating
+   *                              the server socket.
    */
   public void initialize() throws UncheckedIOException {
     mServerThread = new Thread(this);
@@ -149,7 +148,6 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Runnable#run()
    */
   @Override
@@ -169,7 +167,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
         final ClientHandler<N, E, G> handler = new ClientHandler<>(requestId, client, mGraph, mComputation, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
-        // Ignore the exception. The timeout is used to repeatedly check if the server
+        // Ignore the exception. The timeout is used to repeatedly check if the
+        // server
         // should continue running.
       } catch (final Exception e) {
         // TODO Implement some limit of repeated exceptions
@@ -196,8 +195,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    * Starts the server.<br>
    * <br>
    * Make sure {@link #initialize()} is called before. Request the server to
-   * shutdown by using {@link #shutdown()}, the current status can be checked with
-   * {@link #isRunning()}. Once a server was shutdown it should not be used
+   * shutdown by using {@link #shutdown()}, the current status can be checked
+   * with {@link #isRunning()}. Once a server was shutdown it should not be used
    * anymore, instead create a new one.
    */
   public void start() {

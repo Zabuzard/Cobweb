@@ -20,13 +20,12 @@ import de.tischner.cobweb.parsing.osm.OsmParser;
  * parser will then notify all registered handlers.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class DataParser {
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(DataParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataParser.class);
   /**
    * Configuration that provides paths for the data to parse.
    */
@@ -57,8 +56,8 @@ public final class DataParser {
   }
 
   /**
-   * Parses all data given by the configuration provider, like OSM and GTFS data.
-   * Notifies all registered handler when parsing elements.<br>
+   * Parses all data given by the configuration provider, like OSM and GTFS
+   * data. Notifies all registered handler when parsing elements.<br>
    * <br>
    * Use methods like {@link #addOsmHandler(IOsmFileHandler)} to register a
    * handler.

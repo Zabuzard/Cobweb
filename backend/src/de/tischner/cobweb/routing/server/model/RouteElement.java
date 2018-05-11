@@ -14,12 +14,11 @@ import java.util.stream.Collectors;
  * Is used in a {@link Journey} and usually decoded into JSON.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RouteElement {
   /**
-   * A list of latitude and longitude coordinates belonging to this element. Thus,
-   * the size of the arrays is <tt>2</tt>.
+   * A list of latitude and longitude coordinates belonging to this element.
+   * Thus, the size of the arrays is <tt>2</tt>.
    */
   private List<double[]> mGeom;
   /**
@@ -57,7 +56,8 @@ public final class RouteElement {
 
   /**
    * Creates a new route element. Should be used for
-   * {@link ERouteElementType#NODE} since they do not have a transportation mode.
+   * {@link ERouteElementType#NODE} since they do not have a transportation
+   * mode.
    *
    * @param type The type of this route element
    * @param name The name of this element or empty if not present
@@ -120,7 +120,6 @@ public final class RouteElement {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

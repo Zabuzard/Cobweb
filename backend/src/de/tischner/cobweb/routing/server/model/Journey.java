@@ -9,7 +9,6 @@ import java.util.List;
  * Is used in a {@link RoutingResponse} and usually decoded into JSON.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class Journey {
   /**
@@ -17,7 +16,8 @@ public final class Journey {
    */
   private long mArrTime;
   /**
-   * The departure time at the start of the journey, in milliseconds since epoch.
+   * The departure time at the start of the journey, in milliseconds since
+   * epoch.
    */
   private long mDepTime;
   /**
@@ -32,7 +32,8 @@ public final class Journey {
    *                milliseconds since epoch
    * @param arrTime The arrival time at the end of the journey, in milliseconds
    *                since epoch
-   * @param route   The route the journey represents, consists of nodes and paths
+   * @param route   The route the journey represents, consists of nodes and
+   *                paths
    */
   public Journey(final long depTime, final long arrTime, final List<RouteElement> route) {
     mDepTime = depTime;
@@ -41,7 +42,8 @@ public final class Journey {
   }
 
   /**
-   * Creates a new empty journey. Is used to construct the journey via reflection.
+   * Creates a new empty journey. Is used to construct the journey via
+   * reflection.
    */
   @SuppressWarnings("unused")
   private Journey() {
@@ -49,7 +51,8 @@ public final class Journey {
   }
 
   /**
-   * Gets the arrival time at the end of the journey, in milliseconds since epoch.
+   * Gets the arrival time at the end of the journey, in milliseconds since
+   * epoch.
    *
    * @return The arrival time in milliseconds since epoch
    */
@@ -78,7 +81,6 @@ public final class Journey {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -4,7 +4,6 @@ package de.tischner.cobweb.routing.model.graph;
  * Interface for a weighted directed edge that connects two nodes.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  */
 public interface IEdge<N extends INode> {

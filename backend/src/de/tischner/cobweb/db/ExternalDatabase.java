@@ -42,25 +42,24 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * and similar methods.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ExternalDatabase extends ARoutingDatabase {
   /**
    * The logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
 
   /**
    * Pushes the given OSM node to the database if not already contained.<br>
    * <br>
    * In case multiple nodes are to be pushed, auto-commit should be set to
-   * <tt>false</tt> before calling the method. The method will not force a commit
-   * on its own.
+   * <tt>false</tt> before calling the method. The method will not force a
+   * commit on its own.
    *
    * @param node       The node to push to the database
    * @param connection The connection to the database
-   * @throws SQLException If an SQL exception occurred while trying to execute the
-   *                      update
+   * @throws SQLException If an SQL exception occurred while trying to execute
+   *                      the update
    */
   private static void queueOsmNode(final OsmNode node, final Connection connection) throws SQLException {
     // Retrieve information
@@ -92,13 +91,13 @@ public final class ExternalDatabase extends ARoutingDatabase {
    * Pushes the given OSM way to the database if not already contained.<br>
    * <br>
    * In case multiple ways are to be pushed, auto-commit should be set to
-   * <tt>false</tt> before calling the method. The method will not force a commit
-   * on its own.
+   * <tt>false</tt> before calling the method. The method will not force a
+   * commit on its own.
    *
    * @param way        The way to push to the database
    * @param connection The connection to the database
-   * @throws SQLException If an SQL exception occurred while trying to execute the
-   *                      update
+   * @throws SQLException If an SQL exception occurred while trying to execute
+   *                      the update
    */
   private static void queueOsmWay(final OsmWay way, final Connection connection) throws SQLException {
     // Retrieve information
@@ -127,8 +126,8 @@ public final class ExternalDatabase extends ARoutingDatabase {
   private final IDatabaseConfigProvider mConfig;
 
   /**
-   * Creates a new external database object which uses the configuration given by
-   * the provider.<br>
+   * Creates a new external database object which uses the configuration given
+   * by the provider.<br>
    * <br>
    * Use {@link #initialize()} before using the database and {@link #shutdown()}
    * when finished using it.
@@ -141,8 +140,8 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
    * LongStream, int)
    */
   @Override
@@ -191,7 +190,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
    */
   @Override
@@ -217,7 +215,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeName(long)
    */
   @Override
@@ -243,7 +240,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
    * LongStream, int)
@@ -291,7 +287,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getWayByName(java.lang.String)
    */
   @Override
@@ -317,7 +312,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getWayName(long)
    */
   @Override
@@ -343,7 +337,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#initialize()
    */
   @Override
@@ -362,7 +355,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#offerOsmEntities(java.util.stream.
    * Stream, int)
@@ -398,7 +390,6 @@ public final class ExternalDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#shutdown()
    */
   @Override
@@ -408,16 +399,16 @@ public final class ExternalDatabase extends ARoutingDatabase {
   }
 
   /**
-   * Creates a connection to the external database by using the JDBC URL provided
-   * by the configuration provider.
+   * Creates a connection to the external database by using the JDBC URL
+   * provided by the configuration provider.
    *
    * @return The connection to the external database
-   * @throws SQLException If an SQL exception occurred while trying to connect to
-   *                      the external database. For example if the JDB URL was
-   *                      invalid.
+   * @throws SQLException If an SQL exception occurred while trying to connect
+   *                      to the external database. For example if the JDB URL
+   *                      was invalid.
    */
   private Connection createConnection() throws SQLException {
-    return DriverManager.getConnection(mConfig.getJDBCUrl());
+    return DriverManager.getConnection(mConfig.getJdbcUrl());
   }
 
 }

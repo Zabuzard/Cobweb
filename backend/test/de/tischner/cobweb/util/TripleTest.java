@@ -8,7 +8,6 @@ import org.junit.Test;
  * Test for the class {@link Triple}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class TripleTest {
   /**

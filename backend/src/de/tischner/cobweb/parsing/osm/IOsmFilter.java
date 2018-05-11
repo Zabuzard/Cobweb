@@ -8,7 +8,6 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
  * Filter to use for filtering OSM entities.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public interface IOsmFilter {
   /**

@@ -30,18 +30,17 @@ import de.topobyte.osm4j.xml.dynsax.OsmXmlReader;
  * and forward all entities to all registered {@link IOsmFileHandler}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmParser {
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(OsmParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsmParser.class);
   /**
    * Prefix of an OSM file that was reduced. The parser prefers them over an
    * unreduced variant.
    */
-  private final static String REDUCED_PREFIX = "reduced_";
+  private static final String REDUCED_PREFIX = "reduced_";
 
   /**
    * Walks through the given directory and collects all OSM files that should be
@@ -94,18 +93,18 @@ public final class OsmParser {
     final BufferedInputStream bufferedInput = new BufferedInputStream(Files.newInputStream(osmFile));
     final EFileExtension extension = FileUtil.getFileExtension(osmFile);
     switch (extension) {
-    case NONE: // Fall through
-    case OSM:
-      return bufferedInput;
-    case B_ZIP_TWO:
-      return new BZip2CompressorInputStream(bufferedInput);
-    case G_ZIP:
-      return new GzipCompressorInputStream(bufferedInput);
-    case XZ:
-      return new XZCompressorInputStream(bufferedInput);
-    case UNKNOWN: // Fall through
-    default: // Ignore file
-      return null;
+      case NONE: // Fall through
+      case OSM:
+        return bufferedInput;
+      case B_ZIP_TWO:
+        return new BZip2CompressorInputStream(bufferedInput);
+      case G_ZIP:
+        return new GzipCompressorInputStream(bufferedInput);
+      case XZ:
+        return new XZCompressorInputStream(bufferedInput);
+      case UNKNOWN: // Fall through
+      default: // Ignore file
+        return null;
     }
   }
 
@@ -158,16 +157,16 @@ public final class OsmParser {
    * The parser won't parse a file if no handler accepts the file.
    *
    * @throws ParseException If a parse exception occurred while reading the OSM
-   *                        files. For example if the directory is invalid or the
-   *                        OSM files are in a wrong format.
+   *                        files. For example if the directory is invalid or
+   *                        the OSM files are in a wrong format.
    */
   public void parseOsmFiles() throws ParseException {
     try {
       final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory);
       for (final Path file : files) {
         // Collect all handler that accept this file
-        final List<IOsmFileHandler> interestedHandler = mAllHandler.stream()
-            .filter(handler -> handler.isAcceptingFile(file)).collect(Collectors.toList());
+        final List<IOsmFileHandler> interestedHandler =
+            mAllHandler.stream().filter(handler -> handler.isAcceptingFile(file)).collect(Collectors.toList());
         // Do not parse if nobody accepts
         if (interestedHandler.isEmpty()) {
           continue;
@@ -186,7 +185,8 @@ public final class OsmParser {
    * @param file              OSM file to stream
    * @param interestedHandler All handler that are interested in this file
    * @throws OsmInputException If the OSM file is in a wrong format
-   * @throws IOException       If an I/O exception occurred while reading the file
+   * @throws IOException       If an I/O exception occurred while reading the
+   *                           file
    */
   private void streamFile(final Path file, final Collection<IOsmFileHandler> interestedHandler)
       throws OsmInputException, IOException {

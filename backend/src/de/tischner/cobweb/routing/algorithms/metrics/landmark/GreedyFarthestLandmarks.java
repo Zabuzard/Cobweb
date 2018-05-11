@@ -27,7 +27,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * amount of landmarks, the landmark selection might take a while.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the nodes and landmarks
  * @param <E> Type of the edges
  * @param <G> Type of the graph
@@ -48,7 +47,8 @@ public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, 
   private final Random mRandom;
 
   /**
-   * Creates a new landmark provider which generates landmarks on the given graph.
+   * Creates a new landmark provider which generates landmarks on the given
+   * graph.
    *
    * @param graph The graph to select landmarks from
    */
@@ -63,9 +63,9 @@ public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, 
    * from each other.<br>
    * <br>
    * The resulting collection of landmarks is thus distributed well along the
-   * graph. Distances are computed by using a {@link IShortestPathComputation} on
-   * the whole graph for every landmark. Thus, depending on the graph size and the
-   * amount of landmarks, the landmark selection might take a while.
+   * graph. Distances are computed by using a {@link IShortestPathComputation}
+   * on the whole graph for every landmark. Thus, depending on the graph size
+   * and the amount of landmarks, the landmark selection might take a while.
    */
   @Override
   public Collection<N> getLandmarks(final int amount) {
@@ -95,7 +95,8 @@ public final class GreedyFarthestLandmarks<N extends INode, E extends IEdge<N>, 
       landmarks.add(nodeIter.next());
     }
 
-    // Iteratively select the node which is farthest away from the current landmarks
+    // Iteratively select the node which is farthest away from the current
+    // landmarks
     // Start by one since we already have the first landmark
     for (int i = 1; i < amountToUse; i++) {
       // Compute shortest path distances to all nodes

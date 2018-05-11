@@ -11,18 +11,18 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
  * Interface for objects that can construct roads out of OSM nodes and ways.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
 public interface IOsmRoadBuilder<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> {
   /**
-   * Builds an edge which connects the source and destination nodes with the given
-   * unique IDs.
+   * Builds an edge which connects the source and destination nodes with the
+   * given unique IDs.
    *
    * @param way           The OSM way this edge is part of
    * @param sourceId      The unique ID of the source node this edge connects
-   * @param destinationId The unique ID of the destination node this edge connects
+   * @param destinationId The unique ID of the destination node this edge
+   *                      connects
    * @return The constructed edge
    */
   E buildEdge(OsmWay way, long sourceId, long destinationId);

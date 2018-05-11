@@ -17,13 +17,12 @@ import org.slf4j.LoggerFactory;
  * connection.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ScriptExecutor {
   /**
    * Logger used for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
 
   /**
    * Separator used in a SQL query to separate single parts of a statement. Used

@@ -11,7 +11,6 @@ import de.tischner.cobweb.routing.model.graph.BasicNode;
  * Test for the class {@link TentativeDistance}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class TentativeDistanceTest {
 
@@ -36,8 +35,8 @@ public final class TentativeDistanceTest {
    */
   @Test
   public void testCompareTo() {
-    TentativeDistance<BasicNode, BasicEdge<BasicNode>> other = new TentativeDistance<>(new BasicNode(3L), null, 2.0,
-        1.0);
+    TentativeDistance<BasicNode, BasicEdge<BasicNode>> other =
+        new TentativeDistance<>(new BasicNode(3L), null, 2.0, 1.0);
     Assert.assertTrue(mElement.compareTo(other) > 0);
     Assert.assertTrue(other.compareTo(mElement) < 0);
 

@@ -5,7 +5,6 @@ package de.tischner.cobweb.db;
  * latitude and longitude.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class SpatialNodeData {
   /**

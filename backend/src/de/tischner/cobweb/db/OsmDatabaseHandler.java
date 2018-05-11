@@ -22,7 +22,6 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
  * configuration before it offers the data to the database.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmDatabaseHandler implements IOsmFileHandler {
   /**
@@ -33,12 +32,12 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(OsmDatabaseHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsmDatabaseHandler.class);
   /**
    * The current index to use in the entity buffer. It points to the index where
-   * the next element can be inserted. So it is always one greater than the index
-   * of the last inserted element. By that it represents the current size of the
-   * buffer.
+   * the next element can be inserted. So it is always one greater than the
+   * index of the last inserted element. By that it represents the current size
+   * of the buffer.
    */
   private int mBufferIndex;
   /**
@@ -52,9 +51,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
    */
   private final OsmEntity[] mEntityBuffer;
   /**
-   * The handler to use which determines the OSM files that contain more recent or
-   * new data than the data already stored in the database. Will only be used if
-   * the configuration has set the use of an external database.
+   * The handler to use which determines the OSM files that contain more recent
+   * or new data than the data already stored in the database. Will only be used
+   * if the configuration has set the use of an external database.
    */
   private final RecentHandler mRecentHandler;
   /**
@@ -64,13 +63,13 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   private final boolean mUseExternalDb;
 
   /**
-   * Creates a new OSM database handler which operates on the given database using
-   * the given configuration.
+   * Creates a new OSM database handler which operates on the given database
+   * using the given configuration.
    *
    * @param database The database to push OSM data to
    * @param config   The configuration provider
-   * @throws IOException If an I/O-Exception occurred while reading configuration
-   *                     files
+   * @throws IOException If an I/O-Exception occurred while reading
+   *                     configuration files
    */
   public OsmDatabaseHandler(final IRoutingDatabase database, final IDatabaseConfigProvider config) throws IOException {
     mEntityBuffer = new OsmEntity[BUFFER_SIZE];
@@ -86,7 +85,6 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.topobyte.osm4j.core.access.OsmHandler#complete()
    */
   @Override
@@ -101,10 +99,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmBounds)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmBounds)
    */
   @Override
   public void handle(final OsmBounds bounds) throws IOException {
@@ -113,10 +110,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmNode)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmNode)
    */
   @Override
   public void handle(final OsmNode node) throws IOException {
@@ -125,10 +121,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmRelation)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmRelation)
    */
   @Override
   public void handle(final OsmRelation relation) throws IOException {
@@ -137,10 +132,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.model.
-   * iface.OsmWay)
+   * de.topobyte.osm4j.core.access.OsmHandler#handle(de.topobyte.osm4j.core.
+   * model. iface.OsmWay)
    */
   @Override
   public void handle(final OsmWay way) throws IOException {
@@ -149,7 +143,6 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.parsing.IFileHandler#acceptFile(java.nio.file.Path)
    */
   @Override
@@ -165,10 +158,10 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   }
 
   /**
-   * Handles the given OSM entity. Therefore, it collects the entity to a buffer.
-   * If the buffer is full it will be offered to the database in order to push the
-   * collected data. Depending on the size of the buffer and the type of database
-   * this method may take a while when the buffer is full.
+   * Handles the given OSM entity. Therefore, it collects the entity to a
+   * buffer. If the buffer is full it will be offered to the database in order
+   * to push the collected data. Depending on the size of the buffer and the
+   * type of database this method may take a while when the buffer is full.
    *
    * @param entity The entity to handle
    */
@@ -186,8 +179,9 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   }
 
   /**
-   * Offers the buffer to the database in order to push the data to the database.
-   * Afterwards, the buffer index is reset to implicitly clear the buffer.
+   * Offers the buffer to the database in order to push the data to the
+   * database. Afterwards, the buffer index is reset to implicitly clear the
+   * buffer.
    */
   private void offerBuffer() {
     // Offer all items up to the current index

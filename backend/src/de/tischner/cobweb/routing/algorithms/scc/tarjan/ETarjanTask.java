@@ -5,7 +5,6 @@ package de.tischner.cobweb.routing.algorithms.scc.tarjan;
  * wanders through until completion.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum ETarjanTask {
   /**

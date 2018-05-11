@@ -7,7 +7,6 @@ import de.tischner.cobweb.parsing.osm.EHighwayType;
  * highway type and maximal speed.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class HighwayData {
   /**
@@ -27,8 +26,8 @@ public final class HighwayData {
    * Creates a new highway data object with the given attributes.
    *
    * @param wayId    The unique ID of the OSM way this highway belongs to
-   * @param type     The type of the highway. Do not use <tt>null</tt> if unknown,
-   *                 instead use {@link EHighwayType#ROAD}.
+   * @param type     The type of the highway. Do not use <tt>null</tt> if
+   *                 unknown, instead use {@link EHighwayType#ROAD}.
    * @param maxSpeed The maximal allowed speed in <tt>km/h</tt>
    */
   public HighwayData(final long wayId, final EHighwayType type, final int maxSpeed) {
@@ -66,7 +65,6 @@ public final class HighwayData {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -13,7 +13,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * The heuristic metric must be <i>monotone</i> and <i>admissible</i>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of node
  * @param <E> Type of edge
  * @param <G> Type of graph
@@ -25,8 +24,8 @@ public final class AStar<N extends INode, E extends IEdge<N>, G extends IGraph<N
   private final IMetric<N> mMetric;
 
   /**
-   * Creates a new A-Star algorithm which operates on the given graph and uses the
-   * given heuristic metric.
+   * Creates a new A-Star algorithm which operates on the given graph and uses
+   * the given heuristic metric.
    *
    * @param graph  The graph to operate on
    * @param metric The heuristic metric which must be <i>monotone</i> and
@@ -39,7 +38,6 @@ public final class AStar<N extends INode, E extends IEdge<N>, G extends IGraph<N
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra#
    * getEstimatedDistance(de.tischner.cobweb.routing.model.graph.INode,
    * de.tischner.cobweb.routing.model.graph.INode)

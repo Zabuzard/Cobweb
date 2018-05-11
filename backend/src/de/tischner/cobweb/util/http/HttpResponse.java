@@ -9,7 +9,6 @@ import java.util.Map;
  * of this class, especially if values should receive default values.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class HttpResponse {
   /**
@@ -83,7 +82,6 @@ public final class HttpResponse {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

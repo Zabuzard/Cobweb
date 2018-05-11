@@ -12,7 +12,6 @@ import de.tischner.cobweb.util.RoutingUtil;
  * <tt>metres</tt>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of objects the metric operates on, must implement
  *        {@link ISpatial}
  */

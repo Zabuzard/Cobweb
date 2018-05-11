@@ -10,7 +10,6 @@ import de.tischner.cobweb.parsing.osm.EHighwayType;
  * Test for the class {@link RoadEdge}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoadEdgeTest {
 

@@ -12,7 +12,6 @@ import org.junit.Test;
  * Test for the class {@link ReverseIterator}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ReverseIteratorTest {
   /**

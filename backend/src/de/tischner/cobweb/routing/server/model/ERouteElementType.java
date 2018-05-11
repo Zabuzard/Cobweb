@@ -7,7 +7,6 @@ package de.tischner.cobweb.routing.server.model;
  * {@link RouteElement}s as JSON.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum ERouteElementType {
   /**
@@ -23,7 +22,8 @@ public enum ERouteElementType {
    * Gets the route element type that corresponds to the given value.
    *
    * @param value The value to get the element from
-   * @return The corresponding route element type or <tt>null</tt> if not present
+   * @return The corresponding route element type or <tt>null</tt> if not
+   *         present
    */
   public static ERouteElementType fromValue(final int value) {
     for (final ERouteElementType type : ERouteElementType.values()) {

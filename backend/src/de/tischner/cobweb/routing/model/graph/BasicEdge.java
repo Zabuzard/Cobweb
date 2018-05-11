@@ -8,7 +8,6 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * Basic implementation of an {@link IEdge} with an unique ID.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of node
  */
 public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Serializable {
@@ -54,7 +53,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -77,7 +75,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IEdge#getCost()
    */
   @Override
@@ -87,7 +84,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IEdge#getDestination()
    */
   @Override
@@ -97,7 +93,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.IHasId#getId()
    */
   @Override
@@ -107,7 +102,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IEdge#getSource()
    */
   @Override
@@ -117,7 +111,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -130,7 +123,6 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -7,7 +7,6 @@ import java.util.Map;
  * Types of highways. Use {@link #ROAD} for an unknown highway type.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum EHighwayType {
   /**
@@ -77,8 +76,8 @@ public enum EHighwayType {
   private static final Map<String, EHighwayType> NAME_TO_TYPE = EHighwayType.constructLookupTable();
 
   /**
-   * Gets the highway type corresponding to the given tag name or <tt>null</tt> if
-   * there is no. The method runs in <tt>O(1)</tt>.
+   * Gets the highway type corresponding to the given tag name or <tt>null</tt>
+   * if there is no. The method runs in <tt>O(1)</tt>.
    *
    * @param name The tag name of the highway type to get
    * @return The corresponding highway type or <tt>null</tt>

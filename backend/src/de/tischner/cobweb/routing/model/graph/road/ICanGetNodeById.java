@@ -8,7 +8,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * Interface for classes that provide access to nodes by their unique ID.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node which must has an ID
  */
 public interface ICanGetNodeById<N extends INode & IHasId> {
@@ -26,7 +25,8 @@ public interface ICanGetNodeById<N extends INode & IHasId> {
   /**
    * Gets the node with the given ID if present.<br>
    * <br>
-   * The implementation must be consistent with {@link #containsNodeWithId(long)}.
+   * The implementation must be consistent with
+   * {@link #containsNodeWithId(long)}.
    *
    * @param id The ID to get the node for
    * @return The node with the given ID if present, else empty. If there are

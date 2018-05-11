@@ -8,7 +8,6 @@ import java.util.Set;
  * collection of nodes where every node can reach all other nodes in the SCC.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  */
 public final class StronglyConnectedComponent<N> {
@@ -77,7 +76,6 @@ public final class StronglyConnectedComponent<N> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

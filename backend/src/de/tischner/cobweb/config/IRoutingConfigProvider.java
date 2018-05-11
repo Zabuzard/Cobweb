@@ -6,7 +6,6 @@ import java.nio.file.Path;
  * Interface for classes that provide routing related configuration settings.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public interface IRoutingConfigProvider {
   /**

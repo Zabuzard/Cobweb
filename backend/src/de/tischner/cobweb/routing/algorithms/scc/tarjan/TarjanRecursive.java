@@ -8,7 +8,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * Recursive implementation of Tarjans algorithm for computing SCCs.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of the node
  * @param <E> The type of the edge
  * @param <G> The type of the graph
@@ -42,7 +41,6 @@ public final class TarjanRecursive<N extends INode, E extends IEdge<N>, G extend
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.algorithms.scc.tarjan.ATarjan#strongConnect(de.
    * tischner.cobweb.routing.model.graph.INode)
@@ -62,7 +60,8 @@ public final class TarjanRecursive<N extends INode, E extends IEdge<N>, G extend
     }
 
     // All reachable nodes where visited.
-    // If this nodes low link value is equals to its index, then it is the root of
+    // If this nodes low link value is equals to its index, then it is the root
+    // of
     // the SCC.
     if (getIndex(node) == getLowLink(node)) {
       establishScc(node);

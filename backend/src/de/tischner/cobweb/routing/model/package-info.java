@@ -3,6 +3,5 @@
  * application.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 package de.tischner.cobweb.routing.model;

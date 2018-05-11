@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Interface for objects that provide a reversed state flag.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 @FunctionalInterface
 public interface IReversedProvider extends Serializable {

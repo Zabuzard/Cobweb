@@ -16,7 +16,6 @@ import de.tischner.cobweb.util.ReverseIterator;
  * overhead when iterating.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
@@ -47,9 +46,9 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * @param buildReversely Whether or not the path is build reversely. If
    *                       <tt>true</tt> calls to {@link #addEdge(IEdge)} are
    *                       interpreted to start from the end of the path. So the
-   *                       destination of the first added edge is the destination
-   *                       of the path and the source of the last added edge is
-   *                       the source of the path.
+   *                       destination of the first added edge is the
+   *                       destination of the path and the source of the last
+   *                       added edge is the source of the path.
    */
   public EdgePath(final boolean buildReversely) {
     mBuildReversely = buildReversely;
@@ -59,8 +58,8 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
   /**
    * Adds the given edge to this path.<br>
    * <br>
-   * If the path is to be build reversely the edges are interpreted to start from
-   * the end of the path. So the destination of the first added edge is the
+   * If the path is to be build reversely the edges are interpreted to start
+   * from the end of the path. So the destination of the first added edge is the
    * destination of the path and the source of the last added edge is the source
    * of the path.
    *
@@ -73,7 +72,6 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getDestination()
    */
   @Override
@@ -91,7 +89,6 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getSource()
    */
   @Override
@@ -109,7 +106,6 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#getTotalCost()
    */
   @Override
@@ -128,7 +124,6 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Iterable#iterator()
    */
   @Override
@@ -141,7 +136,6 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IPath#length()
    */
   @Override

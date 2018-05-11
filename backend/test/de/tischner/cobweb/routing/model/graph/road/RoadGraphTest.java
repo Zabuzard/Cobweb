@@ -15,7 +15,6 @@ import de.tischner.cobweb.routing.model.graph.IEdge;
  * Test for the class {@link RoadGraph}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoadGraphTest {
   /**
@@ -64,8 +63,8 @@ public final class RoadGraphTest {
    */
   @Test
   public void testAddEdge() {
-    final RoadEdge<RoadNode> edge = new RoadEdge<>(40L, new RoadNode(1L, 1.0, 1.0), new RoadNode(2L, 2.0, 2.0),
-        EHighwayType.MOTORWAY, 100);
+    final RoadEdge<RoadNode> edge =
+        new RoadEdge<>(40L, new RoadNode(1L, 1.0, 1.0), new RoadNode(2L, 2.0, 2.0), EHighwayType.MOTORWAY, 100);
     Assert.assertFalse(mGraph.containsEdge(edge));
     Assert.assertTrue(mGraph.addEdge(edge));
     Assert.assertTrue(mGraph.containsEdge(edge));
@@ -183,8 +182,8 @@ public final class RoadGraphTest {
     Assert.assertTrue(mGraph.containsEdge(firstEdge));
     Assert.assertTrue(mGraph.containsEdge(secondEdge));
 
-    final Set<Long> destinationIds = mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId)
-        .collect(Collectors.toSet());
+    final Set<Long> destinationIds =
+        mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertTrue(destinationIds.contains(1L));
     Assert.assertTrue(destinationIds.contains(2L));
   }
@@ -218,7 +217,8 @@ public final class RoadGraphTest {
   }
 
   /**
-   * Adds the edge to the given graph. It goes from the first to the second node.
+   * Adds the edge to the given graph. It goes from the first to the second
+   * node.
    *
    * @param graph  The graph to add the edge to
    * @param first  The first node

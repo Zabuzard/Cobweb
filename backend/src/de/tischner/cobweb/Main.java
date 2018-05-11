@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
  * which starts the {@link Application}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class Main {
   /**
@@ -26,7 +25,8 @@ public final class Main {
     } catch (final Throwable e) {
       final Logger logger = LoggerFactory.getLogger(Main.class);
       logger.error("An unknown error occurred", e);
-      // Print to standard error in case error occurred before logger was initialized
+      // Print to standard error in case error occurred before logger was
+      // initialized
       System.err.println("An unknown error occurred");
       e.printStackTrace();
     }

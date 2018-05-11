@@ -18,7 +18,6 @@ import de.tischner.cobweb.util.RoutingUtil;
  * time by using a {@link IReversedConsumer}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of the node which must have an ID and be spatial
  */
 public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
@@ -46,8 +45,8 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
    */
   private final int mMaxSpeed;
   /**
-   * An object that provides a reversed flag or <tt>null</tt> if not present. Can
-   * be used to determine if the edge should be interpreted as reversed to
+   * An object that provides a reversed flag or <tt>null</tt> if not present.
+   * Can be used to determine if the edge should be interpreted as reversed to
    * implement implicit edge reversal at constant time.
    */
   private IReversedProvider mReversedProvider;
@@ -82,7 +81,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -131,7 +129,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IEdge#getDestination()
    */
   @Override
@@ -143,8 +140,8 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
   }
 
   /**
-   * Gets the ID of this edge which is unique to the way it belongs to. A way can
-   * consist of several edges.
+   * Gets the ID of this edge which is unique to the way it belongs to. A way
+   * can consist of several edges.
    */
   @Override
   public long getId() {
@@ -153,7 +150,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.model.graph.IEdge#getSource()
    */
   @Override
@@ -166,7 +162,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -182,7 +177,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.IReversedConsumer#
    * setReversedProvider(de.tischner.cobweb.routing.model.graph.road.
    * IReversedProvider)
@@ -194,7 +188,6 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

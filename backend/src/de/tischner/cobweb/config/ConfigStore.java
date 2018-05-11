@@ -16,14 +16,13 @@ import org.slf4j.LoggerFactory;
  * The store provides default configuration values for all properties.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ConfigStore
     implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider, IDatabaseConfigProvider {
   /**
    * The logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(ConfigStore.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigStore.class);
   /**
    * The default settings as key-value pair.
    */
@@ -45,7 +44,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IConfigProvider#getAllSettings()
    */
   @Override
@@ -55,7 +53,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getDbInfo()
    */
   @Override
@@ -65,7 +62,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCache()
    */
   @Override
@@ -75,7 +71,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCacheInfo()
    */
   @Override
@@ -85,7 +80,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IParseConfigProvider#getGtfsDirectory()
    */
   @Override
@@ -95,7 +89,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getInitDbScript()
    */
   @Override
@@ -105,17 +98,15 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getJDBCUrl()
    */
   @Override
-  public String getJDBCUrl() {
+  public String getJdbcUrl() {
     return getSetting(ConfigUtil.KEY_JDBC_URL);
   }
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IParseConfigProvider#getOsmDirectory()
    */
   @Override
@@ -125,7 +116,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IRoutingConfigProvider#getOsmRoadFilter()
    */
   @Override
@@ -135,8 +125,8 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getRoutingServerPort()
+   * @see
+   * de.tischner.cobweb.config.IRoutingConfigProvider#getRoutingServerPort()
    */
   @Override
   public int getRoutingServerPort() {
@@ -145,7 +135,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IConfigProvider#getSetting(java.lang.String)
    */
   @Override
@@ -167,7 +156,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IConfigProvider#setSetting(java.lang.String,
    * java.lang.String)
    */
@@ -178,7 +166,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IDatabaseConfigProvider#useExternalDb()
    */
   @Override
@@ -188,7 +175,6 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.config.IRoutingConfigProvider#useGraphCache()
    */
   @Override
@@ -197,8 +183,8 @@ public final class ConfigStore
   }
 
   /**
-   * Gets the default value stored for the given key or <tt>null</tt> if there is
-   * no.
+   * Gets the default value stored for the given key or <tt>null</tt> if there
+   * is no.
    *
    * @param key The key to get the default value for
    * @return The default value or <tt>null</tt>

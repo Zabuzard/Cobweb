@@ -13,7 +13,6 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * Test for the class {@link BasicGraph}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class BasicGraphTest {
   /**
@@ -154,8 +153,8 @@ public final class BasicGraphTest {
     Assert.assertTrue(mGraph.containsEdge(firstEdge));
     Assert.assertTrue(mGraph.containsEdge(secondEdge));
 
-    final Set<Long> destinationIds = mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId)
-        .collect(Collectors.toSet());
+    final Set<Long> destinationIds =
+        mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertTrue(destinationIds.contains(2L));
     Assert.assertTrue(destinationIds.contains(3L));
   }
@@ -279,14 +278,15 @@ public final class BasicGraphTest {
     Assert.assertTrue(mGraph.getEdges().anyMatch(edge -> firstEdge.equals(edge)));
     Assert.assertTrue(mGraph.getEdges().anyMatch(edge -> secondEdge.equals(edge)));
 
-    final Set<Long> destinationIds = mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId)
-        .collect(Collectors.toSet());
+    final Set<Long> destinationIds =
+        mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertTrue(destinationIds.contains(1L));
     Assert.assertTrue(destinationIds.contains(2L));
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.routing.model.graph.AGraph#size()}.
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.AGraph#size()}.
    */
   @Test
   public void testSize() {
@@ -313,7 +313,8 @@ public final class BasicGraphTest {
   }
 
   /**
-   * Adds the edge to the given graph. It goes from the first to the second node.
+   * Adds the edge to the given graph. It goes from the first to the second
+   * node.
    *
    * @param graph  The graph to add the edge to
    * @param first  The first node

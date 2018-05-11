@@ -13,7 +13,6 @@ import java.nio.file.Path;
  * Class used to serialize and deserialize objects.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <T> Type of the object to serialize or deserialize
  */
 public final class SerializationUtil<T extends Serializable> {
@@ -26,8 +25,8 @@ public final class SerializationUtil<T extends Serializable> {
    *                                read the file
    * @throws ClassNotFoundException If the class to deserialize to could not be
    *                                found
-   * @throws ClassCastException     If the deserialized object is not of the type
-   *                                to deserialize to
+   * @throws ClassCastException     If the deserialized object is not of the
+   *                                type to deserialize to
    */
   @SuppressWarnings("unchecked")
   public T deserialize(final Path path) throws IOException, ClassNotFoundException, ClassCastException {

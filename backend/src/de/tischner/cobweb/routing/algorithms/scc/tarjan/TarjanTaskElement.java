@@ -4,7 +4,6 @@ package de.tischner.cobweb.routing.algorithms.scc.tarjan;
  * Task element that wraps a node adding the current task for Tarjans algorithm.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of the node
  */
 public final class TarjanTaskElement<N> {
@@ -63,8 +62,8 @@ public final class TarjanTaskElement<N> {
   }
 
   /**
-   * Reports the current task as accomplished and moves over to the next task. If
-   * all tasks have been executed, the task is set to <tt>null</tt>.
+   * Reports the current task as accomplished and moves over to the next task.
+   * If all tasks have been executed, the task is set to <tt>null</tt>.
    */
   public void reportTaskAccomplished() {
     if (mCurrentTask == null) {
@@ -72,17 +71,17 @@ public final class TarjanTaskElement<N> {
     }
 
     switch (mCurrentTask) {
-    case INDEX:
-      mCurrentTask = ETarjanTask.GET_SUCCESSORS;
-      return;
-    case GET_SUCCESSORS:
-      mCurrentTask = ETarjanTask.SET_LOWLINK;
-      return;
-    case SET_LOWLINK:
-      mCurrentTask = null;
-      return;
-    default:
-      throw new AssertionError();
+      case INDEX:
+        mCurrentTask = ETarjanTask.GET_SUCCESSORS;
+        return;
+      case GET_SUCCESSORS:
+        mCurrentTask = ETarjanTask.SET_LOWLINK;
+        return;
+      case SET_LOWLINK:
+        mCurrentTask = null;
+        return;
+      default:
+        throw new AssertionError();
     }
   }
 }

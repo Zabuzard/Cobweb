@@ -4,7 +4,6 @@ package de.tischner.cobweb.routing.model.graph.road;
  * Interface for spatial objects.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public interface ISpatial {
   /**

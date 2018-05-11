@@ -13,7 +13,6 @@ import org.junit.Test;
  * Test for the class {@link RoutingResponse}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoutingResponseTest {
   /**
@@ -29,8 +28,8 @@ public final class RoutingResponseTest {
     final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 1.0, 1.0 }));
     final RouteElement second = new RouteElement(ERouteElementType.PATH, ETransportationMode.BIKE, "Main street",
         Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
-    final RouteElement third = new RouteElement(ERouteElementType.NODE, "Wall street 5",
-        Arrays.asList(new double[] { 4.0, 4.0 }));
+    final RouteElement third =
+        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
     final Journey journey = new Journey(100L, 200L, Arrays.asList(first, second, third));
     mResponse = new RoutingResponse(5L, 10L, Arrays.asList(journey, journey));
   }
@@ -79,8 +78,8 @@ public final class RoutingResponseTest {
     final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 1.0, 1.0 }));
     final RouteElement second = new RouteElement(ERouteElementType.PATH, ETransportationMode.BIKE, "Main street",
         Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
-    final RouteElement third = new RouteElement(ERouteElementType.NODE, "Wall street 5",
-        Arrays.asList(new double[] { 4.0, 4.0 }));
+    final RouteElement third =
+        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
     final Journey journey = new Journey(100L, 200L, Arrays.asList(first, second, third));
     try {
       new RoutingResponse(5L, 10L, Arrays.asList(journey, journey));

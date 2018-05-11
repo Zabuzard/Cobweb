@@ -16,7 +16,6 @@ import java.util.Map.Entry;
  * Utility class which provides methods related to HTTP communication.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class HttpUtil {
   /**
@@ -56,7 +55,8 @@ public final class HttpUtil {
     String request;
     while (true) {
       final String line = HttpUtil.readHttpLine(input);
-      // According to the specification empty lines that appear before any content
+      // According to the specification empty lines that appear before any
+      // content
       // need to be rejected
       if (line.isEmpty()) {
         continue;
@@ -96,7 +96,8 @@ public final class HttpUtil {
   }
 
   /**
-   * Sends the given response to the given client by using the HTTP/1.0 protocol.
+   * Sends the given response to the given client by using the HTTP/1.0
+   * protocol.
    *
    * @param response The response to send
    * @param client   Client to send to
@@ -107,8 +108,8 @@ public final class HttpUtil {
     final byte[] contentRaw = response.getContent().getBytes(STANDARD_CHARSET);
 
     // Build response type
-    final String responseType = "HTTP/1.0 " + response.getStatus().getStatusCode() + " " + response.getStatus()
-        + HTTP_NEW_LINE;
+    final String responseType =
+        "HTTP/1.0 " + response.getStatus().getStatusCode() + " " + response.getStatus() + HTTP_NEW_LINE;
 
     // Build response headers
     final StringBuilder responseHeaders = new StringBuilder();
@@ -160,8 +161,8 @@ public final class HttpUtil {
   /**
    * Reads one line of the given HTTP stream.<br>
    * <br>
-   * The method only reads exactly one line. In particular, it does not read more
-   * than desired for buffering purpose.
+   * The method only reads exactly one line. In particular, it does not read
+   * more than desired for buffering purpose.
    *
    * @param input The input stream to read from
    * @return The read line, interpreted as string in the standard charset

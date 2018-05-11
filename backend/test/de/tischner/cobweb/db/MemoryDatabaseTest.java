@@ -26,7 +26,6 @@ import de.topobyte.osm4j.core.model.impl.Way;
  * Test for the class {@link MemoryDatabase}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class MemoryDatabaseTest {
   /**
@@ -111,8 +110,8 @@ public final class MemoryDatabaseTest {
    */
   @Test
   public final void testGetSpatialNodeDataLongStreamInt() {
-    final Collection<SpatialNodeData> allSpatialNodeData = mMemoryDatabase
-        .getSpatialNodeData(LongStream.of(1L, 2L, 10L, 3L), 3);
+    final Collection<SpatialNodeData> allSpatialNodeData =
+        mMemoryDatabase.getSpatialNodeData(LongStream.of(1L, 2L, 10L, 3L), 3);
     Assert.assertEquals(3, allSpatialNodeData.size());
 
     final Set<Long> nodeIds = allSpatialNodeData.stream().map(SpatialNodeData::getId).collect(Collectors.toSet());
@@ -122,15 +121,15 @@ public final class MemoryDatabaseTest {
     Assert.assertFalse(nodeIds.contains(10L));
     Assert.assertTrue(nodeIds.contains(3L));
 
-    final Set<Double> latitudes = allSpatialNodeData.stream().map(SpatialNodeData::getLatitude)
-        .collect(Collectors.toSet());
+    final Set<Double> latitudes =
+        allSpatialNodeData.stream().map(SpatialNodeData::getLatitude).collect(Collectors.toSet());
     Assert.assertEquals(3, latitudes.size());
     Assert.assertTrue(latitudes.contains(10.0));
     Assert.assertTrue(latitudes.contains(20.0));
     Assert.assertTrue(latitudes.contains(30.0));
 
-    final Set<Double> longitudes = allSpatialNodeData.stream().map(SpatialNodeData::getLongitude)
-        .collect(Collectors.toSet());
+    final Set<Double> longitudes =
+        allSpatialNodeData.stream().map(SpatialNodeData::getLongitude).collect(Collectors.toSet());
     Assert.assertEquals(3, longitudes.size());
     Assert.assertTrue(longitudes.contains(10.0));
     Assert.assertTrue(longitudes.contains(20.0));

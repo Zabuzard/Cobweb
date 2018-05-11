@@ -11,36 +11,35 @@ import de.topobyte.osm4j.core.model.iface.OsmEntity;
  * Interface for databases that provide data relevant for routing.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public interface IRoutingDatabase {
   /**
-   * Gets highway data for all highways in the database that have one of the given
-   * way IDs.
+   * Gets highway data for all highways in the database that have one of the
+   * given way IDs.
    *
    * @param wayIds The way IDs to get highway data for
    * @param size   The amount of way IDs to get data for, i.e. the size of
    *               <tt>wayIds</tt>. This value must be set correctly.
    * @return Highway data for all highways that match the given way IDs. If no
-   *         highway data was found for a way ID, then it is not contained in the
-   *         resulting collection. No guarantees on the order of the resulting
-   *         collection are made, especially not that it matches the order of the
-   *         given way IDs.
+   *         highway data was found for a way ID, then it is not contained in
+   *         the resulting collection. No guarantees on the order of the
+   *         resulting collection are made, especially not that it matches the
+   *         order of the given way IDs.
    */
   Collection<HighwayData> getHighwayData(Iterable<Long> wayIds, int size);
 
   /**
-   * Gets highway data for all highways in the database that have one of the given
-   * way IDs.
+   * Gets highway data for all highways in the database that have one of the
+   * given way IDs.
    *
    * @param wayIds The way IDs to get highway data for
    * @param size   The amount of way IDs to get data for, i.e. the size of
    *               <tt>wayIds</tt>. This value must be set correctly.
    * @return Highway data for all highways that match the given way IDs. If no
-   *         highway data was found for a way ID, then it is not contained in the
-   *         resulting collection. No guarantees on the order of the resulting
-   *         collection are made, especially not that it matches the order of the
-   *         given way IDs.
+   *         highway data was found for a way ID, then it is not contained in
+   *         the resulting collection. No guarantees on the order of the
+   *         resulting collection are made, especially not that it matches the
+   *         order of the given way IDs.
    */
   Collection<HighwayData> getHighwayData(LongStream wayIds, int size);
 
@@ -70,10 +69,10 @@ public interface IRoutingDatabase {
    * @param size    The amount of node IDs to get data for, i.e. the size of
    *                <tt>nodeIds</tt>. This value must be set correctly.
    * @return Spatial data for all nodes that match the given node IDs. If no
-   *         spatial data was found for a node ID, then it is not contained in the
-   *         resulting collection. No guarantees on the order of the resulting
-   *         collection are made, especially not that it matches the order of the
-   *         given node IDs.
+   *         spatial data was found for a node ID, then it is not contained in
+   *         the resulting collection. No guarantees on the order of the
+   *         resulting collection are made, especially not that it matches the
+   *         order of the given node IDs.
    */
   Collection<SpatialNodeData> getSpatialNodeData(Iterable<Long> nodeIds, int size);
 
@@ -85,10 +84,10 @@ public interface IRoutingDatabase {
    * @param size    The amount of node IDs to get data for, i.e. the size of
    *                <tt>nodeIds</tt>. This value must be set correctly.
    * @return Spatial data for all nodes that match the given node IDs. If no
-   *         spatial data was found for a node ID, then it is not contained in the
-   *         resulting collection. No guarantees on the order of the resulting
-   *         collection are made, especially not that it matches the order of the
-   *         given node IDs.
+   *         spatial data was found for a node ID, then it is not contained in
+   *         the resulting collection. No guarantees on the order of the
+   *         resulting collection are made, especially not that it matches the
+   *         order of the given node IDs.
    */
   Collection<SpatialNodeData> getSpatialNodeData(LongStream nodeIds, int size);
 
@@ -96,8 +95,8 @@ public interface IRoutingDatabase {
    * Attempts to get the unique OSM ID of a way by its name.
    *
    * @param name The name of the way
-   * @return The unique OSM ID of the way or empty if no way with that name could
-   *         be found
+   * @return The unique OSM ID of the way or empty if no way with that name
+   *         could be found
    */
   Optional<Long> getWayByName(String name);
 
@@ -111,9 +110,9 @@ public interface IRoutingDatabase {
   Optional<String> getWayName(long id);
 
   /**
-   * Initializes this database. Call this method prior to using the database. Use
-   * {@link #shutdown()} when finished using it. Do not call this method after the
-   * database was shutdown, instead create a new one.
+   * Initializes this database. Call this method prior to using the database.
+   * Use {@link #shutdown()} when finished using it. Do not call this method
+   * after the database was shutdown, instead create a new one.
    */
   void initialize();
 

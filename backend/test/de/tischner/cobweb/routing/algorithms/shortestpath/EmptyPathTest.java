@@ -12,7 +12,6 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
  * Test for the class {@link EmptyPath}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class EmptyPathTest {
 

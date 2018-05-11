@@ -11,7 +11,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * Iterative implementation of Tarjans algorithm for computing SCCs.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of the node
  * @param <E> The type of the edge
  * @param <G> The type of the graph
@@ -67,15 +66,16 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
   }
 
   /**
-   * Finishes the given node by updating its low link value or establishing a new
-   * SCC.
+   * Finishes the given node by updating its low link value or establishing a
+   * new SCC.
    *
    * @param node        The node to update
    * @param predecessor The predecessor of the node or <tt>null</tt> if not
    *                    present
    */
   private void doSetLowLinkTask(final N node, final N predecessor) {
-    // If the low link value is equal to the index, the node is the root of the SCC
+    // If the low link value is equal to the index, the node is the root of the
+    // SCC
     if (getIndex(node) == getLowLink(node)) {
       establishScc(node);
     }
@@ -88,7 +88,6 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.algorithms.scc.tarjan.ATarjan#strongConnect(de.
    * tischner.cobweb.routing.model.graph.INode)
@@ -102,33 +101,33 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
       final TarjanTaskElement<N> task = mTaskDeque.pop();
       final N currentNode = task.getNode();
       switch (task.getCurrentTask()) {
-      case INDEX:
-        // Register node if visited the first time
-        if (containsIndexNode(currentNode)) {
-          continue;
-        }
+        case INDEX:
+          // Register node if visited the first time
+          if (containsIndexNode(currentNode)) {
+            continue;
+          }
 
-        doIndexTask(currentNode);
+          doIndexTask(currentNode);
 
-        // Push the next task
-        task.reportTaskAccomplished();
-        mTaskDeque.push(task);
-        break;
-      case GET_SUCCESSORS:
-        // Push the next task
-        task.reportTaskAccomplished();
-        mTaskDeque.push(task);
+          // Push the next task
+          task.reportTaskAccomplished();
+          mTaskDeque.push(task);
+          break;
+        case GET_SUCCESSORS:
+          // Push the next task
+          task.reportTaskAccomplished();
+          mTaskDeque.push(task);
 
-        doGetSuccessorsTask(currentNode);
-        break;
-      case SET_LOWLINK:
-        doSetLowLinkTask(currentNode, task.getPredecessor());
+          doGetSuccessorsTask(currentNode);
+          break;
+        case SET_LOWLINK:
+          doSetLowLinkTask(currentNode, task.getPredecessor());
 
-        // All tasks of this element have been completed
-        task.reportTaskAccomplished();
-        break;
-      default:
-        throw new AssertionError();
+          // All tasks of this element have been completed
+          task.reportTaskAccomplished();
+          break;
+        default:
+          throw new AssertionError();
       }
     }
   }

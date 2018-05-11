@@ -32,11 +32,10 @@ import org.slf4j.LoggerFactory;
  * And example info file might contain a line like
  *
  * <pre>
- * backend\res\input\osmTest\freiburg-regbez-latest.osm    1525362312546
+ * res\input\osmTest\freiburg-regbez-latest.osm    1525362312546
  * </pre>
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RecentHandler implements IFileHandler {
   /**
@@ -46,7 +45,7 @@ public final class RecentHandler implements IFileHandler {
   /**
    * The logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(RecentHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RecentHandler.class);
   /**
    * The path to the info file.
    */
@@ -61,7 +60,8 @@ public final class RecentHandler implements IFileHandler {
    * Creates a new recent handler using the given info file.
    *
    * @param info The path to the info file
-   * @throws IOException If an I/O exception occurred while reading the info file
+   * @throws IOException If an I/O exception occurred while reading the info
+   *                     file
    */
   public RecentHandler(final Path info) throws IOException {
     mInfo = info;
@@ -70,11 +70,11 @@ public final class RecentHandler implements IFileHandler {
   }
 
   /**
-   * Accepts the given file if it is more recent or new compared to the given info
-   * file.<br>
+   * Accepts the given file if it is more recent or new compared to the given
+   * info file.<br>
    * <br>
-   * That is, it accepts if the info object did not contain this path or if it was
-   * modified after it was registered in the info object.<br>
+   * That is, it accepts if the info object did not contain this path or if it
+   * was modified after it was registered in the info object.<br>
    * <br>
    * It collects all accepted files. A call to {@link #updateInfo()} updates the
    * info object accordingly to the accepted files.

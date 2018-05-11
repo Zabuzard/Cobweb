@@ -7,7 +7,6 @@ import de.tischner.cobweb.routing.model.graph.road.ISpatial;
  * Utility class which offers methods related to routing.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoutingUtil {
   /**

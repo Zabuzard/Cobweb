@@ -7,7 +7,6 @@ import java.nio.file.Path;
  * Utility class that offers methods related to files.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class FileUtil {
   /**
@@ -52,8 +51,8 @@ public final class FileUtil {
    * Gets the file extension corresponding to the given extension name.
    *
    * @param extension The name of the file extension
-   * @return The corresponding file extension or {@link EFileExtension#UNKNOWN} if
-   *         not listed in the enum
+   * @return The corresponding file extension or {@link EFileExtension#UNKNOWN}
+   *         if not listed in the enum
    */
   private static EFileExtension parseFileExtension(final String extension) {
     return EFileExtension.fromName(extension.toLowerCase());

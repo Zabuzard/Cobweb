@@ -13,6 +13,12 @@
     To completely disable a check, just comment it out or delete it from the file.
 
     Authors: Max Vetrenko, Ruslan Diachenko, Roman Ivanov.
+	Modified by: Daniel Tischner
+	Modifications: Line limit 120, exclude "module-info.java" for Java 9+ support,
+	  ignore Javadoc link-Tags, member name like mFooBar instead of fooBar,
+	  added some allowed abbreviations for module AbbreviationAsWordInName
+	  to counter a bug with method names in Unit tests that have generic arguments
+	  (see https://github.com/checkstyle/checkstyle/issues/5787).
  -->
 
 <module name = "Checker">
@@ -41,8 +47,8 @@
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
         <module name="LineLength">
-            <property name="max" value="80"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+            <property name="max" value="120"/>
+            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@link"/>
         </module>
         <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>
@@ -119,7 +125,7 @@
              value="Type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <property name="format" value="^m[A-Z][a-z0-9][a-zA-Z0-9]*$"/>
             <message key="name.invalidPattern"
              value="Member name ''{0}'' must match pattern ''{1}''."/>
         </module>
@@ -174,6 +180,7 @@
             <property name="arrayInitIndent" value="2"/>
         </module>
         <module name="AbbreviationAsWordInName">
+            <property name="allowedAbbreviations" value="NE,NN"/>
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="1"/>
         </module>

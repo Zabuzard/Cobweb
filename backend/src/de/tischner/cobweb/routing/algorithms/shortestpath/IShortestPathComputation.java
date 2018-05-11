@@ -14,7 +14,6 @@ import de.tischner.cobweb.routing.model.graph.IPath;
  * source to a destination.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of node
  * @param <E> Type of edge
  */
@@ -22,11 +21,11 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
   /**
    * Computes and returns a collection of all nodes that were visited by the
    * algorithm while computing the shortest path from the given sources to the
-   * given destination. This is known as <i>search space</i> and is primarily used
-   * for debugging and benchmarking.<br>
+   * given destination. This is known as <i>search space</i> and is primarily
+   * used for debugging and benchmarking.<br>
    * <br>
-   * The shortest path from multiple sources is the minimal shortest path for all
-   * source nodes individually.
+   * The shortest path from multiple sources is the minimal shortest path for
+   * all source nodes individually.
    *
    * @param sources     The sources to compute the shortest path from
    * @param destination The destination to compute the shortest path to
@@ -37,8 +36,8 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
   /**
    * Computes and returns a collection of all nodes that were visited by the
    * algorithm while computing the shortest path from the given source to the
-   * given destination. This is known as <i>search space</i> and is primarily used
-   * for debugging and benchmarking.
+   * given destination. This is known as <i>search space</i> and is primarily
+   * used for debugging and benchmarking.
    *
    * @param source      The source to compute the shortest path from
    * @param destination The destination to compute the shortest path to
@@ -50,8 +49,8 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
    * Computes the shortest path from the given sources to the given
    * destination.<br>
    * <br>
-   * The shortest path from multiple sources is the minimal shortest path for all
-   * source nodes individually.
+   * The shortest path from multiple sources is the minimal shortest path for
+   * all source nodes individually.
    *
    * @param sources     The sources to compute the shortest path from
    * @param destination The destination to compute the shortest path to
@@ -72,8 +71,8 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
    * Computes the cost of the shortest path from the given sources to the given
    * destination.<br>
    * <br>
-   * The shortest path from multiple sources is the minimal shortest path for all
-   * source nodes individually.
+   * The shortest path from multiple sources is the minimal shortest path for
+   * all source nodes individually.
    *
    * @param sources     The sources to compute the shortest path from
    * @param destination The destination to compute the shortest path to
@@ -92,15 +91,15 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
   Optional<Double> computeShortestPathCost(N source, N destination);
 
   /**
-   * Computes the costs of all shortest paths from the given sources to all other
-   * nodes.<br>
+   * Computes the costs of all shortest paths from the given sources to all
+   * other nodes.<br>
    * <br>
-   * The shortest path from multiple sources is the minimal shortest path for all
-   * source nodes individually.
+   * The shortest path from multiple sources is the minimal shortest path for
+   * all source nodes individually.
    *
    * @param sources The sources to compute the shortest path from
-   * @return A map which connects destination nodes to the costs of their shortest
-   *         path
+   * @return A map which connects destination nodes to the costs of their
+   *         shortest path
    */
   Map<N, ? extends IHasPathCost> computeShortestPathCostsReachable(Collection<N> sources);
 
@@ -109,8 +108,8 @@ public interface IShortestPathComputation<N extends INode, E extends IEdge<N>> {
    * nodes.
    *
    * @param source The source to compute the shortest path from
-   * @return A map which connects destination nodes to the costs of their shortest
-   *         path
+   * @return A map which connects destination nodes to the costs of their
+   *         shortest path
    */
   Map<N, ? extends IHasPathCost> computeShortestPathCostsReachable(N source);
 }

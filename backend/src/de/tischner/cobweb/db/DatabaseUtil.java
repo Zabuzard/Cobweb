@@ -9,7 +9,6 @@ import java.sql.Types;
  * as SQL query templates or methods used to parse database results.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class DatabaseUtil {
   /**
@@ -37,18 +36,19 @@ public final class DatabaseUtil {
    */
   static final String QUERY_INSERT_SUFFIX = ")";
   /**
-   * SQL query to insert way tag data. Contains placeholder values for the way ID,
-   * name, highway and maxspeed tags.
+   * SQL query to insert way tag data. Contains placeholder values for the way
+   * ID, name, highway and maxspeed tags.
    */
-  static final String QUERY_INSERT_WAY_TAGS = "REPLACE INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
+  static final String QUERY_INSERT_WAY_TAGS =
+      "REPLACE INTO osm_way_tags (id, name, highway, maxspeed) VALUES (?, ?, ?, ?)";
   /**
-   * SQL query to fetch the ID of a node by its name. Contains a placeholder value
-   * for the node name.
+   * SQL query to fetch the ID of a node by its name. Contains a placeholder
+   * value for the node name.
    */
   static final String QUERY_NODE_ID_BY_NAME = "SELECT id FROM osm_node_tags WHERE name = ?";
   /**
-   * SQL query to fetch the name of a node by its ID. Contains a placeholder value
-   * for the node ID.
+   * SQL query to fetch the name of a node by its ID. Contains a placeholder
+   * value for the node ID.
    */
   static final String QUERY_NODE_NAME_BY_ID = "SELECT name FROM osm_node_tags WHERE id = ?";
   /**
@@ -60,13 +60,13 @@ public final class DatabaseUtil {
    */
   static final String QUERY_SPATIAL_NODE_DATA_PREFIX = "SELECT id, latitude, longitude FROM osm_nodes WHERE id IN (";
   /**
-   * SQL query to fetch the id of a way by its name. Contains a placeholder value
-   * for the way name.
+   * SQL query to fetch the id of a way by its name. Contains a placeholder
+   * value for the way name.
    */
   static final String QUERY_WAY_ID_BY_NAME = "SELECT id FROM osm_way_tags WHERE name = ?";
   /**
-   * SQL query to fetch the name of a way by its ID. Contains a placeholder value
-   * for the way ID.
+   * SQL query to fetch the name of a way by its ID. Contains a placeholder
+   * value for the way ID.
    */
   static final String QUERY_WAY_NAME_BY_ID = "SELECT name FROM osm_way_tags WHERE id = ?";
 

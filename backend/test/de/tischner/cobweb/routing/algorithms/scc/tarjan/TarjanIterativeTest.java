@@ -22,7 +22,6 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
  * Test for the class {@link TarjanIterative}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class TarjanIterativeTest {
 
@@ -162,7 +161,8 @@ public final class TarjanIterativeTest {
   }
 
   /**
-   * Adds the edge to the given graph. It goes from the first to the second node.
+   * Adds the edge to the given graph. It goes from the first to the second
+   * node.
    *
    * @param graph  The graph to add the edge to
    * @param first  The first node

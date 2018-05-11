@@ -9,7 +9,6 @@ import org.junit.Test;
  * Test for the class {@link OsmParseUtil}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmParseUtilTest {
 

@@ -16,7 +16,6 @@ import de.tischner.cobweb.routing.model.graph.IPath;
  * corresponding method.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
@@ -25,9 +24,8 @@ public abstract class AShortestPathComputation<N extends INode, E extends IEdge<
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * @see de.tischner.cobweb.routing.algorithms.shortestpath.
+   * IShortestPathComputation#
    * computeSearchSpace(de.tischner.cobweb.routing.model.graph.INode,
    * de.tischner.cobweb.routing.model.graph.INode)
    */
@@ -38,9 +36,8 @@ public abstract class AShortestPathComputation<N extends INode, E extends IEdge<
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * @see de.tischner.cobweb.routing.algorithms.shortestpath.
+   * IShortestPathComputation#
    * computeShortestPath(de.tischner.cobweb.routing.model.graph.INode,
    * de.tischner.cobweb.routing.model.graph.INode)
    */
@@ -51,9 +48,8 @@ public abstract class AShortestPathComputation<N extends INode, E extends IEdge<
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * @see de.tischner.cobweb.routing.algorithms.shortestpath.
+   * IShortestPathComputation#
    * computeShortestPathCost(de.tischner.cobweb.routing.model.graph.INode,
    * de.tischner.cobweb.routing.model.graph.INode)
    */
@@ -64,9 +60,8 @@ public abstract class AShortestPathComputation<N extends INode, E extends IEdge<
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation#
+   * @see de.tischner.cobweb.routing.algorithms.shortestpath.
+   * IShortestPathComputation#
    * computeShortestPathCostsReachable(de.tischner.cobweb.routing.model.graph.
    * INode)
    */

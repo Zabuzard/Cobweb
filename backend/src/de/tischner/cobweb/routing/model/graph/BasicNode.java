@@ -8,7 +8,6 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * Basic implementation of a {@link INode} with an unique ID.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class BasicNode implements INode, IHasId, Serializable {
   /**
@@ -32,7 +31,6 @@ public final class BasicNode implements INode, IHasId, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -55,7 +53,6 @@ public final class BasicNode implements INode, IHasId, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.IHasId#getId()
    */
   @Override
@@ -65,7 +62,6 @@ public final class BasicNode implements INode, IHasId, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -78,7 +74,6 @@ public final class BasicNode implements INode, IHasId, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

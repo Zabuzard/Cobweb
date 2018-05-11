@@ -8,7 +8,6 @@ import org.junit.Test;
  * Test for the class {@link RoadNode}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoadNodeTest {
   /**

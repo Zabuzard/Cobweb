@@ -18,7 +18,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * distance estimate and then compares ascending, i.e. smaller values first.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
@@ -45,14 +44,14 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
 
   /**
    * Creates a new tentative distance container for the given node. This
-   * constructor sets the estimated distance to <tt>0.0</tt> which should be used
-   * whenever there is no desired destination.
+   * constructor sets the estimated distance to <tt>0.0</tt> which should be
+   * used whenever there is no desired destination.
    *
    * @param node              The node to wrap around
    * @param parentEdge        The parent edge that lead to this node
    * @param tentativeDistance The tentative distance from a source to this node,
-   *                          i.e. the sum of the edge costs when backtracking the
-   *                          parent edges to the source
+   *                          i.e. the sum of the edge costs when backtracking
+   *                          the parent edges to the source
    */
   public TentativeDistance(final N node, final E parentEdge, final double tentativeDistance) {
     this(node, parentEdge, tentativeDistance, 0.0);
@@ -64,10 +63,10 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
    * @param node              The node to wrap around
    * @param parentEdge        The parent edge that lead to this node
    * @param tentativeDistance The tentative distance from a source to this node,
-   *                          i.e. the sum of the edge costs when backtracking the
-   *                          parent edges to the source
-   * @param estimatedDistance An estimate about the distance from this node to the
-   *                          desired destination, the guess must be
+   *                          i.e. the sum of the edge costs when backtracking
+   *                          the parent edges to the source
+   * @param estimatedDistance An estimate about the distance from this node to
+   *                          the desired destination, the guess must be
    *                          <i>monotone</i> and <i>admissible</i>
    */
   public TentativeDistance(final N node, final E parentEdge, final double tentativeDistance,
@@ -79,8 +78,9 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
   }
 
   /**
-   * The natural ordering of this container sums up the tentative distance and the
-   * distance estimate and then compares ascending, i.e. smaller values first.
+   * The natural ordering of this container sums up the tentative distance and
+   * the distance estimate and then compares ascending, i.e. smaller values
+   * first.
    */
   @Override
   public int compareTo(final TentativeDistance<N, E> other) {
@@ -139,7 +139,6 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

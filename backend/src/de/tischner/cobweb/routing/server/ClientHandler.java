@@ -39,15 +39,15 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * closed outside.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  * @param <G> Type of the graph
  */
-public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId, G extends IGraph<N, E> & ICanGetNodeById<N>>
-    implements Runnable {
+public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
+    G extends IGraph<N, E> & ICanGetNodeById<N>> implements Runnable {
   /**
-   * Resource that is to be requested from a client if he submits a routing query.
+   * Resource that is to be requested from a client if he submits a routing
+   * query.
    */
   private static final String API_RESOURCE = "/route";
   /**
@@ -85,7 +85,8 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    * @param id          The unique ID of this client request
    * @param client      The client to handle
    * @param graph       The graph used for shortest path computation
-   * @param computation The algorithm to use for computing shortest path requests
+   * @param computation The algorithm to use for computing shortest path
+   *                    requests
    * @param database    The database to use for fetching meta data for nodes and
    *                    edges
    */
@@ -101,9 +102,9 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   /**
    * Handles the clients request.<br>
    * <br>
-   * The method should only be called once, the object should not be used anymore
-   * after the method has finished. The method catches and logs all errors and
-   * exceptions.<br>
+   * The method should only be called once, the object should not be used
+   * anymore after the method has finished. The method catches and logs all
+   * errors and exceptions.<br>
    * <br>
    * The client handler will close the client on its own. So it should not be
    * closed outside.

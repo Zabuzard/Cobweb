@@ -7,7 +7,6 @@ import java.nio.file.Path;
  * given file.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 @FunctionalInterface
 public interface IFileHandler {

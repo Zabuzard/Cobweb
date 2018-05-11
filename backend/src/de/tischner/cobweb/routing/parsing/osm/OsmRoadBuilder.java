@@ -21,7 +21,6 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * is called.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <G> The type of the graph which must be able to get nodes by their ID
  */
 public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & ICanGetNodeById<RoadNode>>
@@ -41,8 +40,8 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   }
 
   /**
-   * Builds an edge which connects the source and destination nodes with the given
-   * unique IDs.<br>
+   * Builds an edge which connects the source and destination nodes with the
+   * given unique IDs.<br>
    * <br>
    * The edge is build incomplete at first and are updated once
    * {@link #complete()} is called.
@@ -63,10 +62,8 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder#buildNode(de.topobyte.
-   * osm4j.core.model.iface.OsmNode)
+   * @see de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder#buildNode(de.
+   * topobyte. osm4j.core.model.iface.OsmNode)
    */
   @Override
   public RoadNode buildNode(final OsmNode node) {

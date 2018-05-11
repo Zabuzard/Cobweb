@@ -20,13 +20,13 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * reversing nodes in constant time. The class is fully serializable.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the nodes which must have an ID and be spatial
  * @param <E> Type of the edges which must have an ID and be able to consume a
  *        {@link IReversedProvider}
  */
-public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable, E extends IEdge<N> & IHasId & IReversedConsumer & Serializable>
-    extends AGraph<N, E> implements ICanGetNodeById<N>, IReversedProvider {
+public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
+    E extends IEdge<N> & IHasId & IReversedConsumer & Serializable> extends AGraph<N, E>
+    implements ICanGetNodeById<N>, IReversedProvider {
   /**
    * The serial version UID.
    */
@@ -49,7 +49,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.AGraph#addEdge(de.tischner.cobweb.
    * routing.model.graph.IEdge)
@@ -62,7 +61,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.IGraph#addNode(de.tischner.cobweb.
    * routing.model.graph.INode)
@@ -79,7 +77,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#
    * containsNodeWithId(long)
    */
@@ -90,9 +87,9 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(long)
+   * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(
+   * long)
    */
   @Override
   public Optional<N> getNodeById(final long id) {
@@ -114,7 +111,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.road.IReversedProvider#isReversed()
    */
@@ -125,10 +121,8 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.model.graph.IGraph#removeNode(de.tischner.cobweb.
-   * routing.model.graph.INode)
+   * @see de.tischner.cobweb.routing.model.graph.IGraph#removeNode(de.tischner.
+   * cobweb. routing.model.graph.INode)
    */
   @Override
   public boolean removeNode(final N node) {
@@ -159,7 +153,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.AGraph#getNodeToIncomingEdges()
    */
   @Override
@@ -172,7 +165,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.AGraph#getNodeToOutgoingEdges()
    */
   @Override

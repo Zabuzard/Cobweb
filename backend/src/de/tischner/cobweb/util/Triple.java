@@ -4,7 +4,6 @@ package de.tischner.cobweb.util;
  * Object for generic triples which hold three objects of given types.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <E1> Type of the first element
  * @param <E2> Type of the second element
  * @param <E3> Type of the third element
@@ -38,7 +37,6 @@ public final class Triple<E1, E2, E3> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -106,7 +104,6 @@ public final class Triple<E1, E2, E3> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -121,7 +118,6 @@ public final class Triple<E1, E2, E3> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

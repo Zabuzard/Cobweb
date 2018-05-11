@@ -23,7 +23,6 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * Test for the class {@link Dijkstra}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class DijkstraTest {
   /**
@@ -78,9 +77,9 @@ public final class DijkstraTest {
    */
   @Test
   public void testComputeSearchSpaceCollectionOfNN() {
-    final List<Long> searchSpace = mDijkstra
-        .computeSearchSpace(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get()).stream().map(IHasId::getId)
-        .collect(Collectors.toList());
+    final List<Long> searchSpace =
+        mDijkstra.computeSearchSpace(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get()).stream()
+            .map(IHasId::getId).collect(Collectors.toList());
     Assert.assertEquals(6, searchSpace.size());
     Assert.assertEquals(Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L), searchSpace);
   }
@@ -91,8 +90,8 @@ public final class DijkstraTest {
    */
   @Test
   public void testComputeShortestPathCollectionOfNN() {
-    final Optional<IPath<BasicNode, BasicEdge<BasicNode>>> possiblePath = mDijkstra
-        .computeShortestPath(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get());
+    final Optional<IPath<BasicNode, BasicEdge<BasicNode>>> possiblePath =
+        mDijkstra.computeShortestPath(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get());
     Assert.assertTrue(possiblePath.isPresent());
     final IPath<BasicNode, BasicEdge<BasicNode>> path = possiblePath.get();
 
@@ -157,8 +156,8 @@ public final class DijkstraTest {
    */
   @Test
   public void testComputeShortestPathCostsReachableCollectionOfN() {
-    final Map<BasicNode, ? extends IHasPathCost> nodeToDistance = mDijkstra
-        .computeShortestPathCostsReachable(Collections.singletonList(mGraph.getNodeById(1L).get()));
+    final Map<BasicNode, ? extends IHasPathCost> nodeToDistance =
+        mDijkstra.computeShortestPathCostsReachable(Collections.singletonList(mGraph.getNodeById(1L).get()));
     Assert.assertEquals(6, nodeToDistance.size());
     Assert.assertEquals(0.0, nodeToDistance.get(mGraph.getNodeById(1L).get()).getPathCost(), 0.0001);
     Assert.assertEquals(1.0, nodeToDistance.get(mGraph.getNodeById(2L).get()).getPathCost(), 0.0001);
@@ -198,7 +197,8 @@ public final class DijkstraTest {
   }
 
   /**
-   * Adds the edge to the given graph. It goes from the first to the second node.
+   * Adds the edge to the given graph. It goes from the first to the second
+   * node.
    *
    * @param graph  The graph to add the edge to
    * @param first  The first node

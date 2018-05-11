@@ -11,12 +11,10 @@ import de.topobyte.osm4j.core.model.iface.OsmEntity;
  * method.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public abstract class ARoutingDatabase implements IRoutingDatabase {
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.lang.Iterable,
    * int)
@@ -28,10 +26,8 @@ public abstract class ARoutingDatabase implements IRoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.lang.Iterable,
-   * int)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.lang.
+   * Iterable, int)
    */
   @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
@@ -40,7 +36,6 @@ public abstract class ARoutingDatabase implements IRoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#offerOsmEntities(java.lang.Iterable,
    * int)

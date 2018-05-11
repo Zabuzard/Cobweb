@@ -6,7 +6,6 @@ import java.util.Map;
  * POJO that models a HTTP request.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class HttpRequest {
   /**
@@ -95,7 +94,6 @@ public final class HttpRequest {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

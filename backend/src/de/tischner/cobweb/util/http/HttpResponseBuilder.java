@@ -14,7 +14,6 @@ import java.util.Map;
  * {@code new HttpResponseBuilder().setContent("Hello World").build()}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class HttpResponseBuilder {
   /**
@@ -35,8 +34,8 @@ public final class HttpResponseBuilder {
   private EHttpStatus mStatus;
 
   /**
-   * Creates a new HTTP response builder with default values for a valid response
-   * with an empty text.<br>
+   * Creates a new HTTP response builder with default values for a valid
+   * response with an empty text.<br>
    * <br>
    * Use the setter methods to set different values and finally construct an
    * instance using {@link #build()}.
@@ -51,8 +50,8 @@ public final class HttpResponseBuilder {
   }
 
   /**
-   * Builds an instance of a {@link HttpResponse} with the values currently set in
-   * this builder.
+   * Builds an instance of a {@link HttpResponse} with the values currently set
+   * in this builder.
    *
    * @return An instance of a response with the current set values
    */

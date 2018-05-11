@@ -8,7 +8,6 @@ import java.util.stream.StreamSupport;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
@@ -18,7 +17,6 @@ import de.tischner.cobweb.routing.model.graph.road.IHasId;
  * Test for the class {@link EdgePath}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class EdgePathTest {
 
@@ -156,14 +154,14 @@ public final class EdgePathTest {
   @Test
   public void testIterator() {
     final List<Long> expectedIds = Arrays.asList(1L, 2L, 3L);
-    final List<Long> ids = StreamSupport.stream(mPath.spliterator(), false).map(IHasId::getId)
-        .collect(Collectors.toList());
-    Assertions.assertEquals(expectedIds, ids);
+    final List<Long> ids =
+        StreamSupport.stream(mPath.spliterator(), false).map(IHasId::getId).collect(Collectors.toList());
+    Assert.assertEquals(expectedIds, ids);
 
     final List<Long> reverseExpectedIds = Arrays.asList(3L, 2L, 1L);
     final List<Long> reverseIds = StreamSupport.stream(EdgePathTest.buildPath(true).spliterator(), false)
         .map(IHasId::getId).collect(Collectors.toList());
-    Assertions.assertEquals(reverseExpectedIds, reverseIds);
+    Assert.assertEquals(reverseExpectedIds, reverseIds);
   }
 
   /**

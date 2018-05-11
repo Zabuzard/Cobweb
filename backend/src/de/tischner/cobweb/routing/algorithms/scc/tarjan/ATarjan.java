@@ -23,7 +23,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * Subclasses need to implement the core method {@link #strongConnect(INode)}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the nodes
  * @param <E> Type of the egdes
  * @param <G> Type of the graph
@@ -83,8 +82,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   }
 
   /**
-   * Gets the largest SCC in the graph. The first call to this method will trigger
-   * a computation of all SCCs.
+   * Gets the largest SCC in the graph. The first call to this method will
+   * trigger a computation of all SCCs.
    */
   @Override
   public StronglyConnectedComponent<N> getLargestScc() {
@@ -107,8 +106,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   }
 
   /**
-   * Computes all SCCs of the given graph. Calls {@link #strongConnect(INode)} on
-   * all nodes that have no index already.
+   * Computes all SCCs of the given graph. Calls {@link #strongConnect(INode)}
+   * on all nodes that have no index already.
    */
   protected void computeSccs() {
     for (final N node : mGraph.getNodes()) {
@@ -126,8 +125,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
    * Whether or not the given node is registered as index node.
    *
    * @param node The node in question
-   * @return <tt>True</tt> if the node is registered as index node, <tt>false</tt>
-   *         otherwise
+   * @return <tt>True</tt> if the node is registered as index node,
+   *         <tt>false</tt> otherwise
    */
   protected boolean containsIndexNode(final N node) {
     return mNodeToIndex.containsKey(node);
@@ -229,8 +228,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   }
 
   /**
-   * Puts the given index for the node. Registers the node as index node if it was
-   * not already.
+   * Puts the given index for the node. Registers the node as index node if it
+   * was not already.
    *
    * @param node  The node to put the index for
    * @param index The index to put
@@ -250,8 +249,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   }
 
   /**
-   * The main logic of the algorithm which finds nodes that are strongly connected
-   * to the given node.
+   * The main logic of the algorithm which finds nodes that are strongly
+   * connected to the given node.
    *
    * @param node The node to connect
    */

@@ -24,7 +24,6 @@ import de.tischner.cobweb.util.NestedMap;
  * distance model of the graph, i.e. the format used by the edge cost.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of the nodes and landmarks
  * @param <E> The type of the edges
  * @param <G> The type of the graph
@@ -33,7 +32,7 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(LandmarkMetric.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LandmarkMetric.class);
   /**
    * Landmarks to use for computing the metric.
    */
@@ -57,8 +56,8 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
    * from the objects to the landmarks. The distance depends on the underlying
    * distance model of the graph, i.e. the format used by the edge cost.<br>
    * <br>
-   * Due to the computation of landmarks and shortest paths, the creation of this
-   * metric might take a while.
+   * Due to the computation of landmarks and shortest paths, the creation of
+   * this metric might take a while.
    *
    * @param amount           The amount of landmarks to use
    * @param graph            The graph to define the metric on
@@ -73,8 +72,9 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
 
   /**
    * Approximates the distance between the given two nodes by comparing shortest
-   * paths from the nodes to the landmarks. The distance depends on the underlying
-   * distance model of the graph, i.e. the format used by the edge cost.
+   * paths from the nodes to the landmarks. The distance depends on the
+   * underlying distance model of the graph, i.e. the format used by the edge
+   * cost.
    */
   @Override
   public double distance(final N first, final N second) {
@@ -102,9 +102,9 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
   }
 
   /**
-   * Initializes this metric. It generates landmarks using the given provider and
-   * computes shortest path distances from the landmarks to all nodes and vice
-   * versa.<br>
+   * Initializes this metric. It generates landmarks using the given provider
+   * and computes shortest path distances from the landmarks to all nodes and
+   * vice versa.<br>
    * <br>
    * Depending on the size of the graph and the amount of landmarks this method
    * may take a while.

@@ -4,7 +4,6 @@ package de.tischner.cobweb.routing.algorithms.metrics;
  * Interface for a metric defined on a given type of objects.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <E> The type of objects the metric operates on
  */
 @FunctionalInterface

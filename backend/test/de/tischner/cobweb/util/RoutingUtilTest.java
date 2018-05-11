@@ -10,12 +10,12 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
  * Test for the class {@link RoutingUtil}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoutingUtilTest {
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.RoutingUtil#degToRad(double)}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#degToRad(double)}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -61,7 +61,8 @@ public final class RoutingUtilTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.RoutingUtil#kmhToMs(double)}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#kmhToMs(double)}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -82,7 +83,8 @@ public final class RoutingUtilTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.RoutingUtil#msToKmh(double)}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#msToKmh(double)}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -93,7 +95,8 @@ public final class RoutingUtilTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.RoutingUtil#radToDeg(double)}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#radToDeg(double)}.
    */
   @SuppressWarnings("static-method")
   @Test

@@ -13,7 +13,6 @@ import org.junit.Test;
  * Test for the class {@link HttpResponse}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public class HttpResponseTest {
   /**

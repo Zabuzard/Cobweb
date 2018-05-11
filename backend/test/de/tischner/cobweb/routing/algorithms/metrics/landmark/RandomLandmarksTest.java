@@ -11,7 +11,6 @@ import de.tischner.cobweb.routing.model.graph.BasicNode;
  * Test for the class {@link RandomLandmarks}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public class RandomLandmarksTest {
 

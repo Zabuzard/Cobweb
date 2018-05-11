@@ -8,7 +8,6 @@ import org.junit.Test;
  * Test for the class {@link SpatialNodeData}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class SpatialNodeDataTest {
 
@@ -34,7 +33,8 @@ public final class SpatialNodeDataTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.db.SpatialNodeData#getLatitude()}.
+   * Test method for
+   * {@link de.tischner.cobweb.db.SpatialNodeData#getLatitude()}.
    */
   @Test
   public final void testGetLatitude() {
@@ -42,7 +42,8 @@ public final class SpatialNodeDataTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.db.SpatialNodeData#getLongitude()}.
+   * Test method for
+   * {@link de.tischner.cobweb.db.SpatialNodeData#getLongitude()}.
    */
   @Test
   public final void testGetLongitude() {

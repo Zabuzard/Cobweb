@@ -50,13 +50,12 @@ import de.tischner.cobweb.util.SerializationUtil;
  * which offers a REST API too.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class Application {
   /**
    * Path to the configuration of the logger.
    */
-  private static final Path LOGGER_CONFIG = Paths.get("backend", "res", "logging", "logConfig.xml");
+  private static final Path LOGGER_CONFIG = Paths.get("res", "logging", "logConfig.xml");
   /**
    * Provided arguments that are used to determine the commands to use.
    */
@@ -139,8 +138,8 @@ public final class Application {
 
   /**
    * Shuts the application down. Use this method after {@link #start()} has been
-   * called. The application should not be used anymore after this method. Instead
-   * create a new one.
+   * called. The application should not be used anymore after this method.
+   * Instead create a new one.
    */
   public void shutdown() {
     // TODO Make sure this is always called
@@ -190,9 +189,9 @@ public final class Application {
   }
 
   /**
-   * Creates file handler that handle OSM files for routing. If they are notified
-   * when parsing OSM data, they will adjust models used for routing like the
-   * graph accordingly.
+   * Creates file handler that handle OSM files for routing. If they are
+   * notified when parsing OSM data, they will adjust models used for routing
+   * like the graph accordingly.
    *
    * @return An iterable consisting of all routing file handlers that adjust
    *         routing models
@@ -211,14 +210,15 @@ public final class Application {
   }
 
   /**
-   * Initializes the API of the application. This consists of the routing server,
-   * the database, the search server and all corresponding utilities and models.
+   * Initializes the API of the application. This consists of the routing
+   * server, the database, the search server and all corresponding utilities and
+   * models.
    *
    * @throws ParseException If an exception occurred while parsing data like
    *                        configuration files
    */
   private void initializeApi() throws ParseException {
-    final Instant initAPIStartTime = Instant.now();
+    final Instant initStartTime = Instant.now();
 
     initializeDatabase();
     initializeGraph();
@@ -243,18 +243,18 @@ public final class Application {
     initializeRouting();
 
     final Instant initEndTime = Instant.now();
-    mLogger.info("Initialization of API took: {}", Duration.between(initAPIStartTime, initEndTime));
+    mLogger.info("Initialization of API took: {}", Duration.between(initStartTime, initEndTime));
   }
 
   /**
    * Initializes the database which stores meta data used for routing. Depending
-   * on the configuration this may create tables in an external database or create
-   * an internal in-memory database.
+   * on the configuration this may create tables in an external database or
+   * create an internal in-memory database.
    *
    * @throws ParseException If an exception occurred while parsing data like
    *                        configuration files. Or when a problem with an
-   *                        external database occurred like passing invalid SQL or
-   *                        if a connection could not be established.
+   *                        external database occurred like passing invalid SQL
+   *                        or if a connection could not be established.
    */
   private void initializeDatabase() throws ParseException {
     mLogger.info("Initializing database");
@@ -274,8 +274,8 @@ public final class Application {
    * deserialized graph is big this method may take a while.
    *
    * @throws ParseException If an exception occurred while parsing data like
-   *                        configuration files or if the graph to deserialize is
-   *                        invalid.
+   *                        configuration files or if the graph to deserialize
+   *                        is invalid.
    */
   private void initializeGraph() throws ParseException {
     mLogger.info("Initializing graph");
@@ -329,12 +329,13 @@ public final class Application {
   }
 
   /**
-   * Serializes the graph model if desired. That is, if the size of the graph has
-   * changed and the configuration contains the property to use the graph cache.
+   * Serializes the graph model if desired. That is, if the size of the graph
+   * has changed and the configuration contains the property to use the graph
+   * cache.
    *
-   * @param graphSizeBefore The size of the graph after it was deserialized. Used
-   *                        to determine if the current graph has changed compared
-   *                        to the serialized version.
+   * @param graphSizeBefore The size of the graph after it was deserialized.
+   *                        Used to determine if the current graph has changed
+   *                        compared to the serialized version.
    * @throws ParseException If an exception occurred while parsing data like
    *                        configuration files or if an exception at
    *                        serialization occurred

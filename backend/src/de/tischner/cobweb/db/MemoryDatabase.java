@@ -32,13 +32,12 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * and similar methods.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public class MemoryDatabase extends ARoutingDatabase {
   /**
    * The logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
   /**
    * Map connecting node names to their unique OSM IDs.
    */
@@ -81,8 +80,8 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#getHighwayData(java.util.stream.
    * LongStream, int)
    */
   @Override
@@ -97,7 +96,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
    */
   @Override
@@ -110,7 +108,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeName(long)
    */
   @Override
@@ -120,7 +117,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
    * LongStream, int)
@@ -137,7 +133,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getWayByName(java.lang.String)
    */
   @Override
@@ -150,7 +145,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#getWayName(long)
    */
   @Override
@@ -160,7 +154,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#initialize()
    */
   @Override
@@ -170,7 +163,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#offerOsmEntities(java.util.stream.
    * Stream, int)
@@ -192,7 +184,6 @@ public class MemoryDatabase extends ARoutingDatabase {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.db.IRoutingDatabase#shutdown()
    */
   @Override

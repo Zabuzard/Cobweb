@@ -2,33 +2,76 @@
   <property name="version" value="0.1" />
   <property name="projectdir" value="./" />
   <property name="Main-class" value="de.tischner.cobweb.Main" />
+  <property name="app-name" value="Cobweb" />
   <property name="jar-name" value="cobwebBackend" />
   <property name="src-dir" location="${projectdir}/src" />
   <property name="test-dir" location="${projectdir}/test" />
   <property name="bin-dir" location="${projectdir}/bin" />
+  <property name="doc-dir" location="${projectdir}/doc" />
   <property name="dist-dir" location="${projectdir}" />
   <property name="lib-dir" location="${projectdir}/lib" />
-  <property name="junit-jar" location="${lib-dir}/junit/junit-4.12.jar" />
-  <property name="hamcrest-jar" location="${lib-dir}/checkstyle/hamcrest-core-1.3.jar" />
-  <property name="checkstyle-jar" location="${lib-dir}/checkstyle/checkstyle-8.3-all.jar" />
-  <property name="checkstyle-config" location="${lib-dir}/checkstyle/checkstyle-config.xml" />
-  
+  <property name="lib-base-dir" location="${lib-dir}/base" />
+  <property name="lib-test-dir" location="${lib-dir}/test" />
+  <property name="lib-misc-dir" location="${lib-dir}/misc" />
+  <property name="checkstyle-jar" location="${lib-misc-dir}/checkstyle/checkstyle-8.3-all.jar" />
+  <property name="checkstyle-config" location="${lib-misc-dir}/checkstyle/checkstyle-config.xml" />
+
   <path id="classpath.base">
+    <fileset dir="${lib-base-dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <pathelement location="${bin-dir}" />
   </path>
-  
+
   <property file="build.properties"/>
 
   <path id="classpath.test">
-    <pathelement location="${junit-jar}" />
-    <pathelement location="${hamcrest-jar}" />
-    <pathelement location="${bin-dir}" />
+    <fileset dir="${lib-test-dir}">
+      <include name="**/*.jar" />
+    </fileset>
     <path refid="classpath.base" />
   </path>
 
   <path id="classpath.run">
-    <pathelement location="${bin-dir}" />
     <path refid="classpath.base" />
   </path>
+
+  <target name="compile">
+    <mkdir dir="${bin-dir}"/>
+    <javac target="8" source="8" srcdir="${src-dir}" destdir="${bin-dir}" verbose="false"
+        includeantruntime="false" debug="on" encoding="utf-8">
+      <classpath refid="classpath.base" />
+    </javac>
+	<javac target="8" source="8" srcdir="${test-dir}" destdir="${bin-dir}" verbose="false"
+        includeantruntime="false" debug="on" encoding="utf-8">
+      <classpath refid="classpath.test" />
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile, doc">
+    <jar destfile="${dist-dir}/${jar-name}-${version}.jar" basedir="${bin-dir}" excludes="**/*Test.class">
+      <manifest>
+        <attribute name="Main-Class" value="${Main-class}" />
+      </manifest>
+    </jar>
+    <jar destfile="${dist-dir}/${jar-name}-${version}-standalone.jar" basedir="${bin-dir}" excludes="**/*Test.class">
+	  <zipgroupfileset dir="${lib-base-dir}" includes="**/*.jar"/>
+      <manifest>
+        <attribute name="Main-Class" value="${Main-class}" />
+      </manifest>
+    </jar>
+    <jar destfile="${dist-dir}/${jar-name}-${version}-test.jar" basedir="${bin-dir}">
+	  <zipgroupfileset dir="${lib-base-dir}" includes="**/*.jar"/>
+	  <zipgroupfileset dir="${lib-test-dir}" includes="**/*.jar"/>
+    </jar>
+    <jar destfile="${dist-dir}/${jar-name}-${version}-src.jar">
+      <fileset dir="${src-dir}"/>
+      <fileset dir="${test-dir}"/>
+    </jar>
+    <jar destfile="${dist-dir}/${jar-name}-${version}-doc.jar">
+      <fileset dir="${doc-dir}"/>
+    </jar>
+  </target>
 
   <target name="checkstyle">
     <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" 
@@ -40,42 +83,6 @@
         <formatter type="plain" usefile="false"/>
     </checkstyle>
   </target>
-
-  <target name="compile">
-    <mkdir dir="${bin-dir}"/>
-    <javac srcdir="${src-dir}" destdir="${bin-dir}" verbose="false"
-        includeantruntime="false" debug="on" encoding="utf-8">
-      <classpath refid="classpath.test" />
-    </javac>
-	<javac srcdir="${test-dir}" destdir="${bin-dir}" verbose="false"
-        includeantruntime="false" debug="on" encoding="utf-8">
-      <classpath refid="classpath.test" />
-    </javac>
-  </target>
-  
-  <target name="jar" depends="compile">
-    <jar destfile="${dist-dir}/${jar-name}-${version}.jar" basedir="${bin-dir}" excludes="**/*Test.class">
-      <manifest>
-        <attribute name="Main-Class" value="${Main-class}" />
-      </manifest>
-    </jar>
-    <jar destfile="${dist-dir}/${jar-name}-${version}-test.jar" basedir="${bin-dir}">
-      <manifest>
-        <attribute name="Main-Class" value="${Main-class}" />
-      </manifest>
-    </jar>
-    <jar destfile="${dist-dir}/${jar-name}-${version}-src.jar">
-      <fileset dir="${src-dir}"/>
-      <fileset dir="${test-dir}"/>
-    </jar>
-  </target>
-
-  <target name="clean">
-    <delete verbose="true" quiet="true">
-      <fileset dir="${bin-dir}" includes="**/*.class" />
-      <fileset dir="${dist-dir}" includes="${jar-name}*.jar" />
-    </delete>
-  </target> 
 
   <target name="test" depends="compile">
     <junit haltonfailure="yes" haltonerror="yes">
@@ -89,5 +96,23 @@
     </junit>
   </target>
 
-  <target name="all" depends="test, checkstyle, jar" />
+  <target name="doc">
+    <delete dir="${doc-dir}" failonerror="false"/>
+	<mkdir dir="${doc-dir}"/>
+	<javadoc destdir="${doc-dir}" author="true" version="true" use="true"
+	      windowtitle="${app-name} Documentation" failonwarning="true">
+		<classpath refid="classpath.base" />
+	  <packageset dir="${src-dir}"/>
+	</javadoc>
+  </target> 
+
+  <target name="clean">
+    <delete verbose="true" quiet="true">
+      <fileset dir="${bin-dir}" includes="**/*.class" />
+      <fileset dir="${dist-dir}" includes="${jar-name}*.jar" />
+    </delete>
+	<delete dir="${doc-dir}" failonerror="false"/>
+  </target> 
+
+  <target name="all" depends="doc, test, checkstyle, jar" />
 </project>

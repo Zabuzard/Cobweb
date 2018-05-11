@@ -4,7 +4,6 @@ package de.tischner.cobweb.util.http;
  * Enumeration of valid HTTP/1.0 content types, also known as MIME types.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum EHttpContentType {
   /**
@@ -40,8 +39,8 @@ public enum EHttpContentType {
    * Gets the content type corresponding to the given text value.
    *
    * @param textValue The text value to get the type of
-   * @return The content type that corresponds to the given text or <tt>null</tt>
-   *         if not present
+   * @return The content type that corresponds to the given text or
+   *         <tt>null</tt> if not present
    */
   public static EHttpContentType fromTextValue(final String textValue) {
     for (final EHttpContentType contentType : EHttpContentType.values()) {

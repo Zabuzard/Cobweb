@@ -5,7 +5,6 @@ package de.tischner.cobweb.routing.model.graph;
  * which lead to the destination.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */

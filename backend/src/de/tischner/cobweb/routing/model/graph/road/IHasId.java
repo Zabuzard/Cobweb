@@ -8,7 +8,6 @@ package de.tischner.cobweb.routing.model.graph.road;
  * interpreted as unique.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 @FunctionalInterface
 public interface IHasId {

@@ -19,7 +19,6 @@ import java.util.stream.Stream;
  * {@link #reverse()} are not implemented.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> The type of nodes
  * @param <E> The type of edges
  */
@@ -53,7 +52,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.IGraph#addEdge(de.tischner.cobweb.
    * routing.model.graph.IEdge)
@@ -70,10 +68,9 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.tischner.cobweb.routing.model.graph.IGraph#containsEdge(de.tischner.cobweb
-   * .routing.model.graph.IEdge)
+   * de.tischner.cobweb.routing.model.graph.IGraph#containsEdge(de.tischner.
+   * cobweb .routing.model.graph.IEdge)
    */
   @Override
   public boolean containsEdge(final E edge) {
@@ -84,7 +81,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IGraph#getAmountOfEdges()
    */
   @Override
@@ -94,7 +90,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IGraph#getEdges()
    */
   @Override
@@ -104,7 +99,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.IGraph#getIncomingEdges(de.tischner.
    * cobweb.routing.model.graph.INode)
@@ -120,7 +114,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.IGraph#getOutgoingEdges(de.tischner.
    * cobweb.routing.model.graph.INode)
@@ -146,10 +139,8 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.model.graph.IGraph#removeEdge(de.tischner.cobweb.
-   * routing.model.graph.IEdge)
+   * @see de.tischner.cobweb.routing.model.graph.IGraph#removeEdge(de.tischner.
+   * cobweb. routing.model.graph.IEdge)
    */
   @Override
   public boolean removeEdge(final E edge) {
@@ -163,7 +154,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.IGraph#size()
    */
   @Override
@@ -173,7 +163,6 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -187,13 +176,14 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
   /**
    * Removes the given edge from the given map by using the given key.<br>
    * <br>
-   * If the edge set is empty after removal, the key is removed from the map too.
+   * If the edge set is empty after removal, the key is removed from the map
+   * too.
    *
    * @param edge        The edge to remove
    * @param keyNode     The key of the set where the edge is to be removed from
    * @param nodeToEdges The map that connects nodes to a set of edges
-   * @return <tt>True</tt> if the edge was found and thus removed, <tt>false</tt>
-   *         otherwise
+   * @return <tt>True</tt> if the edge was found and thus removed,
+   *         <tt>false</tt> otherwise
    */
   private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, Set<E>> nodeToEdges) {
     final Set<E> edges = nodeToEdges.get(keyNode);
@@ -208,12 +198,12 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
   }
 
   /**
-   * Gets a map that connects nodes to their incoming edges. The map is backed by
-   * the graph, changes will be reflected in the graph.<br>
+   * Gets a map that connects nodes to their incoming edges. The map is backed
+   * by the graph, changes will be reflected in the graph.<br>
    * <br>
-   * Do only change the map directly if you know the consequences. Else the graph
-   * can easily get into a corrupted state. In many situations it is best to use
-   * the given methods like {@link #addEdge(IEdge)} instead.
+   * Do only change the map directly if you know the consequences. Else the
+   * graph can easily get into a corrupted state. In many situations it is best
+   * to use the given methods like {@link #addEdge(IEdge)} instead.
    *
    * @return A map connecting nodes to their incoming edges
    */
@@ -222,12 +212,12 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
   }
 
   /**
-   * Gets a map that connects nodes to their outgoing edges. The map is backed by
-   * the graph, changes will be reflected in the graph.<br>
+   * Gets a map that connects nodes to their outgoing edges. The map is backed
+   * by the graph, changes will be reflected in the graph.<br>
    * <br>
-   * Do only change the map directly if you know the consequences. Else the graph
-   * can easily get into a corrupted state. In many situations it is best to use
-   * the given methods like {@link #addEdge(IEdge)} instead.
+   * Do only change the map directly if you know the consequences. Else the
+   * graph can easily get into a corrupted state. In many situations it is best
+   * to use the given methods like {@link #addEdge(IEdge)} instead.
    *
    * @return A map connecting nodes to their outgoing edges
    */

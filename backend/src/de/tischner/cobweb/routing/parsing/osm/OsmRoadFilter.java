@@ -51,13 +51,13 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
  * area=yes
  * train=yes
  * </pre>
- *
+ * <p>
  * The filter will accept only OSM ways that have a <tt>highway</tt> tag value
  * of either <tt>motorway</tt> or <tt>trunk</tt> and not a value <tt>yes</tt>
  * for the tag <tt>area</tt> or <tt>train</tt>.
+ * </p>
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmRoadFilter implements IOsmFilter {
   /**
@@ -75,7 +75,7 @@ public final class OsmRoadFilter implements IOsmFilter {
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(OsmRoadFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsmRoadFilter.class);
   /**
    * Symbol which separates tag keys from their values.
    */
@@ -113,8 +113,8 @@ public final class OsmRoadFilter implements IOsmFilter {
   private final Map<String, Set<String>> mTagToValuesKeep;
 
   /**
-   * Creates a new OSM road filter which filters OSM entities based on the filter
-   * configuration provided by the given configuration provider.
+   * Creates a new OSM road filter which filters OSM entities based on the
+   * filter configuration provided by the given configuration provider.
    *
    * @param config The configuration provider that provides the filter
    *               configuration
@@ -232,22 +232,24 @@ public final class OsmRoadFilter implements IOsmFilter {
   }
 
   /**
-   * Whether or not the given OSM tag and its value were registered in drop mode.
+   * Whether or not the given OSM tag and its value were registered in drop
+   * mode.
    *
    * @param tag The tag in question
-   * @return <tt>True</tt> if the tag and its value were registered in drop mode,
-   *         <tt>false</tt> otherwise
+   * @return <tt>True</tt> if the tag and its value were registered in drop
+   *         mode, <tt>false</tt> otherwise
    */
   private boolean isDropTag(final OsmTag tag) {
     return OsmRoadFilter.isTagInMap(tag, mTagToValuesDrop);
   }
 
   /**
-   * Whether or not the given OSM tag and its value were registered in keep mode.
+   * Whether or not the given OSM tag and its value were registered in keep
+   * mode.
    *
    * @param tag The tag in question
-   * @return <tt>True</tt> if the tag and its value were registered in keep mode,
-   *         <tt>false</tt> otherwise
+   * @return <tt>True</tt> if the tag and its value were registered in keep
+   *         mode, <tt>false</tt> otherwise
    */
   private boolean isKeepTag(final OsmTag tag) {
     return OsmRoadFilter.isTagInMap(tag, mTagToValuesKeep);

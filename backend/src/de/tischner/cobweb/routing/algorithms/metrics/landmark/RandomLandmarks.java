@@ -23,7 +23,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * of landmarks.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the nodes and landmarks
  * @param <G> Type of the graph
  */
@@ -34,8 +33,8 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
    */
   private final G mGraph;
   /**
-   * The random number generator to use for generating the indices of the nodes to
-   * select as landmarks.
+   * The random number generator to use for generating the indices of the nodes
+   * to select as landmarks.
    */
   private final Random mRandom;
 
@@ -52,10 +51,10 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
   /**
    * Selects landmarks randomly from the set of nodes.<br>
    * <br>
-   * If the nodes of the graph do not provide {@link RandomAccess}, the selection
-   * might need to iterate all nodes in order to select the random nodes. In this
-   * case the landmark generation runs in <tt>O(n)</tt>, else only in the amount
-   * of landmarks.
+   * If the nodes of the graph do not provide {@link RandomAccess}, the
+   * selection might need to iterate all nodes in order to select the random
+   * nodes. In this case the landmark generation runs in <tt>O(n)</tt>, else
+   * only in the amount of landmarks.
    */
   @Override
   public Collection<N> getLandmarks(final int amount) {
@@ -92,7 +91,8 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
     Arrays.sort(indices);
 
     // Iterate to each index and collect the node
-    // This loop is optimized and faster than a straightforward approach because it
+    // This loop is optimized and faster than a straightforward approach because
+    // it
     // has no conditional checks
     final Iterator<N> nodeIter = nodes.iterator();
     int indexBefore = 0;

@@ -15,7 +15,6 @@ import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
  * {@link BasicEdge}s.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> implements ICanGetNodeById<BasicNode> {
   /**
@@ -36,7 +35,6 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.IGraph#addNode(de.tischner.cobweb.
    * routing.model.graph.INode)
@@ -52,7 +50,6 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#
    * containsNodeWithId(long)
    */
@@ -63,9 +60,9 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
 
   /*
    * (non-Javadoc)
-   *
    * @see
-   * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(long)
+   * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(
+   * long)
    */
   @Override
   public Optional<BasicNode> getNodeById(final long id) {
@@ -87,10 +84,8 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
 
   /*
    * (non-Javadoc)
-   *
-   * @see
-   * de.tischner.cobweb.routing.model.graph.IGraph#removeNode(de.tischner.cobweb.
-   * routing.model.graph.INode)
+   * @see de.tischner.cobweb.routing.model.graph.IGraph#removeNode(de.tischner.
+   * cobweb. routing.model.graph.INode)
    */
   @Override
   public boolean removeNode(final BasicNode node) {
@@ -106,8 +101,8 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
    * destination.<br>
    * <br>
    * The implementation runs in <tt>O(|E|)</tt>, that is in the amount of edges.
-   * Edge reversal is made explicit by replacing all previous edges with new edges
-   * that have the same ID but are reversed.
+   * Edge reversal is made explicit by replacing all previous edges with new
+   * edges that have the same ID but are reversed.
    */
   @Override
   public void reverse() {

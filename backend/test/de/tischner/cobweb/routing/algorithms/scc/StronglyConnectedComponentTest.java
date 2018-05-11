@@ -10,7 +10,6 @@ import de.tischner.cobweb.routing.model.graph.BasicNode;
  * Test for the class {@link StronglyConnectedComponent}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class StronglyConnectedComponentTest {
 

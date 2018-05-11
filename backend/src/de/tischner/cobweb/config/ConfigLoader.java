@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
  * configuration currently provided by the given provider to a file.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ConfigLoader {
   /**
@@ -33,20 +32,21 @@ public final class ConfigLoader {
   /**
    * Path to the configuration file.
    */
-  private static final Path CONFIG_PATH = Paths.get("backend", "res", "config.ini");
+  private static final Path CONFIG_PATH = Paths.get("res", "config.ini");
   /**
    * Logger to use for logging.
    */
-  private final static Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
   /**
    * Map that holds the loaded configuration as key-value pairs.
    */
   private final Properties mProperties;
 
   /**
-   * Creates a new configuration loader. Use {@link #loadConfig(IConfigProvider)}
-   * to load a configuration from a file into the given provider and
-   * {@link #saveConfig(IConfigProvider)} to save it back to the file.
+   * Creates a new configuration loader. Use
+   * {@link #loadConfig(IConfigProvider)} to load a configuration from a file
+   * into the given provider and {@link #saveConfig(IConfigProvider)} to save it
+   * back to the file.
    */
   public ConfigLoader() {
     mProperties = new Properties();
@@ -54,9 +54,9 @@ public final class ConfigLoader {
 
   /**
    * Loads the configuration into the given provider. If the configuration does
-   * not yet exist, an attempt to save using {@link #saveConfig(IConfigProvider)}
-   * is made. Therefore, default values provided by the {@link IConfigProvider}
-   * are used.
+   * not yet exist, an attempt to save using
+   * {@link #saveConfig(IConfigProvider)} is made. Therefore, default values
+   * provided by the {@link IConfigProvider} are used.
    *
    * @param provider Provider to load the configuration into.
    * @throws UncheckedIOException If an I/O-exception occurred while loading or

@@ -9,7 +9,6 @@ import java.util.stream.Stream;
  * the nodes.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
@@ -42,8 +41,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
   boolean containsEdge(E edge);
 
   /**
-   * Gets the amount of edges contained in the graph. This operation should run in
-   * <tt>O(1)</tt>.
+   * Gets the amount of edges contained in the graph. This operation should run
+   * in <tt>O(1)</tt>.
    *
    * @return The amount of edges contained in the graph
    */
@@ -110,15 +109,16 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * destination.<br>
    * <br>
    * There are no requirements made on the time complexity. It is up to the
-   * implementing class if this method runs fast or if it explicitly reverses each
-   * edge. However, edges retrieved before the reversal still need to remain equal
-   * to the edges after the reversal, according to their <tt>equals</tt> method.
+   * implementing class if this method runs fast or if it explicitly reverses
+   * each edge. However, edges retrieved before the reversal still need to
+   * remain equal to the edges after the reversal, according to their
+   * <tt>equals</tt> method.
    */
   void reverse();
 
   /**
-   * Gets the amount of nodes contained in the graph. This operation should run in
-   * <tt>O(1)</tt>.
+   * Gets the amount of nodes contained in the graph. This operation should run
+   * in <tt>O(1)</tt>.
    *
    * @return The amount of nodes contained in the graph
    */

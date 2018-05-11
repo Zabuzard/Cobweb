@@ -7,7 +7,6 @@ package de.tischner.cobweb.util;
  * {@link #NONE} is used for files without any file extension.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum EFileExtension {
   /**

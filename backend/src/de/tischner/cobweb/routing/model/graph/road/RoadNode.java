@@ -9,7 +9,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * it has spatial data and a unique ID.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   /**
@@ -44,7 +43,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -75,7 +73,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLatitude()
    */
   @Override
@@ -85,7 +82,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLongitude()
    */
   @Override
@@ -95,7 +91,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -108,8 +103,8 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
-   * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(double)
+   * @see
+   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(double)
    */
   @Override
   public void setLatitude(final double latitude) {
@@ -118,7 +113,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLongitude(double)
    */
@@ -129,7 +123,6 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -4,7 +4,6 @@ package de.tischner.cobweb.util.http;
  * Enumeration of valid HTTP/1.0 states.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum EHttpStatus {
   /**
@@ -24,8 +23,8 @@ public enum EHttpStatus {
    */
   METHOD_NOT_ALLOWED(405),
   /**
-   * The request was processed successfully but the response does not contain any
-   * content.
+   * The request was processed successfully but the response does not contain
+   * any content.
    */
   NO_CONTENT(204),
   /**
@@ -33,7 +32,8 @@ public enum EHttpStatus {
    */
   NOT_FOUND(404),
   /**
-   * The functionality to serve the given request is not supported by the server.
+   * The functionality to serve the given request is not supported by the
+   * server.
    */
   NOT_IMPLEMENTED(501),
   /**

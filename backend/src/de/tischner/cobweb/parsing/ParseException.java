@@ -5,7 +5,6 @@ package de.tischner.cobweb.parsing;
  * example if the data is in a wrong format or a file does not exist.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class ParseException extends RuntimeException {
   /**

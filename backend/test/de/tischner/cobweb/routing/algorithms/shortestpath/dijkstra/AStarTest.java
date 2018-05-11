@@ -11,7 +11,6 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
  * Test for the class {@link AStar}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class AStarTest {
 

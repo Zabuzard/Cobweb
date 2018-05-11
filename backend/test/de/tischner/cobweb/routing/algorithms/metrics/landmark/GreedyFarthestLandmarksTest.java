@@ -11,7 +11,6 @@ import de.tischner.cobweb.routing.model.graph.BasicNode;
  * Test for the class {@link GreedyFarthestLandmarks}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class GreedyFarthestLandmarksTest {
 
@@ -36,8 +35,8 @@ public final class GreedyFarthestLandmarksTest {
     graph.addEdge(new BasicEdge<>(1L, third, fourth, 1.0));
     graph.addEdge(new BasicEdge<>(1L, fourth, first, 1.0));
 
-    final GreedyFarthestLandmarks<BasicNode, BasicEdge<BasicNode>, BasicGraph> landmarks = new GreedyFarthestLandmarks<>(
-        graph);
+    final GreedyFarthestLandmarks<BasicNode, BasicEdge<BasicNode>, BasicGraph> landmarks =
+        new GreedyFarthestLandmarks<>(graph);
 
     Assert.assertEquals(0, landmarks.getLandmarks(0).size());
     Assert.assertEquals(1, landmarks.getLandmarks(1).size());

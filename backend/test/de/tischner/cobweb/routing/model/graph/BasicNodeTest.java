@@ -8,7 +8,6 @@ import org.junit.Test;
  * Test for the class {@link BasicNode}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class BasicNodeTest {
 

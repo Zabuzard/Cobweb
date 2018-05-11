@@ -8,7 +8,6 @@ import java.util.ListIterator;
  * Iterator which iterates a given list reversely.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <E> Type of the element
  */
 public final class ReverseIterator<E> implements Iterator<E> {
@@ -29,7 +28,6 @@ public final class ReverseIterator<E> implements Iterator<E> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.util.Iterator#hasNext()
    */
   @Override
@@ -39,7 +37,6 @@ public final class ReverseIterator<E> implements Iterator<E> {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.util.Iterator#next()
    */
   @Override

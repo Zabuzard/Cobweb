@@ -9,13 +9,11 @@ import com.google.gson.FieldNamingStrategy;
  * <tt>mField</tt> to <tt>field</tt>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class MemberFieldNamingStrategy implements FieldNamingStrategy {
 
   /*
    * (non-Javadoc)
-   *
    * @see
    * com.google.gson.FieldNamingStrategy#translateName(java.lang.reflect.Field)
    */

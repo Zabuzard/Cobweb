@@ -35,8 +35,8 @@ import de.topobyte.osm4j.xml.output.OsmXmlOutputStream;
 public final class OsmReducer {
 
   public static void main(final String[] args) {
-    final Path input = Paths.get("backend", "res", "input", "osm", "freiburg-regbez-latest.osm");
-    final Path output = Paths.get("backend", "res", "input", "osm", "reduced_freiburg-regbez-latest.osm");
+    final Path input = Paths.get("res", "input", "osm", "freiburg-regbez-latest.osm");
+    final Path output = Paths.get("res", "input", "osm", "reduced_freiburg-regbez-latest.osm");
 
     final ConfigStore config = new ConfigStore();
     final ConfigLoader configLoader = new ConfigLoader();
@@ -241,7 +241,8 @@ public final class OsmReducer {
             }
           }
         }
-        // Select relation for removal if it contains at least one dead relation member
+        // Select relation for removal if it contains at least one dead relation
+        // member
         if (containsDeadRelationMember) {
           relationsToRemove.add(relation);
         }
@@ -274,7 +275,8 @@ public final class OsmReducer {
     long counter = 0;
 
     try (OutputStream output = Files.newOutputStream(outputPath)) {
-      // We need to use the PrintWriter constructor else we will not be able to write
+      // We need to use the PrintWriter constructor else we will not be able to
+      // write
       // in UTF-8 with this library
       final PrintWriter outputWrapper = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
       final OsmOutputStream writer = new OsmXmlOutputStream(outputWrapper, true);

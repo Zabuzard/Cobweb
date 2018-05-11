@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  * API. It is primarily used to be constructed from the clients JSON request.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class RoutingRequest {
   /**
@@ -27,7 +26,8 @@ public final class RoutingRequest {
   private long mFrom;
   /**
    * An array containing all allowed transportation modes. The values are to be
-   * interpreted as values corresponding to the enum {@link ETransportationMode}.
+   * interpreted as values corresponding to the enum
+   * {@link ETransportationMode}.
    */
   private int[] mModes;
   /**
@@ -42,8 +42,8 @@ public final class RoutingRequest {
    * @param to      The unique ID of the node to end the journey at
    * @param depTime The departure time to start journeys with, in milliseconds
    *                since epoch
-   * @param modes   A set containing all allowed transportation modes, must not be
-   *                empty
+   * @param modes   A set containing all allowed transportation modes, must not
+   *                be empty
    */
   public RoutingRequest(final long from, final long to, final long depTime, final Set<ETransportationMode> modes) {
     mFrom = from;
@@ -62,7 +62,8 @@ public final class RoutingRequest {
   }
 
   /**
-   * Gets the departure time to start journeys with, in milliseconds since epoch.
+   * Gets the departure time to start journeys with, in milliseconds since
+   * epoch.
    *
    * @return The departure time in milliseconds since epoch
    */
@@ -99,7 +100,6 @@ public final class RoutingRequest {
 
   /*
    * (non-Javadoc)
-   *
    * @see java.lang.Object#toString()
    */
   @Override

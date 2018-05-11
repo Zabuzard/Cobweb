@@ -14,7 +14,6 @@ import de.topobyte.osm4j.core.model.iface.OsmWay;
  * This is needed since the OSM API does not support adding multiple handlers.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmHandlerForwarder implements OsmHandler {
   /**

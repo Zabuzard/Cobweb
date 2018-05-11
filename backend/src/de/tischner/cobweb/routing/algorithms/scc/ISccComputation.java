@@ -7,7 +7,6 @@ import java.util.Collection;
  * components (SCCs) of a given structure.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  * @param <N> Type of nodes
  */
 public interface ISccComputation<N> {

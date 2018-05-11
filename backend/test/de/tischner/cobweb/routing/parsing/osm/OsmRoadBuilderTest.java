@@ -21,7 +21,6 @@ import de.topobyte.osm4j.core.model.impl.Way;
  * Test for the class {@link OsmRoadBuilder}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public final class OsmRoadBuilderTest {
   /**
@@ -154,7 +153,8 @@ public final class OsmRoadBuilderTest {
   }
 
   /**
-   * Adds the edge to the given graph. It goes from the first to the second node.
+   * Adds the edge to the given graph. It goes from the first to the second
+   * node.
    *
    * @param graph  The graph to add the edge to
    * @param first  The first node

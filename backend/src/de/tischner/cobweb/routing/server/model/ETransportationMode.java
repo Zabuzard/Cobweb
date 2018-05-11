@@ -7,7 +7,6 @@ package de.tischner.cobweb.routing.server.model;
  * {@link RouteElement}s as JSON.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- *
  */
 public enum ETransportationMode {
   /**
@@ -35,7 +34,8 @@ public enum ETransportationMode {
    * Gets the transportation mode that corresponds to the given value.
    *
    * @param value The value to get the element from
-   * @return The corresponding transportation mode or <tt>null</tt> if not present
+   * @return The corresponding transportation mode or <tt>null</tt> if not
+   *         present
    */
   public static ETransportationMode fromValue(final int value) {
     for (final ETransportationMode mode : ETransportationMode.values()) {
