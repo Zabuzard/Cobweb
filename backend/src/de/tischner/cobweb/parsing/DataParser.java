@@ -39,6 +39,11 @@ public final class DataParser {
    * Currently registered OSM handler.
    */
   private final Collection<IOsmFileHandler> mOsmHandler;
+  /**
+   * <tt>True</tt> if the parser is used for the reducer command, will use a
+   * different configuration then.
+   */
+  private final boolean mUseReducerConfiguration;
 
   /**
    * Creates a new data parser using the given configuration.
@@ -49,8 +54,26 @@ public final class DataParser {
    *                 file should be used.
    */
   public DataParser(final IParseConfigProvider config, final Collection<Path> osmFiles) {
+    this(config, osmFiles, false);
+  }
+
+  /**
+   * Creates a new data parser using the given configuration.
+   *
+   * @param config                  The configuration provider to use
+   * @param osmFiles                Collection of files that contain the OSM
+   *                                files to parse or <tt>null</tt> if the
+   *                                directory set in the configuration file
+   *                                should be used.
+   * @param useReducerConfiguration <tt>True</tt> if the parser is used for the
+   *                                reducer command, will use a different
+   *                                configuration then
+   */
+  public DataParser(final IParseConfigProvider config, final Collection<Path> osmFiles,
+      final boolean useReducerConfiguration) {
     mConfig = config;
     mOsmFiles = osmFiles;
+    mUseReducerConfiguration = useReducerConfiguration;
     mOsmHandler = new ArrayList<>();
   }
 
@@ -81,14 +104,23 @@ public final class DataParser {
         LOGGER.debug("Parsing OSM data for {} handler", mOsmHandler.size());
       }
 
-      final Path osmDirectory = mConfig.getOsmDirectory();
       // Decide whether to use the directory set in the configuration or a given
       // collection of files instead
-      final OsmParser osmParser;
+      final Path directoryToUse;
+      final Collection<Path> filesToUse;
       if (mOsmFiles != null) {
-        osmParser = new OsmParser(null, mOsmFiles, mOsmHandler);
+        directoryToUse = null;
+        filesToUse = mOsmFiles;
       } else {
-        osmParser = new OsmParser(osmDirectory, null, mOsmHandler);
+        directoryToUse = mConfig.getOsmDirectory();
+        filesToUse = null;
+      }
+      // Choose the right configuration
+      final OsmParser osmParser;
+      if (mUseReducerConfiguration) {
+        osmParser = new OsmParser(directoryToUse, filesToUse, mOsmHandler, true, true);
+      } else {
+        osmParser = new OsmParser(directoryToUse, filesToUse, mOsmHandler);
       }
 
       osmParser.parseOsmFiles();

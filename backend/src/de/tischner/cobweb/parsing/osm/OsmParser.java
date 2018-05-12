@@ -40,23 +40,27 @@ public final class OsmParser {
    * Prefix of an OSM file that was reduced. The parser prefers them over an
    * unreduced variant.
    */
-  private static final String REDUCED_PREFIX = "reduced_";
+  static final String REDUCED_PREFIX = "reduced_";
 
   /**
    * Walks through the given directory or list of files and collects all OSM
    * files that should be considered for parsing. If a file is prefixed with
-   * {@link #REDUCED_PREFIX}, the unreduced variant will not be considered.
+   * {@link #REDUCED_PREFIX}, the unreduced variant will not be considered. This
+   * behavior can be reversed by using <tt>considerUnreduced</tt>.
    *
-   * @param directory Directory that contains the OSM files or <tt>null</tt> if
-   *                  <tt>files</tt> is used
-   * @param files     A collection of files which contain the OSM files or
-   *                  <tt>null</tt> if <tt>directory</tt> is used
+   * @param directory             Directory that contains the OSM files or
+   *                              <tt>null</tt> if <tt>files</tt> is used
+   * @param files                 A collection of files which contain the OSM
+   *                              files or <tt>null</tt> if <tt>directory</tt>
+   *                              is used
+   * @param considerUnreducedOnly If <tt>true</tt> the behavior is reversed and
+   *                              the method collects all unreduced variants
    * @return A collection of OSM files that should be considered for parsing
    * @throws IOException If an I/O exception occurred wile walking through the
    *                     directory
    */
-  private static Collection<Path> findOsmFilesToConsider(final Path directory, final Collection<Path> files)
-      throws IOException {
+  private static Collection<Path> findOsmFilesToConsider(final Path directory, final Collection<Path> files,
+      final boolean considerUnreducedOnly) throws IOException {
     final Set<Path> allPaths;
     if (directory != null) {
       allPaths = Files.walk(directory).filter(Files::isRegularFile).collect(Collectors.toSet());
@@ -65,17 +69,27 @@ public final class OsmParser {
     }
 
     final List<Path> pathsToConsider = new ArrayList<>();
-    // Filter out non-reduced versions if reduced are available
+    // Filter out non-reduced versions if reduced are available, or reversed
+    // behavior if flag is set
     for (final Path path : allPaths) {
       final Path fileName = path.getFileName();
       final String fileNameAsText = fileName.toString();
-      if (fileNameAsText.startsWith(REDUCED_PREFIX)) {
+      if (!considerUnreducedOnly && fileNameAsText.startsWith(REDUCED_PREFIX)) {
         // Consider reduced version
+        pathsToConsider.add(path);
+        continue;
+      } else if (considerUnreducedOnly && !fileNameAsText.startsWith(REDUCED_PREFIX)) {
+        // Consider unreduced version
         pathsToConsider.add(path);
         continue;
       }
 
-      // Collect only if there is no a reduced version
+      if (considerUnreducedOnly) {
+        // Never collect a reduced version
+        continue;
+      }
+
+      // Collect only if there is no reduced version
       final String reducedFileNameAsText = REDUCED_PREFIX + fileNameAsText;
       final Path reducedFileName = Paths.get(reducedFileNameAsText);
       final Path reducedPath = path.getParent().resolve(reducedFileName);
@@ -123,16 +137,24 @@ public final class OsmParser {
    */
   private final Collection<IOsmFileHandler> mAllHandler;
   /**
+   * If <tt>true</tt> the parser considers unreduced variants of OSM files only.
+   */
+  private final boolean mConsiderUnreducedOnly;
+
+  /**
    * Directory that contains the OSM files or <tt>null</tt> if {@link #mFiles}
    * is used.
    */
   private final Path mDirectory;
-
   /**
    * Collection of files that contain the OSM files or <tt>null</tt> if
    * {@link #mDirectory} is used.
    */
   private final Collection<Path> mFiles;
+  /**
+   * If <tt>true</tt> each OSM file will be streamed twice, else only once
+   */
+  private final boolean mStreamTwice;
   /**
    * Whether or not meta data of OSM entities should be parsed.
    */
@@ -152,7 +174,29 @@ public final class OsmParser {
    * @param allHandler The handler to notify when parsing entities
    */
   public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler) {
-    this(directory, files, allHandler, false);
+    this(directory, files, allHandler, false, false, false);
+  }
+
+  /**
+   * Creates a new OSM parser which will parse OSM files in the given directory
+   * or collection of files and notify the given handler for all parsed OSM
+   * entities.<br>
+   * <br>
+   * The parser will not parse meta data of entities.
+   *
+   * @param directory             The directory that contains the OSM files or
+   *                              <tt>null</tt> if <tt>files</tt> is used
+   * @param files                 Collection of files that contain the OSM files
+   *                              or <tt>null</tt> if <tt>directory</tt> is used
+   * @param allHandler            The handler to notify when parsing entities
+   * @param considerUnreducedOnly If <tt>true</tt> the parser considers
+   *                              unreduced variants of OSM files only
+   * @param streamTwice           If <tt>true</tt> each OSM file will be
+   *                              streamed twice, else only once
+   */
+  public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler,
+      final boolean considerUnreducedOnly, final boolean streamTwice) {
+    this(directory, files, allHandler, considerUnreducedOnly, streamTwice, false);
   }
 
   /**
@@ -160,20 +204,26 @@ public final class OsmParser {
    * or collection of files and notify the given handler for all parsed OSM
    * entities.
    *
-   * @param directory   The directory that contains the OSM files or
-   *                    <tt>null</tt> if <tt>files</tt> is used
-   * @param files       Collection of files that contain the OSM files or
-   *                    <tt>null</tt> if <tt>directory</tt> is used
-   * @param allHandler  The handler to notify when parsing entities
-   * @param useMetaData Whether or not the parser should parse meta data for the
-   *                    entities
+   * @param directory             The directory that contains the OSM files or
+   *                              <tt>null</tt> if <tt>files</tt> is used
+   * @param files                 Collection of files that contain the OSM files
+   *                              or <tt>null</tt> if <tt>directory</tt> is used
+   * @param allHandler            The handler to notify when parsing entities
+   * @param considerUnreducedOnly If <tt>true</tt> the parser considers
+   *                              unreduced variants of OSM files only
+   * @param streamTwice           If <tt>true</tt> each OSM file will be
+   *                              streamed twice, else only once
+   * @param useMetaData           Whether or not the parser should parse meta
+   *                              data for the entities
    */
   public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler,
-      final boolean useMetaData) {
+      final boolean considerUnreducedOnly, final boolean streamTwice, final boolean useMetaData) {
     mDirectory = directory;
     mFiles = files;
     mAllHandler = allHandler;
+    mConsiderUnreducedOnly = considerUnreducedOnly;
     mUseMetaData = useMetaData;
+    mStreamTwice = streamTwice;
   }
 
   /**
@@ -188,7 +238,7 @@ public final class OsmParser {
    */
   public void parseOsmFiles() throws ParseException {
     try {
-      final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory, mFiles);
+      final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory, mFiles, mConsiderUnreducedOnly);
       for (final Path file : files) {
         // Collect all handler that accept this file
         final List<IOsmFileHandler> interestedHandler =
@@ -199,6 +249,9 @@ public final class OsmParser {
         }
         // Parse the file and notify all interested handler
         streamFile(file, interestedHandler);
+        if (mStreamTwice) {
+          streamFile(file, interestedHandler);
+        }
       }
     } catch (IOException | OsmInputException e) {
       throw new ParseException(e);

@@ -26,6 +26,7 @@ import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
+import de.tischner.cobweb.parsing.osm.OsmReducer;
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
@@ -132,6 +133,7 @@ public final class Application {
    */
   public void initialize() {
     initializeLogger();
+    mLogger.info("Command is: {}", mCommandData.getCommand().getName());
     mLogger.info("Initializing application");
     try {
       final Instant initStartTime = Instant.now();
@@ -188,7 +190,7 @@ public final class Application {
           CleanUtil.clean(mConfig, mConfig);
           break;
         case REDUCE:
-          // TODO Implement reduce command
+          startReducer();
           break;
         default:
           throw new AssertionError();
@@ -390,6 +392,31 @@ public final class Application {
     } catch (final IOException e) {
       throw new ParseException(e);
     }
+  }
+
+  /**
+   * Starts the reducer command.
+   */
+  private void startReducer() {
+    // Prepare data parsing
+    final Collection<Path> paths = mCommandData.getPaths();
+    final DataParser dataParser;
+    if (paths.isEmpty()) {
+      // Use configuration file
+      dataParser = new DataParser(mConfig, null, true);
+    } else {
+      // Override settings with the given paths
+      dataParser = new DataParser(mConfig, paths, true);
+    }
+
+    // Add OSM handler
+    dataParser.addOsmHandler(new OsmReducer(new OsmRoadFilter(mConfig)));
+
+    // Parse all data
+    final Instant parseStartTime = Instant.now();
+    dataParser.parseData();
+    final Instant parseEndTime = Instant.now();
+    mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
   }
 
 }
