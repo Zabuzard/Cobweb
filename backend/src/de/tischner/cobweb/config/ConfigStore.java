@@ -53,6 +53,15 @@ public final class ConfigStore
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getCleanDbScript()
+   */
+  @Override
+  public Path getCleanDbScript() {
+    return Paths.get(getSetting(ConfigUtil.KEY_CLEAN_DB_SCRIPT));
+  }
+
+  /*
+   * (non-Javadoc)
    * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getDbInfo()
    */
   @Override
@@ -203,6 +212,7 @@ public final class ConfigStore
     // Database settings
     mDefaultSettings.put(ConfigUtil.KEY_JDBC_URL, ConfigUtil.VALUE_JDBC_URL);
     mDefaultSettings.put(ConfigUtil.KEY_INIT_DB_SCRIPT, ConfigUtil.VALUE_INIT_DB_SCRIPT.toString());
+    mDefaultSettings.put(ConfigUtil.KEY_CLEAN_DB_SCRIPT, ConfigUtil.VALUE_CLEAN_DB_SCRIPT.toString());
     mDefaultSettings.put(ConfigUtil.KEY_USE_EXTERNAL_DB, String.valueOf(ConfigUtil.VALUE_USE_EXTERNAL_DB));
     mDefaultSettings.put(ConfigUtil.KEY_DB_INFO, ConfigUtil.VALUE_DB_INFO.toString());
 

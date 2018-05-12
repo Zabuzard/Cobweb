@@ -43,17 +43,27 @@ public final class OsmParser {
   private static final String REDUCED_PREFIX = "reduced_";
 
   /**
-   * Walks through the given directory and collects all OSM files that should be
-   * considered for parsing. If a file is prefixed with {@link #REDUCED_PREFIX},
-   * the unreduced variant will not be considered.
+   * Walks through the given directory or list of files and collects all OSM
+   * files that should be considered for parsing. If a file is prefixed with
+   * {@link #REDUCED_PREFIX}, the unreduced variant will not be considered.
    *
-   * @param directory Directory that contains the OSM files
+   * @param directory Directory that contains the OSM files or <tt>null</tt> if
+   *                  <tt>files</tt> is used
+   * @param files     A collection of files which contain the OSM files or
+   *                  <tt>null</tt> if <tt>directory</tt> is used
    * @return A collection of OSM files that should be considered for parsing
    * @throws IOException If an I/O exception occurred wile walking through the
    *                     directory
    */
-  private static Collection<Path> findOsmFilesToConsider(final Path directory) throws IOException {
-    final Set<Path> allPaths = Files.walk(directory).filter(Files::isRegularFile).collect(Collectors.toSet());
+  private static Collection<Path> findOsmFilesToConsider(final Path directory, final Collection<Path> files)
+      throws IOException {
+    final Set<Path> allPaths;
+    if (directory != null) {
+      allPaths = Files.walk(directory).filter(Files::isRegularFile).collect(Collectors.toSet());
+    } else {
+      allPaths = files.stream().filter(Files::isRegularFile).collect(Collectors.toSet());
+    }
+
     final List<Path> pathsToConsider = new ArrayList<>();
     // Filter out non-reduced versions if reduced are available
     for (final Path path : allPaths) {
@@ -113,10 +123,16 @@ public final class OsmParser {
    */
   private final Collection<IOsmFileHandler> mAllHandler;
   /**
-   * Directory that contains the OSM files.
+   * Directory that contains the OSM files or <tt>null</tt> if {@link #mFiles}
+   * is used.
    */
   private final Path mDirectory;
 
+  /**
+   * Collection of files that contain the OSM files or <tt>null</tt> if
+   * {@link #mDirectory} is used.
+   */
+  private final Collection<Path> mFiles;
   /**
    * Whether or not meta data of OSM entities should be parsed.
    */
@@ -124,28 +140,38 @@ public final class OsmParser {
 
   /**
    * Creates a new OSM parser which will parse OSM files in the given directory
-   * and notify the given handler for all parsed OSM entities.<br>
+   * or collection of files and notify the given handler for all parsed OSM
+   * entities.<br>
    * <br>
    * The parser will not parse meta data of entities.
    *
-   * @param directory  The directory that contains the OSM files
+   * @param directory  The directory that contains the OSM files or
+   *                   <tt>null</tt> if <tt>files</tt> is used
+   * @param files      Collection of files that contain the OSM files or
+   *                   <tt>null</tt> if <tt>directory</tt> is used
    * @param allHandler The handler to notify when parsing entities
    */
-  public OsmParser(final Path directory, final Collection<IOsmFileHandler> allHandler) {
-    this(directory, allHandler, false);
+  public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler) {
+    this(directory, files, allHandler, false);
   }
 
   /**
    * Creates a new OSM parser which will parse OSM files in the given directory
-   * and notify the given handler for all parsed OSM entities.
+   * or collection of files and notify the given handler for all parsed OSM
+   * entities.
    *
-   * @param directory   The directory that contains the OSM files
+   * @param directory   The directory that contains the OSM files or
+   *                    <tt>null</tt> if <tt>files</tt> is used
+   * @param files       Collection of files that contain the OSM files or
+   *                    <tt>null</tt> if <tt>directory</tt> is used
    * @param allHandler  The handler to notify when parsing entities
    * @param useMetaData Whether or not the parser should parse meta data for the
    *                    entities
    */
-  public OsmParser(final Path directory, final Collection<IOsmFileHandler> allHandler, final boolean useMetaData) {
+  public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler,
+      final boolean useMetaData) {
     mDirectory = directory;
+    mFiles = files;
     mAllHandler = allHandler;
     mUseMetaData = useMetaData;
   }
@@ -162,7 +188,7 @@ public final class OsmParser {
    */
   public void parseOsmFiles() throws ParseException {
     try {
-      final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory);
+      final Collection<Path> files = OsmParser.findOsmFilesToConsider(mDirectory, mFiles);
       for (final Path file : files) {
         // Collect all handler that accept this file
         final List<IOsmFileHandler> interestedHandler =

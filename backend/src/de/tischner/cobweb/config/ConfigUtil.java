@@ -11,6 +11,11 @@ import java.nio.file.Paths;
  */
 final class ConfigUtil {
   /**
+   * Name of the key that stores the path to the SQL script to execute when
+   * cleaning the external database.
+   */
+  static final String KEY_CLEAN_DB_SCRIPT = "cleanDbScript";
+  /**
    * Name of the key that stores the path to the database info object.
    */
   static final String KEY_DB_INFO = "dbInfo";
@@ -60,6 +65,11 @@ final class ConfigUtil {
    * Name of the key that stores whether or not the graph cache should be used.
    */
   static final String KEY_USE_GRAPH_CACHE = "useGraphCache";
+  /**
+   * Default path to the SQL script that is executed when cleaning the external
+   * database.
+   */
+  static final Path VALUE_CLEAN_DB_SCRIPT = Paths.get("res", "cache", "db", "cleanDb.sql");
   /**
    * Default path to the database info object.
    */

@@ -6,12 +6,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.util.ContextInitializer;
+import de.tischner.cobweb.commands.CommandData;
+import de.tischner.cobweb.commands.CommandParser;
+import de.tischner.cobweb.commands.ECommand;
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
 import de.tischner.cobweb.db.ExternalDatabase;
@@ -36,6 +40,7 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
+import de.tischner.cobweb.util.CleanUtil;
 import de.tischner.cobweb.util.SerializationUtil;
 
 /**
@@ -57,9 +62,9 @@ public final class Application {
    */
   private static final Path LOGGER_CONFIG = Paths.get("res", "logging", "logConfig.xml");
   /**
-   * Provided arguments that are used to determine the commands to use.
+   * Parsed argument data used to determine the commands to use.
    */
-  private final String[] mArgs;
+  private final CommandData mCommandData;
   /**
    * Algorithm to use for shortest path computation.
    */
@@ -100,14 +105,25 @@ public final class Application {
    * default service which answers routing requests over a REST API.</li>
    * <li><b><tt>args[0] = reduce</tt></b>: Reduces all input data such that the
    * default service will run faster.</li>
-   * <li><b><tt>args[0] = clear</tt></b>: Clears the database and all cached and
+   * <li><b><tt>args[0] = clean</tt></b>: Clears the database and all cached and
    * serialized data.</li>
+   * <li><b><tt>args[1+]</tt></b>: Paths to data files that should be used by
+   * the commands instead of the files from the directories set in the
+   * configuration file.
+   * <ul>
+   * <li><tt>start</tt>: Uses the given files as data files (OSM, GTFS) instead
+   * of the set directories.</li>
+   * <li><tt>reduce</tt>: Reduces the given unreduced data files (OSM, GTFS)
+   * instead of the unreduced files in the set directories.</li>
+   * <li><tt>clean</tt>: Not supported, will ignore paths.</li>
+   * </ul>
+   * </li>
    * </ul>
    *
    * @param args The arguments that specify which command to use.
    */
   public Application(final String[] args) {
-    mArgs = args;
+    mCommandData = CommandParser.parseCommands(args);
   }
 
   /**
@@ -125,9 +141,9 @@ public final class Application {
       // Save to ensure old configuration files get new default parameter
       mConfigLoader.saveConfig(mConfig);
 
-      // TODO Choose based on arguments what to do
-      // TODO Provide clean caches command, provide reducer command
-      initializeApi();
+      if (mCommandData.getCommand() == ECommand.START) {
+        initializeApi();
+      }
       final Instant initEndTime = Instant.now();
       mLogger.info("Initialization took: {}", Duration.between(initStartTime, initEndTime));
     } catch (final Throwable e) {
@@ -164,8 +180,19 @@ public final class Application {
   public void start() {
     try {
       mLogger.info("Starting application");
-      // TODO Do something, based on arguments
-      mRoutingServer.start();
+      switch (mCommandData.getCommand()) {
+        case START:
+          mRoutingServer.start();
+          break;
+        case CLEAN:
+          CleanUtil.clean(mConfig, mConfig);
+          break;
+        case REDUCE:
+          // TODO Implement reduce command
+          break;
+        default:
+          throw new AssertionError();
+      }
     } catch (final Throwable e) {
       mLogger.error("Error while starting application", e);
       throw e;
@@ -226,10 +253,20 @@ public final class Application {
     final int graphSizeBefore = mGraph.size();
 
     // Prepare data parsing
-    final DataParser dataParser = new DataParser(mConfig);
+    final Collection<Path> paths = mCommandData.getPaths();
+    final DataParser dataParser;
+    if (paths.isEmpty()) {
+      // Use configuration file
+      dataParser = new DataParser(mConfig, null);
+    } else {
+      // Override settings with the given paths
+      dataParser = new DataParser(mConfig, paths);
+    }
+
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
     createOsmRoutingHandler().forEach(dataParser::addOsmHandler);
+
     // Parse all data
     final Instant parseStartTime = Instant.now();
     dataParser.parseData();

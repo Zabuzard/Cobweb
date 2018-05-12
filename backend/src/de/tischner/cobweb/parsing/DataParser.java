@@ -31,6 +31,11 @@ public final class DataParser {
    */
   private final IParseConfigProvider mConfig;
   /**
+   * Collection of files that contain the OSM files to parse or <tt>null</tt> if
+   * the directory set in the configuration file should be used.
+   */
+  private final Collection<Path> mOsmFiles;
+  /**
    * Currently registered OSM handler.
    */
   private final Collection<IOsmFileHandler> mOsmHandler;
@@ -38,10 +43,14 @@ public final class DataParser {
   /**
    * Creates a new data parser using the given configuration.
    *
-   * @param config The configuration provider to use
+   * @param config   The configuration provider to use
+   * @param osmFiles Collection of files that contain the OSM files to parse or
+   *                 <tt>null</tt> if the directory set in the configuration
+   *                 file should be used.
    */
-  public DataParser(final IParseConfigProvider config) {
+  public DataParser(final IParseConfigProvider config, final Collection<Path> osmFiles) {
     mConfig = config;
+    mOsmFiles = osmFiles;
     mOsmHandler = new ArrayList<>();
   }
 
@@ -73,7 +82,15 @@ public final class DataParser {
       }
 
       final Path osmDirectory = mConfig.getOsmDirectory();
-      final OsmParser osmParser = new OsmParser(osmDirectory, mOsmHandler);
+      // Decide whether to use the directory set in the configuration or a given
+      // collection of files instead
+      final OsmParser osmParser;
+      if (mOsmFiles != null) {
+        osmParser = new OsmParser(null, mOsmFiles, mOsmHandler);
+      } else {
+        osmParser = new OsmParser(osmDirectory, null, mOsmHandler);
+      }
+
       osmParser.parseOsmFiles();
     } else if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Skipping parsing OSM data since no handler are registered");

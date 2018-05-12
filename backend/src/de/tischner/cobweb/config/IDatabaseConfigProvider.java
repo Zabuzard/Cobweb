@@ -9,6 +9,14 @@ import java.nio.file.Path;
  */
 public interface IDatabaseConfigProvider {
   /**
+   * Gets the path to the SQL script that is executed to clean an external
+   * database.
+   *
+   * @return The path to the SQL script
+   */
+  Path getCleanDbScript();
+
+  /**
    * Gets the path to the database info object that stores information about the
    * content of the database. Can be used to determine which data files need to
    * be considered when parsing in order to avoid pushing the same data again.
