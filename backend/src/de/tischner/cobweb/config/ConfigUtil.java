@@ -43,6 +43,15 @@ final class ConfigUtil {
    */
   static final String KEY_JDBC_URL = "jdbcUrl";
   /**
+   * Name of the key that stores the maximal amount of matches the name search
+   * server should send.
+   */
+  static final String KEY_NAME_SEARCH_SERVER_MATCH_LIMIT = "nameSearchServerMatchLimit";
+  /**
+   * Name of the key that stores the port the name search server should use.
+   */
+  static final String KEY_NAME_SEARCH_SERVER_PORT = "nameSearchServerPort";
+  /**
    * Name of the key that stores the path to the directory where all OSM input
    * data are stored.
    */
@@ -69,7 +78,7 @@ final class ConfigUtil {
    * Default path to the SQL script that is executed when cleaning the external
    * database.
    */
-  static final Path VALUE_CLEAN_DB_SCRIPT = Paths.get("res", "cache", "db", "cleanDb.sql");
+  static final Path VALUE_CLEAN_DB_SCRIPT = Paths.get("res", "cache", "db", "scripts", "cleanDb.sql");
   /**
    * Default path to the database info object.
    */
@@ -90,11 +99,19 @@ final class ConfigUtil {
    * Default path to the SQL script that is executed when initializing the
    * external database.
    */
-  static final Path VALUE_INIT_DB_SCRIPT = Paths.get("res", "cache", "db", "initDb.sql");
+  static final Path VALUE_INIT_DB_SCRIPT = Paths.get("res", "cache", "db", "scripts", "initDb.sql");
   /**
    * Default JDBC URL to use when connecting to the external database.
    */
   static final String VALUE_JDBC_URL = "jdbc:sqlite:res/cache/db/routing.db";
+  /**
+   * Default maximal amount of matches the name search server sends.
+   */
+  static final int VALUE_NAME_SEARCH_SERVER_MATCH_LIMIT = 1_000;
+  /**
+   * Default port to use by the name search server.
+   */
+  static final int VALUE_NAME_SEARCH_SERVER_PORT = 846;
   /**
    * Default path to the directory that contains all OSM data.
    */

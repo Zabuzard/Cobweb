@@ -10,14 +10,13 @@ import org.junit.Test;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 public final class SpatialNodeDataTest {
-
   /**
    * The spatial node data used for testing.
    */
   private SpatialNodeData mSpatialNodeData;
 
   /**
-   * Setups a highway data instance for testing.
+   * Setups a spatial node data instance for testing.
    */
   @Before
   public void setUp() {

@@ -62,6 +62,20 @@ public final class MemoryDatabaseTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#getAllNodeNameData()}.
+   */
+  @Test
+  public final void testGetAllNodeNameData() {
+    final Collection<NodeNameData> nodeNameData = mMemoryDatabase.getAllNodeNameData();
+    Assert.assertEquals(1, nodeNameData.size());
+
+    final NodeNameData data = nodeNameData.iterator().next();
+    Assert.assertEquals(1L, data.getId());
+    Assert.assertEquals("Wall street 2", data.getName());
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.db.MemoryDatabase#getHighwayData(java.util.stream.LongStream, int)}.
    */
   @Test

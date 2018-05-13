@@ -6,13 +6,13 @@ import java.util.stream.StreamSupport;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 
 /**
- * Abstract class for implementations of {@link IRoutingDatabase}. Implements
- * some of the overloaded methods by using the core variant of the corresponding
- * method.
+ * Abstract class for implementations of {@link IRoutingDatabase} and
+ * {@link INameSearchDatabase}. Implements some of the overloaded methods by
+ * using the core variant of the corresponding method.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public abstract class ARoutingDatabase implements IRoutingDatabase {
+public abstract class ADatabase implements IRoutingDatabase, INameSearchDatabase {
   /*
    * (non-Javadoc)
    * @see

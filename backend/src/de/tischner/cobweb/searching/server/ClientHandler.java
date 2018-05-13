@@ -1,4 +1,4 @@
-package de.tischner.cobweb.routing.server;
+package de.tischner.cobweb.searching.server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,25 +11,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import de.tischner.cobweb.db.IRoutingDatabase;
-import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
-import de.tischner.cobweb.routing.model.graph.IEdge;
-import de.tischner.cobweb.routing.model.graph.IGraph;
-import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
-import de.tischner.cobweb.routing.model.graph.road.ISpatial;
-import de.tischner.cobweb.routing.server.model.RoutingRequest;
+import de.tischner.cobweb.searching.model.NodeNameSet;
+import de.tischner.cobweb.searching.server.model.NameSearchRequest;
 import de.tischner.cobweb.util.MemberFieldNamingStrategy;
 import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.EHttpStatus;
 import de.tischner.cobweb.util.http.HttpRequest;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
+import de.zabuza.lexisearch.indexing.IKeyRecord;
+import de.zabuza.lexisearch.queries.FuzzyPrefixQuery;
 
 /**
- * Class that handles a routing client. It is designed to communicate with a
- * client via HTTP and serve routing requests.<br>
+ * Class that handles a name search client. It is designed to communicate with a
+ * client via HTTP and serve name search requests.<br>
  * <br>
  * To handle the client call {@link #run()}. The method should only be called
  * once, the object should not be used anymore after the method has
@@ -39,17 +34,13 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * closed outside.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> Type of the node
- * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & ICanGetNodeById<N>> implements Runnable {
+public final class ClientHandler implements Runnable {
   /**
-   * Resource that is to be requested from a client if he submits a routing
+   * Resource that is to be requested from a client if he submits a name search
    * query.
    */
-  private static final String API_RESOURCE = "/route";
+  private static final String API_RESOURCE = "/namesearch";
   /**
    * Logger used for logging.
    */
@@ -59,21 +50,21 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    */
   private final Socket mClient;
   /**
-   * The algorithm to use for computing shortest path requests.
+   * The query object to use for answering fuzzy prefix queries.
    */
-  private final IShortestPathComputation<N, E> mComputation;
-  /**
-   * The database to use for fetching meta data for nodes and edges.
-   */
-  private final IRoutingDatabase mDatabase;
-  /**
-   * The graph used for shortest path computation.
-   */
-  private final G mGraph;
+  private final FuzzyPrefixQuery<IKeyRecord<String>> mFuzzyQuery;
   /**
    * The unique ID of this client request.
    */
   private final int mId;
+  /**
+   * The maximal amount of matches to send in a response.
+   */
+  private final int mMatchLimit;
+  /**
+   * The data-set of node names to query on.
+   */
+  private final NodeNameSet mNodeNames;
 
   /**
    * Creates a new handler which handles the given client using the given
@@ -82,21 +73,20 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    * To handle the client call {@link #run()}. The method should only be called
    * once, the object should not be used anymore after the method has finished.
    *
-   * @param id          The unique ID of this client request
-   * @param client      The client to handle
-   * @param graph       The graph used for shortest path computation
-   * @param computation The algorithm to use for computing shortest path
-   *                    requests
-   * @param database    The database to use for fetching meta data for nodes and
-   *                    edges
+   * @param id         The unique ID of this client request
+   * @param client     The client to handle
+   * @param fuzzyQuery The query object to use for answering fuzzy prefix
+   *                   queries
+   * @param nodeNames  The data-set of node names to query on
+   * @param matchLimit The maximal amount of matches to send in a response
    */
-  public ClientHandler(final int id, final Socket client, final G graph,
-      final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
+  public ClientHandler(final int id, final Socket client, final FuzzyPrefixQuery<IKeyRecord<String>> fuzzyQuery,
+      final NodeNameSet nodeNames, final int matchLimit) {
     mId = id;
     mClient = client;
-    mGraph = graph;
-    mComputation = computation;
-    mDatabase = database;
+    mFuzzyQuery = fuzzyQuery;
+    mNodeNames = nodeNames;
+    mMatchLimit = matchLimit;
   }
 
   /**
@@ -138,7 +128,7 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    */
   private void handleRequest(final HttpRequest request) throws IOException {
     // TODO Maybe don't log always
-    LOGGER.info("Handling routing HTTP request with id: {}", mId);
+    LOGGER.info("Handling search name HTTP request with id: {}", mId);
 
     // Method not allowed
     final String type = request.getType().toUpperCase();
@@ -193,9 +183,9 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     // Parse the JSON request and handle it
     final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
     try {
-      final RoutingRequest routingRequest = gson.fromJson(request.getContent(), RoutingRequest.class);
-      final RequestHandler<N, E, G> handler = new RequestHandler<>(mClient, gson, mGraph, mComputation, mDatabase);
-      handler.handleRequest(routingRequest);
+      final NameSearchRequest nameSearchRequest = gson.fromJson(request.getContent(), NameSearchRequest.class);
+      final RequestHandler handler = new RequestHandler(mClient, gson, mFuzzyQuery, mNodeNames, mMatchLimit);
+      handler.handleRequest(nameSearchRequest);
     } catch (final JsonSyntaxException e) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);
       return;

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public class MemoryDatabase extends ARoutingDatabase {
+public class MemoryDatabase extends ADatabase {
   /**
    * The logger to use for logging.
    */
@@ -76,6 +77,16 @@ public class MemoryDatabase extends ARoutingDatabase {
     mNodeToName = new HashMap<>();
     mWayToName = new HashMap<>();
     mWayToHighwayData = new HashMap<>();
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.INameSearchDatabase#getAllNodeNameData()
+   */
+  @Override
+  public Collection<NodeNameData> getAllNodeNameData() {
+    return mNodeToName.entrySet().stream().map(entry -> new NodeNameData(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
   }
 
   /*

@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class ConfigStore
-    implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider, IDatabaseConfigProvider {
+public final class ConfigStore implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider,
+    INameSearchConfigProvider, IDatabaseConfigProvider {
   /**
    * The logger to use for logging.
    */
@@ -112,6 +112,26 @@ public final class ConfigStore
   @Override
   public String getJdbcUrl() {
     return getSetting(ConfigUtil.KEY_JDBC_URL);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.config.INameSearchConfigProvider#getMatchLimit()
+   */
+  @Override
+  public int getMatchLimit() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_NAME_SEARCH_SERVER_MATCH_LIMIT));
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * de.tischner.cobweb.config.INameSearchConfigProvider#getNameSearchServerPort
+   * ()
+   */
+  @Override
+  public int getNameSearchServerPort() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT));
   }
 
   /*
@@ -226,6 +246,12 @@ public final class ConfigStore
     mDefaultSettings.put(ConfigUtil.KEY_GRAPH_CACHE_INFO, ConfigUtil.VALUE_GRAPH_CACHE_INFO.toString());
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_SERVER_PORT, String.valueOf(ConfigUtil.VALUE_ROUTING_SERVER_PORT));
     mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
+
+    // Name search settings
+    mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT,
+        String.valueOf(ConfigUtil.VALUE_NAME_SEARCH_SERVER_PORT));
+    mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_MATCH_LIMIT,
+        String.valueOf(ConfigUtil.VALUE_NAME_SEARCH_SERVER_MATCH_LIMIT));
   }
 
 }

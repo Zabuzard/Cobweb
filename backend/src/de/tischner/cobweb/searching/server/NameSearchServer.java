@@ -1,30 +1,31 @@
-package de.tischner.cobweb.routing.server;
+package de.tischner.cobweb.searching.server;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tischner.cobweb.config.IRoutingConfigProvider;
-import de.tischner.cobweb.db.IRoutingDatabase;
-import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
-import de.tischner.cobweb.routing.model.graph.IEdge;
-import de.tischner.cobweb.routing.model.graph.IGraph;
-import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
-import de.tischner.cobweb.routing.model.graph.road.ISpatial;
-import de.tischner.cobweb.routing.server.model.RoutingRequest;
-import de.tischner.cobweb.routing.server.model.RoutingResponse;
+import de.tischner.cobweb.config.INameSearchConfigProvider;
+import de.tischner.cobweb.db.INameSearchDatabase;
+import de.tischner.cobweb.searching.model.NodeNameSet;
+import de.tischner.cobweb.searching.server.model.NameSearchRequest;
+import de.tischner.cobweb.searching.server.model.NameSearchResponse;
+import de.zabuza.lexisearch.indexing.IKeyRecord;
+import de.zabuza.lexisearch.indexing.qgram.QGramProvider;
+import de.zabuza.lexisearch.queries.FuzzyPrefixQuery;
+import de.zabuza.lexisearch.ranking.PostingBeforeRecordRanking;
 
 /**
- * A server which offers a REST API that is able to answer routing requests.<br>
+ * A server which offers a REST API that is able to answer name search
+ * requests.<br>
  * <br>
  * After construction the {@link #initialize()} method should be called.
  * Afterwards it can be started by using {@link #start()}. Request the server to
@@ -32,54 +33,59 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * {@link #isRunning()}. Once a server was shutdown it should not be used
  * anymore, instead create a new one.<br>
  * <br>
- * A request may consist of departure time, source and destination nodes and
- * meta-data like desired transportation modes. A response consists of departure
- * and arrival time, together with possible routes.<br>
+ * A request consists of a name, which can be a prefix and fuzzy, and a maximal
+ * amount of matches interested in. A response consists of a list of matches,
+ * sorted by relevance (most relevant first). The response will not contain more
+ * matches than specified by the request. A match consists of the full name and
+ * the corresponding OSM node ID.<br>
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
- * Requests are parsed into {@link RoutingRequest} and responses into
- * {@link RoutingResponse}. Accepted HTTP methods are <tt>POST</tt> and
+ * Requests are parsed into {@link NameSearchRequest} and responses into
+ * {@link NameSearchResponse}. Accepted HTTP methods are <tt>POST</tt> and
  * <tt>OPTIONS</tt>. The server will send <tt>BAD REQUEST</tt> to invalid
  * requests.<br>
  * <br>
  * The server itself handles clients in parallel using a cached thread pool. For
- * construction it wants a configuration, a graph to route on, an algorithm to
- * compute shortest paths with and a database for retrieving meta-data.
+ * construction it wants a configuration and a database for retrieving the name
+ * data-set.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> Type of the node
- * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & ICanGetNodeById<N>> implements Runnable {
+public final class NameSearchServer implements Runnable {
   /**
    * Logger used for logging.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RoutingServer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NameSearchServer.class);
+  /**
+   * The value to use for the <tt>q-grams</tt>, i.e. the <tt>q</tt>.
+   */
+  private static final int Q_GRAM_VALUE = 3;
   /**
    * The timeout used when waiting for a client to connect, in milliseconds. The
    * server status is checked after each timeout.
    */
   private static final int SOCKET_TIMEOUT = 2_000;
   /**
-   * The algorithm to use for shortest path computation.
-   */
-  private final IShortestPathComputation<N, E> mComputation;
-  /**
    * Configuration provider which provides the port that should be used by the
    * server.
    */
-  private final IRoutingConfigProvider mConfig;
+  private final INameSearchConfigProvider mConfig;
   /**
-   * Database used for retrieving meta-data about graph objects like nodes and
-   * edges.
+   * Database used for retrieving the name data-set.
    */
-  private final IRoutingDatabase mDatabase;
+  private final INameSearchDatabase mDatabase;
   /**
-   * The graph to route on.
+   * The query object to use for answering fuzzy prefix queries.
    */
-  private final G mGraph;
+  private FuzzyPrefixQuery<IKeyRecord<String>> mFuzzyQuery;
+  /**
+   * The maximal amount of matches to send in a response.
+   */
+  private int mMatchLimit;
+  /**
+   * The data-set of node names to query on.
+   */
+  private NodeNameSet mNodeNames;
   /**
    * The server socket to use for communication.
    */
@@ -94,8 +100,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
   private volatile boolean mShouldRun;
 
   /**
-   * Creates a new routing server with the given configuration that works with
-   * the given tools.<br>
+   * Creates a new name search server with the given configuration that works
+   * with the given tools.<br>
    * <br>
    * After construction the {@link #initialize()} method should be called.
    * Afterwards it can be started by using {@link #start()}. Request the server
@@ -103,18 +109,12 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    * with {@link #isRunning()}. Once a server was shutdown it should not be used
    * anymore, instead create a new one.
    *
-   * @param config      Configuration provider which provides the port that
-   *                    should be used by the server
-   * @param graph       The graph to route on
-   * @param computation The algorithm to use for shortest path computation
-   * @param database    Database used for retrieving meta-data about graph
-   *                    objects like nodes and edges
+   * @param config   Configuration provider which provides the port that should
+   *                 be used by the server
+   * @param database Database used for retrieving the name data-set
    */
-  public RoutingServer(final IRoutingConfigProvider config, final G graph,
-      final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
+  public NameSearchServer(final INameSearchConfigProvider config, final INameSearchDatabase database) {
     mConfig = config;
-    mGraph = graph;
-    mComputation = computation;
     mDatabase = database;
   }
 
@@ -126,9 +126,11 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    *                              the server socket.
    */
   public void initialize() throws UncheckedIOException {
+    initializeFuzzyPrefixQuery();
+    mMatchLimit = mConfig.getMatchLimit();
     mServerThread = new Thread(this);
     try {
-      mServerSocket = new ServerSocket(mConfig.getRoutingServerPort());
+      mServerSocket = new ServerSocket(mConfig.getNameSearchServerPort());
       mServerSocket.setSoTimeout(SOCKET_TIMEOUT);
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
@@ -164,7 +166,7 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
         // Handle the client
         requestId++;
-        final ClientHandler<N, E, G> handler = new ClientHandler<>(requestId, client, mGraph, mComputation, mDatabase);
+        final ClientHandler handler = new ClientHandler(requestId, client, mFuzzyQuery, mNodeNames, mMatchLimit);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
         // Ignore the exception. The timeout is used to repeatedly check if the
@@ -172,11 +174,11 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
       } catch (final Exception e) {
         // TODO Implement some limit of repeated exceptions
         // Log every exception and try to keep alive
-        LOGGER.error("Unknown exception in routing server routine", e);
+        LOGGER.error("Unknown exception in name search server routine", e);
       }
     }
 
-    LOGGER.info("Routing server is shutting down");
+    LOGGER.info("Name search server is shutting down");
   }
 
   /**
@@ -187,7 +189,7 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    */
   public void shutdown() {
     mShouldRun = false;
-    LOGGER.info("Set shutdown request to routing server");
+    LOGGER.info("Set shutdown request to name search server");
   }
 
   /**
@@ -202,9 +204,27 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
     if (isRunning()) {
       return;
     }
-    LOGGER.info("Starting routing server");
+    LOGGER.info("Starting name search server");
     mShouldRun = true;
     mServerThread.start();
+  }
+
+  /**
+   * Initializes the query object which is used for answering fuzzy prefix
+   * queries.
+   */
+  private void initializeFuzzyPrefixQuery() {
+    LOGGER.info("Setting up fuzzy prefix query");
+    final Instant fuzzyTimeStart = Instant.now();
+
+    final QGramProvider qGramProvider = new QGramProvider(Q_GRAM_VALUE);
+    final PostingBeforeRecordRanking<String> ranking = new PostingBeforeRecordRanking<>();
+    mNodeNames = NodeNameSet.buildFromNodeNameData(mDatabase.getAllNodeNameData(), qGramProvider);
+    mFuzzyQuery = new FuzzyPrefixQuery<>(mNodeNames, qGramProvider, ranking);
+    LOGGER.info("Inverted index size: {}", mNodeNames.size());
+
+    final Instant fuzzyTimeEnd = Instant.now();
+    LOGGER.info("Setup took: {}", Duration.between(fuzzyTimeStart, fuzzyTimeEnd));
   }
 
 }

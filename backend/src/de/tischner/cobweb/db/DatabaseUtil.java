@@ -12,6 +12,11 @@ import java.sql.Types;
  */
 public final class DatabaseUtil {
   /**
+   * SQL query to fetch all node name data. This selects node IDs and names of
+   * entries that have a name.
+   */
+  static final String QUERY_ALL_NODE_NAME_DATA = "SELECT id, name FROM osm_node_tags WHERE name IS NOT NULL";
+  /**
    * Delimiter used in SQL insert statements to separate the data that is to be
    * inserted.
    */

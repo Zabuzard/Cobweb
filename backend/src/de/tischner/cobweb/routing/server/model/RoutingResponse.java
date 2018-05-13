@@ -42,7 +42,7 @@ public final class RoutingResponse {
   }
 
   /**
-   * Creates a new empty routing request. Is used to construct the element via
+   * Creates a new empty routing response. Is used to construct the element via
    * reflection.
    */
   @SuppressWarnings("unused")

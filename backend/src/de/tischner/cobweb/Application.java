@@ -18,8 +18,8 @@ import de.tischner.cobweb.commands.CommandParser;
 import de.tischner.cobweb.commands.ECommand;
 import de.tischner.cobweb.config.ConfigLoader;
 import de.tischner.cobweb.config.ConfigStore;
+import de.tischner.cobweb.db.ADatabase;
 import de.tischner.cobweb.db.ExternalDatabase;
-import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.db.MemoryDatabase;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
 import de.tischner.cobweb.parsing.DataParser;
@@ -41,6 +41,7 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
+import de.tischner.cobweb.searching.server.NameSearchServer;
 import de.tischner.cobweb.util.CleanUtil;
 import de.tischner.cobweb.util.SerializationUtil;
 
@@ -79,9 +80,9 @@ public final class Application {
    */
   private ConfigLoader mConfigLoader;
   /**
-   * Database to use for storing routing meta data.
+   * Database to use for storing meta data.
    */
-  private IRoutingDatabase mDatabase;
+  private ADatabase mDatabase;
   /**
    * Graph to route on.
    */
@@ -90,6 +91,10 @@ public final class Application {
    * Logger to use for logging.
    */
   private Logger mLogger;
+  /**
+   * Server to use for responding to name search requests. Offers a REST API.
+   */
+  private NameSearchServer mNameSearchServer;
   /**
    * Server to use for responding to routing requests. Offers a REST API.
    */
@@ -185,6 +190,7 @@ public final class Application {
       switch (mCommandData.getCommand()) {
         case START:
           mRoutingServer.start();
+          mNameSearchServer.start();
           break;
         case CLEAN:
           CleanUtil.clean(mConfig, mConfig);
@@ -280,6 +286,7 @@ public final class Application {
     mLogger.info("Graph size: {}", mGraph.getSizeInformation());
 
     initializeRouting();
+    initializeNameSearch();
 
     final Instant initEndTime = Instant.now();
     mLogger.info("Initialization of API took: {}", Duration.between(initStartTime, initEndTime));
@@ -344,6 +351,17 @@ public final class Application {
   private void initializeLogger() {
     System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, LOGGER_CONFIG.toString());
     mLogger = LoggerFactory.getLogger(Application.class);
+  }
+
+  /**
+   * Initializes the name search server and algorithms used to answer name
+   * search requests. Depending on the used algorithms this method may take a
+   * while for all precomputations to finish.
+   */
+  private void initializeNameSearch() {
+    mLogger.info("Initializing name search");
+    mNameSearchServer = new NameSearchServer(mConfig, mDatabase);
+    mNameSearchServer.initialize();
   }
 
   /**

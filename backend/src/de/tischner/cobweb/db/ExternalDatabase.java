@@ -43,7 +43,7 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class ExternalDatabase extends ARoutingDatabase {
+public final class ExternalDatabase extends ADatabase {
   /**
    * The logger to use for logging.
    */
@@ -136,6 +136,34 @@ public final class ExternalDatabase extends ARoutingDatabase {
    */
   public ExternalDatabase(final IDatabaseConfigProvider config) {
     mConfig = config;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.INameSearchDatabase#getAllNodeNameData()
+   */
+  @Override
+  public Collection<NodeNameData> getAllNodeNameData() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Getting all node name data");
+    }
+    final List<NodeNameData> nodeData = new ArrayList<>();
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_ALL_NODE_NAME_DATA)) {
+        // Execute the statement and collect the result
+        try (ResultSet result = statement.executeQuery()) {
+          while (result.next()) {
+            final long id = result.getLong(1);
+            final String name = result.getString(2);
+            nodeData.add(new NodeNameData(id, name));
+          }
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting node name data, current result is {}", nodeData, e);
+    }
+
+    return nodeData;
   }
 
   /*
@@ -394,8 +422,8 @@ public final class ExternalDatabase extends ARoutingDatabase {
    */
   @Override
   public void shutdown() {
+    // Nothing needs to be done
     LOGGER.info("Shutting down database");
-    // TODO Implement something
   }
 
   /**

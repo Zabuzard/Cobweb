@@ -1,7 +1,7 @@
 package de.tischner.cobweb.db;
 
 /**
- * POJO for spatial node data. Stores information about a node like its way ID,
+ * POJO for spatial node data. Stores information about a node like its ID,
  * latitude and longitude.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
