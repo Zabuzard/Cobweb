@@ -51,8 +51,10 @@ function planRouteFromHashHandler() {
 		return;
 	}
 
-	setUiToRequest(request);
-	handleValidRequest(request);
+	var names = parseNamesFromHash();
+
+	setUiToRequest(request, names.fromName, names.toName);
+	handleValidRequest(request, names.fromName, names.toName);
 }
 
 /**
@@ -69,8 +71,28 @@ function planRouteHandler() {
 	if (request == null) {
 		handleInvalidRequest(request);
 	} else {
-		handleValidRequest(request);
+		var names = parseNamesFromPanel();
+		handleValidRequest(request, names.fromName, names.toName);
 	}
+}
+
+/**
+ * Searches for a name given in the passed reference to <tt>this</tt>.
+ * Results are displayed as drop-down list.
+ */
+function nameSearchHandler() {
+	var name = $(this).val();
+	// Ignore empty names
+	if (name.length === 0 || !name.trim()) {
+		return;
+	}
+
+	// Build request
+	var request = {};
+	request.name = name;
+	request.amount = matchLimit;
+
+	sendNameSearchRequestToServer(request, $(this).attr('id'));
 }
 
 /**
@@ -85,13 +107,15 @@ function handleInvalidRequest(request) {
  * Handles a valid routing request. This will send the request to the server.
  * @param {{depTime:number, modes:number[], from:number, to:number}} request - The request
  * to handle in the JSON format specified by the REST API
+ * @param {string} fromName - The current value in the from field
+ * @param {string} toName - The current value in the to field
  */
-function handleValidRequest(request) {
+function handleValidRequest(request, fromName, toName) {
 	clearMessages();
 
-	setUrlToRequest(request);
+	setUrlToRequest(request, fromName, toName);
 
-	sendRequestToServer(request);
+	sendRouteRequestToServer(request);
 }
 
 /**
@@ -100,7 +124,19 @@ function handleValidRequest(request) {
  * @param {Object} error - The error itself
  */
 function handleRouteServerError(status, error) {
-	var text = "Error while communicating with the server.\n";
+	var text = "Error while communicating with the route server.\n";
+	text += "Status: " + status + "\n";
+	text += "Message: " + error;
+	setErrorMessage(text);
+}
+
+/**
+ * Handles an error that appeared while communicating with the name search server.
+ * @param {Object} status - The status of the error
+ * @param {Object} error - The error itself
+ */
+function handleNameSearchServerError(status, error) {
+	var text = "Error while communicating with the name search server.\n";
 	text += "Status: " + status + "\n";
 	text += "Message: " + error;
 	setErrorMessage(text);
@@ -155,4 +191,28 @@ function handleJourney(journey) {
 
 	// Zoom into departure node
 	zoomIntoNode(journey.route[0]);
+}
+
+/**
+ * Handles a name search response from the server.
+ * @param {{matches:{id:number, name:string}[]} response - The response from the server as JSON
+ * according to the REST API specification
+ * @param {number} inputId - The ID of the input field corresponding to this response.
+ */
+function handleNameSearchServerResponse(response, inputId) {
+	if (response.matches.length === 0) {
+		return;
+	}
+
+	// Iterate all matches and build the data-source
+	var dataSource = [];
+	for (var i = 0; i < response.matches.length; i++) {
+		var match = response.matches[i];
+		dataSource[i] = {
+			value: match.id,
+			label: match.name
+		}
+	}
+	
+	$('#' + inputId).autocomplete('option', 'source', dataSource);
 }

@@ -30,10 +30,15 @@ function hasHash() {
  * Fills the URL hash with the information given by the given routing request.
  * @param {{depTime:number, modes:number[], from:number, to:number}} request - The request
  * to use in the JSON format specified by the REST API
+ * @param {string} fromName - The current value in the from field
+ * @param {string} toName - The current value in the to field
  */
-function setUrlToRequest(request) {
+function setUrlToRequest(request, fromName, toName) {
 	var hash = window.location.hash.substring(1);
 	var currentParams = deparam(hash);
+	
+	currentParams.fromName = fromName;
+	currentParams.toName = toName;
 
 	for (var key in request) {
 		if (request.hasOwnProperty(key)) {
@@ -49,10 +54,14 @@ function setUrlToRequest(request) {
  * Fills the user interface with the information given by the given routing request.
  * @param {{depTime:number, modes:number[], from:number, to:number}} request - The request
  * to use in the JSON format specified by the REST API
+ * @param {string} fromName - The current value in the from field
+ * @param {string} toName - The current value in the to field
  */
-function setUiToRequest(request) {
-	$('#from').val(request.from);
-	$('#to').val(request.to);
+function setUiToRequest(request, fromName, toName) {
+	$('#from').val(fromName);
+	$('#fromVal').val(request.from);
+	$('#to').val(toName);
+	$('#toVal').val(request.to);
 
 	var date = new Date(request.depTime);
 	$('#departureDate').datepicker("setDate", date);
@@ -97,6 +106,36 @@ function setErrorMessage(message) {
 function clearMessages() {
 	$('#message').removeClass('infoMessage errorMessage');
 	$('#message').text('');
+}
+
+/**
+ * Returns the given node ID or, if not present, attempts to extract the first match
+ * from the data-source of the auto-complete widget attached to an object with the given ID.
+ * @param {*} nodeId - The node ID to return or an empty string if not present
+ * @param {string} inputId - The ID of the object that has the widget attached to
+ * @returns The given node ID or, if not present, the value of the first match.
+ * An empty string if both are not present
+ */
+function getNodeIdOrFallback(nodeId, inputId) {
+	if (nodeId.length === 0) {
+		// Fallback if no value was set
+		return extractFirstMatch('from');
+	}
+	return nodeId;
+}
+
+/**
+ * Attempts to extract the first match from the data-source of the auto-complete
+ * widget attached to an object with the given ID.
+ * @param {string} inputId - The ID of the object that has the widget attached to
+ * @returns The value of the first match or an empty string if not present
+ */
+function extractFirstMatch(inputId) {
+	var matches = $('#' + inputId).autocomplete('option', 'source');
+	if (matches.length === 0) {
+		return '';
+	}
+	return matches[0].value;
 }
 
 /**

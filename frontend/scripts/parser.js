@@ -20,6 +20,21 @@ function parseRequestFromHash() {
 }
 
 /**
+ * Parses names from the sites hash.
+ * @returns {{fromName:string, toName:string}} The parsed names as object
+ */
+function parseNamesFromHash() {
+	var hash = window.location.hash.substring(1);
+	var request = deparam(hash);
+	
+	var names = {};
+	names.fromName = request.fromName;
+	names.toName = request.toName;
+
+	return names;
+}
+
+/**
  * Parses a routing request from the sites user interface.
  * @returns {Object} The parsed request in a JSON format as specified by the REST API
  */
@@ -27,8 +42,8 @@ function parseRequestFromPanel() {
 	var request = {};
 
 	// Extract
-	var from = $('#from').val();
-	var to = $('#to').val();
+	var from = getNodeIdOrFallback($('#fromVal').val(), 'from');
+	var to = getNodeIdOrFallback($('#toVal').val(), 'to');
 	var depTimestamp = parseTimestampFromPanel();
 
 	var transportationModes = [];
@@ -45,6 +60,19 @@ function parseRequestFromPanel() {
 	request = validateRequest(request);
 
 	return request;
+}
+
+/**
+ * Parses names from the sites user interface.
+ * @returns {{fromName:string, toName:string}} The parsed names as object
+ */
+function parseNamesFromPanel() {
+	var names = {};
+
+	names.fromName = $('#from').val();
+	names.toName = $('#to').val();
+
+	return names;
 }
 
 /**

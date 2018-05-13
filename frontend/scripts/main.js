@@ -6,8 +6,10 @@
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 
- /** The URL of the routing server which offers the REST API. */
+ /** The URL of the routing server which offers a REST API. */
 var routeRequestServer = 'http://localhost:845/route';
+ /** The URL of the name search server which offers a REST API. */
+var nameSearchRequestServer = 'http://localhost:846/namesearch';
 /**The access-token of the Mapbox API to use. */
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
 /** The URL of the Mapbox server. */
@@ -47,6 +49,8 @@ var transIdToMode = {
 	2 : "footMode",
 	3 : "bikeMode"
 }
+/** Maximal amount of name search matches to request. */
+var matchLimit = 5;
 
 // Starts the init function when the document is loaded.
 $(document).ready(init);
@@ -83,6 +87,36 @@ function initUI() {
 
 	// Layer changer
 	$('#mapLayerChanger').click(layerChangeHandler);
+	
+	// Name search handler
+	$('#from, #to').each(function() {
+		$(this).keyup(nameSearchHandler);
+		
+		$(this).autocomplete({
+			source: [],
+			select: function(e, ui) {
+				e.preventDefault();
+
+				// Display the label, not the value
+				$(this).val(ui.item.label);
+
+				// Set the value to a hidden field
+				var id = $(this).attr('id');
+				$('#' + id + 'Val').val(ui.item.value);
+			},
+			focus: function(e, ui) {
+				e.preventDefault();
+
+				// Display the label, not the value
+				$(this).val(ui.item.label);
+			},
+			search: function(e, ui) {
+				// Clear the hidden value before every search
+				var id = $(this).attr('id');
+				$('#' + id + 'Val').val('');
+			}
+		});
+	});
 }
 
 /**
@@ -114,7 +148,7 @@ function initMap() {
  * @param {{depTime:number, modes:number[], from:number, to:number}} request - The request
  * to send in the JSON format specified by the REST API
  */
-function sendRequestToServer(request) {
+function sendRouteRequestToServer(request) {
 	$.ajax({
 		url: routeRequestServer,
 		method: 'POST',
@@ -127,6 +161,30 @@ function sendRequestToServer(request) {
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			handleRouteServerError(textStatus, errorThrown);
+		}
+	});
+}
+
+/**
+ * Sends the given request to the name search server.
+ * @param {{name:string, amount:number}} request - The request
+ * to send in the JSON format specified by the REST API
+ * @param {number} inputId - The ID of the input field corresponding
+ * to this request. Will be passed to the handler for displaying a drop-down list.
+ */
+function sendNameSearchRequestToServer(request, inputId) {
+	$.ajax({
+		url: nameSearchRequestServer,
+		method: 'POST',
+		timeout: 5 * 1000,
+		contentType: 'application/json; charset=utf-8',
+		dataType: 'json',
+		data: JSON.stringify(request),
+		success: function(response) {
+			handleNameSearchServerResponse(response, inputId);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			handleNameSearchServerError(textStatus, errorThrown);
 		}
 	});
 }
