@@ -43,13 +43,13 @@ public final class OsmReducer implements IOsmFileHandler {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(OsmReducer.class);
   /**
-   * The amount of entities already parsed for the current pass.
-   */
-  private int mEntityAmount;
-  /**
    * The default locale of the system.
    */
   private final Locale mDefaultLocale;
+  /**
+   * The amount of entities already parsed for the current pass.
+   */
+  private int mEntityAmount;
   /**
    * The path of the file currently streamed.
    */
@@ -158,17 +158,6 @@ public final class OsmReducer implements IOsmFileHandler {
     }
   }
 
-  /**
-   * Callback used for every entity that is handled by this handler.
-   */
-  private void handleEntityCallback() {
-    mEntityAmount++;
-
-    if (LOGGER.isDebugEnabled() && mEntityAmount % LOG_EVERY_ENTITY_AMOUNT == 0) {
-      LOGGER.debug("Handled {} entities", mEntityAmount);
-    }
-  }
-
   /*
    * (non-Javadoc)
    * @see
@@ -225,6 +214,17 @@ public final class OsmReducer implements IOsmFileHandler {
       mFile = file;
     }
     return true;
+  }
+
+  /**
+   * Callback used for every entity that is handled by this handler.
+   */
+  private void handleEntityCallback() {
+    mEntityAmount++;
+
+    if (LOGGER.isDebugEnabled() && mEntityAmount % LOG_EVERY_ENTITY_AMOUNT == 0) {
+      LOGGER.debug("Handled {} entities", mEntityAmount);
+    }
   }
 
 }
