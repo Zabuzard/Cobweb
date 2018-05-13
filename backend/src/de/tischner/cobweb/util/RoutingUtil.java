@@ -22,6 +22,10 @@ public final class RoutingUtil {
    */
   private static final double MAXIMAL_ROAD_SPEED = 200.0;
   /**
+   * Factor to multiply with to convert milliseconds to nanoseconds.
+   */
+  private static final int MILLIS_TO_NANO = 1_000_000;
+  /**
    * Factor to multiply with to convert <tt>m/s</tt> (metres per second) into
    * <tt>km/h</tt> (kilometres per hour).
    */
@@ -114,6 +118,17 @@ public final class RoutingUtil {
    */
   public static double msToKmh(final double ms) {
     return ms * MS_TO_KMH;
+  }
+
+  /**
+   * Converts the given value in <tt>nanoseconds</tt> to <tt>milliseconds</tt>.
+   * The result is rounded down.
+   *
+   * @param nanos The value in <tt>nanoseconds</tt> to convert
+   * @return The corresponding value in <tt>milliseconds</tt>, rounded down
+   */
+  public static long nanoToMilliseconds(final long nanos) {
+    return nanos / MILLIS_TO_NANO;
   }
 
   /**

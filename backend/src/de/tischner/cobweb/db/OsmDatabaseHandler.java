@@ -34,6 +34,10 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(OsmDatabaseHandler.class);
   /**
+   * Whether or not parsing of nodes has been finished already.
+   */
+  private boolean mAreNodesFinished;
+  /**
    * The current index to use in the entity buffer. It points to the index where
    * the next element can be inserted. So it is always one greater than the
    * index of the last inserted element. By that it represents the current size
@@ -138,6 +142,11 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
    */
   @Override
   public void handle(final OsmWay way) throws IOException {
+    if (!mAreNodesFinished) {
+      // Flush the buffer to ensure database has all nodes
+      mAreNodesFinished = true;
+      offerBuffer();
+    }
     handleEntity(way);
   }
 
@@ -186,6 +195,10 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
   private void offerBuffer() {
     // Offer all items up to the current index
     final int size = mBufferIndex;
+    if (size == 0) {
+      return;
+    }
+
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Offering buffer of size: {}", size);
     }

@@ -101,11 +101,27 @@ function setErrorMessage(message) {
 }
 
 /**
- * Clears any displays message in the message box on the site.
+ * Clears any message in the message box on the site.
  */
 function clearMessages() {
 	$('#message').removeClass('infoMessage errorMessage');
 	$('#message').text('');
+}
+
+/**
+ * Displays the given time in the miscellaneous info message box on the site.
+ * @param {number} time - The time to display, in milliseconds
+ */
+function setMiscInfo(time) {
+	var seconds = time / 1000;
+	$('#miscInfoPanel').text("computed in " + seconds + "s");
+}
+
+/**
+ * Clears any message in the miscellaneous info message box on the site.
+ */
+function clearMiscInfo() {
+	$('#miscInfoPanel').text('');
 }
 
 /**
@@ -131,7 +147,7 @@ function getNodeIdOrFallback(nodeId, inputId) {
  * @returns The value of the first match or an empty string if not present
  */
 function extractFirstMatch(inputId) {
-	var matches = $('#' + inputId).autocomplete('option', 'source');
+	var matches = currentMatches[inputId];
 	if (matches.length === 0) {
 		return '';
 	}

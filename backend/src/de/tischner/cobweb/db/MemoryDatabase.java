@@ -111,9 +111,6 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getNodeByName(final String name) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting node by name {}", name);
-    }
     return Optional.ofNullable(mNameToNode.get(name));
   }
 
@@ -148,9 +145,6 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getWayByName(final String name) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting way by name {}", name);
-    }
     return Optional.ofNullable(mNameToWay.get(name));
   }
 

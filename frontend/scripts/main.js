@@ -37,20 +37,25 @@ var isMapLayerStreet;
 var mapRouteMarkerGroup = [];
 /** A map connecting transportation mode strings to their corresponding IDs. */
 var transModeToId = {
-	"carMode" : 0,
-	"tramMode" : 1,
-	"footMode" : 2,
-	"bikeMode" : 3
+	'carMode' : 0,
+	'tramMode' : 1,
+	'footMode' : 2,
+	'bikeMode' : 3
 }
 /** A map connecting transportation mode IDs to their corresponding strings. */
 var transIdToMode = {
-	0 : "carMode",
-	1 : "tramMode",
-	2 : "footMode",
-	3 : "bikeMode"
+	0 : 'carMode',
+	1 : 'tramMode',
+	2 : 'footMode',
+	3 : 'bikeMode'
 }
 /** Maximal amount of name search matches to request. */
 var matchLimit = 5;
+/** Map which connects input IDs to their current matches*/
+var currentMatches = {
+	'from': [],
+	'to': []
+}
 
 // Starts the init function when the document is loaded.
 $(document).ready(init);
@@ -89,33 +94,41 @@ function initUI() {
 	$('#mapLayerChanger').click(layerChangeHandler);
 	
 	// Name search handler
-	$('#from, #to').each(function() {
-		$(this).keyup(nameSearchHandler);
-		
-		$(this).autocomplete({
-			source: [],
-			select: function(e, ui) {
-				e.preventDefault();
+	initNameSearchHandler('from');
+	initNameSearchHandler('to');
+}
 
-				// Display the label, not the value
-				$(this).val(ui.item.label);
+/**
+ * Initializes name search handler for the given input field.
+ * @param {string} inputId - The ID of the input field to initialize handlers for
+ */
+function initNameSearchHandler(inputId) {
+	$('#' + inputId).keyup(nameSearchHandler);
 
-				// Set the value to a hidden field
-				var id = $(this).attr('id');
-				$('#' + id + 'Val').val(ui.item.value);
-			},
-			focus: function(e, ui) {
-				e.preventDefault();
+	$('#' + inputId).autocomplete({
+		source: function (request, response) {
+			// Respond with an unfiltered data set
+			response(currentMatches[inputId]);
+		},
+		select: function(e, ui) {
+			e.preventDefault();
 
-				// Display the label, not the value
-				$(this).val(ui.item.label);
-			},
-			search: function(e, ui) {
-				// Clear the hidden value before every search
-				var id = $(this).attr('id');
-				$('#' + id + 'Val').val('');
-			}
-		});
+			// Display the label, not the value
+			$('#' + inputId).val(ui.item.label);
+
+			// Set the value to a hidden field
+			$('#' + inputId + 'Val').val(ui.item.value);
+		},
+		focus: function(e, ui) {
+			e.preventDefault();
+
+			// Display the label, not the value
+			$('#' + inputId).val(ui.item.label);
+		},
+		search: function(e, ui) {
+			// Clear the hidden value before every search
+			$('#' + inputId + 'Val').val('');
+		}
 	});
 }
 

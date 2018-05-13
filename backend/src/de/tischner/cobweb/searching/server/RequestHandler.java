@@ -17,6 +17,7 @@ import de.tischner.cobweb.searching.model.NodeNameSet;
 import de.tischner.cobweb.searching.server.model.Match;
 import de.tischner.cobweb.searching.server.model.NameSearchRequest;
 import de.tischner.cobweb.searching.server.model.NameSearchResponse;
+import de.tischner.cobweb.util.RoutingUtil;
 import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
@@ -91,16 +92,17 @@ public final class RequestHandler {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Handling request: {}", request);
     }
+    final long startTime = System.nanoTime();
 
     // Get the search request
     final String name = request.getName();
     if (name.trim().isEmpty()) {
-      sendEmptyResponse();
+      sendEmptyResponse(startTime);
       return;
     }
     int amount = request.getAmount();
     if (amount <= 0) {
-      sendEmptyResponse();
+      sendEmptyResponse(startTime);
       return;
     }
     if (amount > mMatchLimit) {
@@ -110,8 +112,11 @@ public final class RequestHandler {
     // Compute matches
     final List<Match> matches = buildMatches(mFuzzyQuery.searchOr(Collections.singletonList(name)), amount);
 
+    final long endTime = System.nanoTime();
+
     // Build and send response
-    final NameSearchResponse response = new NameSearchResponse(matches);
+    final NameSearchResponse response =
+        new NameSearchResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), matches);
     sendResponse(response);
   }
 
@@ -144,10 +149,14 @@ public final class RequestHandler {
    * Sends an empty name search response. This is usually used if the name to
    * search was empty or no match could be found.
    *
+   * @param startTime The time the computation started, in nanoseconds. Must be
+   *                  compatible with {@link System#nanoTime()}.
    * @throws IOException If an I/O exception occurred while sending the response
    */
-  private void sendEmptyResponse() throws IOException {
-    final NameSearchResponse response = new NameSearchResponse(Collections.emptyList());
+  private void sendEmptyResponse(final long startTime) throws IOException {
+    final long endTime = System.nanoTime();
+    final NameSearchResponse response =
+        new NameSearchResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), Collections.emptyList());
     sendResponse(response);
   }
 

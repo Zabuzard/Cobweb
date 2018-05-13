@@ -40,8 +40,15 @@
 }
 
 #message {
-	padding: 10px;
-	white-space: pre-line;
+  padding: 10px;
+  white-space: pre-line;
+}
+
+#miscInfoPanel {
+  position: absolute;
+  bottom: 0px;
+  left: 7px;
+  font-size: 70%;
 }
 
 #mapLayerChanger {

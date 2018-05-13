@@ -6,8 +6,9 @@ import java.util.List;
  * POJO that models a name search response.<br>
  * <br>
  * A response consists of a list of matches, sorted by relevance (most relevant
- * first). A match consists of the full name and the corresponding OSM node
- * ID.<br>
+ * first). It also includes the time it needed to answer the query in
+ * milliseconds. A match consists of the full name and the corresponding OSM
+ * node ID.<br>
  * <br>
  * It has the exact structure that is expected as response format for the REST
  * API. It is primarily used to be constructed and then encoded to JSON to be
@@ -20,14 +21,20 @@ public final class NameSearchResponse {
    * A list of all computed matches, sorted by relevance (most relevant first).
    */
   private List<Match> mMatches;
+  /**
+   * The duration answering the query took, in milliseconds.
+   */
+  private long mTime;
 
   /**
    * Creates a new name search response.
    *
+   * @param time    The duration answering the query took, in milliseconds
    * @param matches A list of all computed matches, sorted by relevance (most
    *                relevant first)
    */
-  public NameSearchResponse(final List<Match> matches) {
+  public NameSearchResponse(final long time, final List<Match> matches) {
+    mTime = time;
     mMatches = matches;
   }
 
@@ -49,6 +56,15 @@ public final class NameSearchResponse {
    */
   public List<Match> getMatches() {
     return mMatches;
+  }
+
+  /**
+   * Gets the duration answering the query took, in milliseconds.
+   *
+   * @return The duration to get
+   */
+  public long getTime() {
+    return mTime;
   }
 
   /*

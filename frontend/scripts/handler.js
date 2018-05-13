@@ -63,6 +63,7 @@ function planRouteFromHashHandler() {
 function planRouteHandler() {
 	// Clear any previous messages
 	clearMessages();
+	clearMiscInfo();
 	// Delete any previous routes
 	clearMapRouteMarker();
 
@@ -112,6 +113,7 @@ function handleInvalidRequest(request) {
  */
 function handleValidRequest(request, fromName, toName) {
 	clearMessages();
+	clearMiscInfo();
 
 	setUrlToRequest(request, fromName, toName);
 
@@ -131,24 +133,14 @@ function handleRouteServerError(status, error) {
 }
 
 /**
- * Handles an error that appeared while communicating with the name search server.
- * @param {Object} status - The status of the error
- * @param {Object} error - The error itself
- */
-function handleNameSearchServerError(status, error) {
-	var text = "Error while communicating with the name search server.\n";
-	text += "Status: " + status + "\n";
-	text += "Message: " + error;
-	setErrorMessage(text);
-}
-
-/**
  * Handles a routing response from the server.
  * @param {{from:number, to:number, journeys:{depTime:number, arrTime:number,
- * route:{type:number, mode:number, name:string, geom:number[][]}[]}[]}} response - The response from the server as JSON
- * according to the REST API specification
+ * route:{time:number, type:number, mode:number, name:string, geom:number[][]}[]}[]}} response - The response from the
+ * server as JSON according to the REST API specification
  */
 function handleRouteServerResponse(response) {
+	setMiscInfo(response.time);
+
 	// If no path could be computed
 	if (response.journeys.length == 0) {
 		var text = "Not reachable";
@@ -195,7 +187,7 @@ function handleJourney(journey) {
 
 /**
  * Handles a name search response from the server.
- * @param {{matches:{id:number, name:string}[]} response - The response from the server as JSON
+ * @param {{time:number, matches:{id:number, name:string}[]} response - The response from the server as JSON
  * according to the REST API specification
  * @param {number} inputId - The ID of the input field corresponding to this response.
  */
@@ -214,5 +206,17 @@ function handleNameSearchServerResponse(response, inputId) {
 		}
 	}
 	
-	$('#' + inputId).autocomplete('option', 'source', dataSource);
+	currentMatches[inputId] = dataSource;
+}
+
+/**
+ * Handles an error that appeared while communicating with the name search server.
+ * @param {Object} status - The status of the error
+ * @param {Object} error - The error itself
+ */
+function handleNameSearchServerError(status, error) {
+	var text = "Error while communicating with the name search server.\n";
+	text += "Status: " + status + "\n";
+	text += "Message: " + error;
+	setErrorMessage(text);
 }

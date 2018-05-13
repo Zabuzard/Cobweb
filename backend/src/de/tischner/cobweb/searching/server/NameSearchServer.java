@@ -35,9 +35,10 @@ import de.zabuza.lexisearch.ranking.PostingBeforeRecordRanking;
  * <br>
  * A request consists of a name, which can be a prefix and fuzzy, and a maximal
  * amount of matches interested in. A response consists of a list of matches,
- * sorted by relevance (most relevant first). The response will not contain more
- * matches than specified by the request. A match consists of the full name and
- * the corresponding OSM node ID.<br>
+ * sorted by relevance (most relevant first). It also includes the time it
+ * needed to answer the query in milliseconds. The response will not contain
+ * more matches than specified by the request. A match consists of the full name
+ * and the corresponding OSM node ID.<br>
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
  * Requests are parsed into {@link NameSearchRequest} and responses into

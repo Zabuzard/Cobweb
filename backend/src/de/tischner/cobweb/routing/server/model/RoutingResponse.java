@@ -6,7 +6,8 @@ import java.util.List;
  * POJO that models a routing response.<br>
  * <br>
  * A response consists of departure and arrival time, together with possible
- * routes.<br>
+ * routes. It also includes the time it needed to answer the query in
+ * milliseconds.<br>
  * <br>
  * It has the exact structure that is expected as response format for the REST
  * API. It is primarily used to be constructed and then encoded to JSON to be
@@ -24,6 +25,10 @@ public final class RoutingResponse {
    */
   private List<Journey> mJourneys;
   /**
+   * The duration answering the query took, in milliseconds.
+   */
+  private long mTime;
+  /**
    * The unique ID of the node to end the journeys at.
    */
   private long mTo;
@@ -31,11 +36,13 @@ public final class RoutingResponse {
   /**
    * Creates a new routing response.
    *
+   * @param time     The duration answering the query took, in milliseconds
    * @param from     The unique ID of the node to start the journeys from
    * @param to       The unique ID of the node to end the journeys at
    * @param journeys A list of all computed appropriate journeys
    */
-  public RoutingResponse(final long from, final long to, final List<Journey> journeys) {
+  public RoutingResponse(final long time, final long from, final long to, final List<Journey> journeys) {
+    mTime = time;
     mFrom = from;
     mTo = to;
     mJourneys = journeys;
@@ -66,6 +73,15 @@ public final class RoutingResponse {
    */
   public List<Journey> getJourneys() {
     return mJourneys;
+  }
+
+  /**
+   * Gets the duration answering the query took, in milliseconds.
+   *
+   * @return The duration to get
+   */
+  public long getTime() {
+    return mTime;
   }
 
   /**

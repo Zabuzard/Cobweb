@@ -34,7 +34,8 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * <br>
  * A request may consist of departure time, source and destination nodes and
  * meta-data like desired transportation modes. A response consists of departure
- * and arrival time, together with possible routes.<br>
+ * and arrival time, together with possible routes. It also includes the time it
+ * needed to answer the query in milliseconds.<br>
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
  * Requests are parsed into {@link RoutingRequest} and responses into

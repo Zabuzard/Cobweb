@@ -96,6 +96,19 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#nanoToMilliseconds(long)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testNanoToMilliseconds() {
+    Assert.assertEquals(10L, RoutingUtil.nanoToMilliseconds(10_000_000L));
+    Assert.assertEquals(1L, RoutingUtil.nanoToMilliseconds(1_500_000L));
+    Assert.assertEquals(1L, RoutingUtil.nanoToMilliseconds(1_000_000L));
+    Assert.assertEquals(0L, RoutingUtil.nanoToMilliseconds(0L));
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.util.RoutingUtil#radToDeg(double)}.
    */
   @SuppressWarnings("static-method")

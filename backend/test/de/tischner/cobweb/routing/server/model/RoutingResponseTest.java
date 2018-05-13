@@ -31,7 +31,7 @@ public final class RoutingResponseTest {
     final RouteElement third =
         new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
     final Journey journey = new Journey(100L, 200L, Arrays.asList(first, second, third));
-    mResponse = new RoutingResponse(5L, 10L, Arrays.asList(journey, journey));
+    mResponse = new RoutingResponse(10L, 5L, 10L, Arrays.asList(journey, journey));
   }
 
   /**
@@ -61,6 +61,15 @@ public final class RoutingResponseTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.routing.server.model.RoutingResponse#getTime()}.
+   */
+  @Test
+  public void testGetTime() {
+    Assert.assertEquals(10L, mResponse.getTime());
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.routing.server.model.RoutingResponse#getTo()}.
    */
   @Test
@@ -70,7 +79,7 @@ public final class RoutingResponseTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.server.model.RoutingResponse#RoutingResponse(long, long, java.util.List)}.
+   * {@link de.tischner.cobweb.routing.server.model.RoutingResponse#RoutingResponse(long, long, long, List)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -82,9 +91,9 @@ public final class RoutingResponseTest {
         new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
     final Journey journey = new Journey(100L, 200L, Arrays.asList(first, second, third));
     try {
-      new RoutingResponse(5L, 10L, Arrays.asList(journey, journey));
-      new RoutingResponse(-5L, -10L, Collections.singletonList(journey));
-      new RoutingResponse(0L, 0L, Collections.emptyList());
+      new RoutingResponse(10L, 5L, 10L, Arrays.asList(journey, journey));
+      new RoutingResponse(1L, -5L, -10L, Collections.singletonList(journey));
+      new RoutingResponse(0L, 0L, 0L, Collections.emptyList());
     } catch (final Exception e) {
       Assert.fail();
     }

@@ -225,9 +225,6 @@ public final class ExternalDatabase extends ADatabase {
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_ID_BY_NAME)) {
         statement.setString(1, name);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Getting node by name {}, query is: {}", name, statement);
-        }
         try (ResultSet result = statement.executeQuery()) {
           if (result.next()) {
             return Optional.of(result.getLong(1));
@@ -247,9 +244,6 @@ public final class ExternalDatabase extends ADatabase {
    */
   @Override
   public Optional<String> getNodeName(final long id) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting node name by id: {}", id);
-    }
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_NAME_BY_ID)) {
         statement.setLong(1, id);
@@ -319,9 +313,6 @@ public final class ExternalDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getWayByName(final String name) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting way by name: {}", name);
-    }
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_ID_BY_NAME)) {
         statement.setString(1, name);
@@ -344,9 +335,6 @@ public final class ExternalDatabase extends ADatabase {
    */
   @Override
   public Optional<String> getWayName(final long id) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Getting way name by id: {}", id);
-    }
     try (Connection connection = createConnection()) {
       try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_NAME_BY_ID)) {
         statement.setLong(1, id);

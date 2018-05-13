@@ -105,15 +105,17 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Handling request: {}", request);
     }
+    final long startTime = System.nanoTime();
+
     // Get the source and destination
     final Optional<N> sourceOptional = mGraph.getNodeById(request.getFrom());
     if (!sourceOptional.isPresent()) {
-      sendEmptyResponse(request);
+      sendEmptyResponse(request, startTime);
       return;
     }
     final Optional<N> destinationOptional = mGraph.getNodeById(request.getTo());
     if (!destinationOptional.isPresent()) {
-      sendEmptyResponse(request);
+      sendEmptyResponse(request, startTime);
       return;
     }
 
@@ -123,7 +125,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
 
     final Optional<IPath<N, E>> pathOptional = mComputation.computeShortestPath(source, destination);
     if (!pathOptional.isPresent()) {
-      sendEmptyResponse(request);
+      sendEmptyResponse(request, startTime);
       return;
     }
 
@@ -131,9 +133,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final IPath<N, E> path = pathOptional.get();
     final Journey journey = buildJourney(request, path);
 
+    final long endTime = System.nanoTime();
+
     // Build and send response
-    final RoutingResponse response =
-        new RoutingResponse(request.getFrom(), request.getTo(), Collections.singletonList(journey));
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
+        request.getFrom(), request.getTo(), Collections.singletonList(journey));
     sendResponse(response);
   }
 
@@ -214,11 +218,15 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * Sends an empty routing response. This is usually used if no shortest path
    * could be found.
    *
-   * @param request The request to respond to
+   * @param request   The request to respond to
+   * @param startTime The time the computation started, in nanoseconds. Must be
+   *                  compatible with {@link System#nanoTime()}.
    * @throws IOException If an I/O exception occurred while sending the response
    */
-  private void sendEmptyResponse(final RoutingRequest request) throws IOException {
-    final RoutingResponse response = new RoutingResponse(request.getFrom(), request.getTo(), Collections.emptyList());
+  private void sendEmptyResponse(final RoutingRequest request, final long startTime) throws IOException {
+    final long endTime = System.nanoTime();
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
+        request.getFrom(), request.getTo(), Collections.emptyList());
     sendResponse(response);
   }
 
