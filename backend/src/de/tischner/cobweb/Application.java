@@ -60,6 +60,11 @@ import de.tischner.cobweb.util.SerializationUtil;
  */
 public final class Application {
   /**
+   * The amount of landmarks to use for the landmark heuristic used by the
+   * routing algorithm.
+   */
+  private static final int AMOUNT_OF_LANDMARKS = 50;
+  /**
    * Path to the configuration of the logger.
    */
   private static final Path LOGGER_CONFIG = Paths.get("res", "logging", "logConfig.xml");
@@ -165,7 +170,7 @@ public final class Application {
    * Instead create a new one.
    */
   public void shutdown() {
-    // TODO Make sure this is always called
+    // TODO Make sure this is always called, register some shutdown hook
     mLogger.info("Shutting down application");
     try {
       mRoutingServer.shutdown();
@@ -375,8 +380,7 @@ public final class Application {
     final Instant preCompTimeStart = Instant.now();
     // Create the shortest path algorithm
     final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
-    // TODO Adjust the amount of landmarks, use some constant
-    final IMetric<RoadNode> metric = new LandmarkMetric<>(50, mGraph, landmarkProvider);
+    final IMetric<RoadNode> metric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mGraph, landmarkProvider);
     mComputation = new AStar<>(mGraph, metric);
     final Instant preCompTimeEnd = Instant.now();
     mLogger.info("Precomputation took: {}", Duration.between(preCompTimeStart, preCompTimeEnd));

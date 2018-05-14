@@ -305,7 +305,7 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
       LOGGER.debug("Submitting buffered requests of size: {}", size);
     }
     final Collection<SpatialNodeData> nodeData =
-        mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests).limit(size), size);
+        mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests, 0, size), size);
     nodeData.forEach(this::insertSpatialData);
 
     // Reset index since buffer is empty again

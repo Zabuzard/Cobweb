@@ -202,7 +202,7 @@ public final class OsmDatabaseHandler implements IOsmFileHandler {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Offering buffer of size: {}", size);
     }
-    mDatabase.offerOsmEntities(Arrays.stream(mEntityBuffer).limit(size), size);
+    mDatabase.offerOsmEntities(Arrays.stream(mEntityBuffer, 0, size), size);
 
     // Reset index since buffer is empty again
     mBufferIndex = 0;

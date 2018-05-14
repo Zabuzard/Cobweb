@@ -163,8 +163,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
   protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<N> sources,
       final N pathDestination) {
     // NOTE If RAM allows, the maps could be exchanged by arrays after mapping
-    // the
-    // real node IDs to dummy IDs without gaps.
+    // the real node IDs to dummy IDs without gaps.
     final Map<N, TentativeDistance<N, E>> nodeToDistance = new HashMap<>(sources.size());
     final Map<N, TentativeDistance<N, E>> nodeToSettledDistance = new HashMap<>(sources.size());
     final PriorityQueue<TentativeDistance<N, E>> activeNodes = new PriorityQueue<>(sources.size());
