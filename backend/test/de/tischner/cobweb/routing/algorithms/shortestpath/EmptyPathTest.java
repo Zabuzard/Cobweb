@@ -36,7 +36,7 @@ public final class EmptyPathTest {
   @Test
   public void testEmptyPath() {
     try {
-      new EmptyPath<>(new RoadNode(1L, 1.0, 1.0));
+      new EmptyPath<>(new RoadNode(1L, 1.0F, 1.0F));
     } catch (final Exception e) {
       Assert.fail();
     }

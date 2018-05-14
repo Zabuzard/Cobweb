@@ -32,12 +32,12 @@ public final class RoadGraphTest {
   @Before
   public void setUp() {
     mGraph = new RoadGraph<>();
-    final RoadNode firstNode = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode secondNode = new RoadNode(2L, 2.0, 2.0);
-    final RoadNode thirdNode = new RoadNode(3L, 3.0, 3.0);
-    final RoadNode fourthNode = new RoadNode(4L, 4.0, 4.0);
-    final RoadNode fifthNode = new RoadNode(5L, 5.0, 5.0);
-    final RoadNode sixthNode = new RoadNode(6L, 6.0, 6.0);
+    final RoadNode firstNode = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode secondNode = new RoadNode(2L, 2.0F, 2.0F);
+    final RoadNode thirdNode = new RoadNode(3L, 3.0F, 3.0F);
+    final RoadNode fourthNode = new RoadNode(4L, 4.0F, 4.0F);
+    final RoadNode fifthNode = new RoadNode(5L, 5.0F, 5.0F);
+    final RoadNode sixthNode = new RoadNode(6L, 6.0F, 6.0F);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -64,7 +64,7 @@ public final class RoadGraphTest {
   @Test
   public void testAddEdge() {
     final RoadEdge<RoadNode> edge =
-        new RoadEdge<>(40L, new RoadNode(1L, 1.0, 1.0), new RoadNode(2L, 2.0, 2.0), EHighwayType.MOTORWAY, 100);
+        new RoadEdge<>(40L, new RoadNode(1L, 1.0F, 1.0F), new RoadNode(2L, 2.0F, 2.0F), EHighwayType.MOTORWAY, 100);
     Assert.assertFalse(mGraph.containsEdge(edge));
     Assert.assertTrue(mGraph.addEdge(edge));
     Assert.assertTrue(mGraph.containsEdge(edge));
@@ -79,7 +79,7 @@ public final class RoadGraphTest {
   @Test
   public void testAddNode() {
     Assert.assertEquals(6, mGraph.size());
-    mGraph.addNode(new RoadNode(10L, 10.0, 10.0));
+    mGraph.addNode(new RoadNode(10L, 10.0F, 10.0F));
     Assert.assertEquals(7, mGraph.size());
   }
 
@@ -147,7 +147,7 @@ public final class RoadGraphTest {
    */
   @Test
   public void testRemoveNode() {
-    final RoadNode node = new RoadNode(10L, 10.0, 10.0);
+    final RoadNode node = new RoadNode(10L, 10.0F, 10.0F);
     Assert.assertEquals(6, mGraph.size());
     Assert.assertFalse(mGraph.removeNode(node));
     Assert.assertEquals(6, mGraph.size());
@@ -165,9 +165,9 @@ public final class RoadGraphTest {
    */
   @Test
   public void testReverse() {
-    final RoadNode first = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode second = new RoadNode(2L, 2.0, 2.0);
-    final RoadNode third = new RoadNode(3L, 3.0, 3.0);
+    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
+    final RoadNode third = new RoadNode(3L, 3.0F, 3.0F);
     final RoadEdge<RoadNode> firstEdge = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
     final RoadEdge<RoadNode> secondEdge = new RoadEdge<>(2L, second, third, EHighwayType.MOTORWAY, 100);
     mGraph = new RoadGraph<>();

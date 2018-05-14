@@ -20,7 +20,7 @@ public final class SpatialNodeDataTest {
    */
   @Before
   public void setUp() {
-    mSpatialNodeData = new SpatialNodeData(1L, 10.0, 5.0);
+    mSpatialNodeData = new SpatialNodeData(1L, 10.0F, 5.0F);
   }
 
   /**
@@ -51,15 +51,15 @@ public final class SpatialNodeDataTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.db.SpatialNodeData#SpatialNodeData(long, double, double)}.
+   * {@link de.tischner.cobweb.db.SpatialNodeData#SpatialNodeData(long, float, float)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public final void testSpatialNodeData() {
     try {
-      new SpatialNodeData(1L, 10.0, 5.0);
-      new SpatialNodeData(-10L, -10.0, -5.0);
-      new SpatialNodeData(0L, 0.0, 0.0);
+      new SpatialNodeData(1L, 10.0F, 5.0F);
+      new SpatialNodeData(-10L, -10.0F, -5.0F);
+      new SpatialNodeData(0L, 0.0F, 0.0F);
     } catch (final Exception e) {
       Assert.fail();
     }

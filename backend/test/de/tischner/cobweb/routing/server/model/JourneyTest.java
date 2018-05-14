@@ -25,11 +25,11 @@ public final class JourneyTest {
    */
   @Before
   public void setUp() {
-    final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 1.0, 1.0 }));
+    final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new float[] { 1.0F, 1.0F }));
     final RouteElement second = new RouteElement(ERouteElementType.PATH, ETransportationMode.BIKE, "Main street",
-        Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
+        Arrays.asList(new float[] { 1.0F, 1.0F }, new float[] { 2.0F, 2.0F }, new float[] { 4.0F, 4.0F }));
     final RouteElement third =
-        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
+        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new float[] { 4.0F, 4.0F }));
     mJourney = new Journey(100L, 200L, Arrays.asList(first, second, third));
   }
 
@@ -76,11 +76,11 @@ public final class JourneyTest {
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testJourney() {
-    final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 1.0, 1.0 }));
+    final RouteElement first = new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new float[] { 1.0F, 1.0F }));
     final RouteElement second = new RouteElement(ERouteElementType.PATH, "Main street",
-        Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
+        Arrays.asList(new float[] { 1.0F, 1.0F }, new float[] { 2.0F, 2.0F }, new float[] { 4.0F, 4.0F }));
     final RouteElement third =
-        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new double[] { 4.0, 4.0 }));
+        new RouteElement(ERouteElementType.NODE, "Wall street 5", Arrays.asList(new float[] { 4.0F, 4.0F }));
     try {
       new Journey(100L, 200L, Arrays.asList(first, second, third));
       new Journey(0, 0, Collections.emptyList());

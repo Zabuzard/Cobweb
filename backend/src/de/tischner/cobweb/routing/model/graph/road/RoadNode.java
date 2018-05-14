@@ -22,11 +22,11 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   /**
    * The latitude of this node, in degrees.
    */
-  private double mLatitude;
+  private float mLatitude;
   /**
    * The longitude of this node, in degrees.
    */
-  private double mLongitude;
+  private float mLongitude;
 
   /**
    * Creates a new road node with the given ID and spatial data.
@@ -35,7 +35,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
    * @param latitude  The latitude of this node, in degrees
    * @param longitude The longitude of this node, in degrees
    */
-  public RoadNode(final long id, final double latitude, final double longitude) {
+  public RoadNode(final long id, final float latitude, final float longitude) {
     mId = id;
     mLatitude = latitude;
     mLongitude = longitude;
@@ -76,7 +76,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
    * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLatitude()
    */
   @Override
-  public double getLatitude() {
+  public float getLatitude() {
     return mLatitude;
   }
 
@@ -85,7 +85,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
    * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLongitude()
    */
   @Override
-  public double getLongitude() {
+  public float getLongitude() {
     return mLongitude;
   }
 
@@ -104,20 +104,20 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   /*
    * (non-Javadoc)
    * @see
-   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(double)
+   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(float)
    */
   @Override
-  public void setLatitude(final double latitude) {
+  public void setLatitude(final float latitude) {
     mLatitude = latitude;
   }
 
   /*
    * (non-Javadoc)
    * @see
-   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLongitude(double)
+   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLongitude(float)
    */
   @Override
-  public void setLongitude(final double longitude) {
+  public void setLongitude(final float longitude) {
     mLongitude = longitude;
   }
 

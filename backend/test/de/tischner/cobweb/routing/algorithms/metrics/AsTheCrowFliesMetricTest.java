@@ -18,8 +18,8 @@ public final class AsTheCrowFliesMetricTest {
   @Test
   public final void testDistance() {
     final AsTheCrowFliesMetric<RoadNode> metric = new AsTheCrowFliesMetric<>();
-    final RoadNode first = new RoadNode(1L, 10.0, 10.0);
-    final RoadNode second = new RoadNode(2L, 20.0, 20.0);
+    final RoadNode first = new RoadNode(1L, 10.0F, 10.0F);
+    final RoadNode second = new RoadNode(2L, 20.0F, 20.0F);
 
     Assert.assertEquals(0.0, metric.distance(first, first), 0.0001);
     Assert.assertEquals(0.0, metric.distance(second, second), 0.0001);

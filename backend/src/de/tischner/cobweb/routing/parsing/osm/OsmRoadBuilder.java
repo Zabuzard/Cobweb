@@ -67,7 +67,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    */
   @Override
   public RoadNode buildNode(final OsmNode node) {
-    return new RoadNode(node.getId(), node.getLatitude(), node.getLongitude());
+    return new RoadNode(node.getId(), (float) node.getLatitude(), (float) node.getLongitude());
   }
 
   /**

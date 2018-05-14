@@ -58,7 +58,7 @@ public final class TarjanTaskElementTest {
   @Test
   public void testGetPredecessor() {
     Assert.assertEquals(2L, mElement.getPredecessor().getId());
-    Assert.assertNull(new TarjanTaskElement<>(new RoadNode(1L, 1.0, 1.0), null).getPredecessor());
+    Assert.assertNull(new TarjanTaskElement<>(new RoadNode(1L, 1.0F, 1.0F), null).getPredecessor());
   }
 
   /**
@@ -87,8 +87,8 @@ public final class TarjanTaskElementTest {
   @Test
   public void testTarjanTaskElement() {
     try {
-      new TarjanTaskElement<>(new RoadNode(1L, 1.0, 1.0), new RoadNode(2L, 2.0, 2.0));
-      new TarjanTaskElement<>(new RoadNode(1L, 1.0, 1.0), null);
+      new TarjanTaskElement<>(new RoadNode(1L, 1.0F, 1.0F), new RoadNode(2L, 2.0F, 2.0F));
+      new TarjanTaskElement<>(new RoadNode(1L, 1.0F, 1.0F), null);
     } catch (final Exception e) {
       Assert.fail();
     }

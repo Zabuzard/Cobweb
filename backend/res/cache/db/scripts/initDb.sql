@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `osm_nodes` (
 	`id`	BIGINT NOT NULL UNIQUE,
-	`latitude`	DOUBLE NOT NULL,
-	`longitude`	DOUBLE NOT NULL,
+	`latitude`	REAL NOT NULL,
+	`longitude`	REAL NOT NULL,
 	PRIMARY KEY(`id`)
 );
 

@@ -42,12 +42,12 @@ public final class OsmRoadBuilderTest {
   @Before
   public void setUp() {
     mGraph = new RoadGraph<>();
-    final RoadNode firstNode = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode secondNode = new RoadNode(2L, 2.0, 2.0);
-    final RoadNode thirdNode = new RoadNode(3L, 3.0, 3.0);
-    final RoadNode fourthNode = new RoadNode(4L, 4.0, 4.0);
-    final RoadNode fifthNode = new RoadNode(5L, 5.0, 5.0);
-    final RoadNode sixthNode = new RoadNode(6L, 6.0, 6.0);
+    final RoadNode firstNode = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode secondNode = new RoadNode(2L, 2.0F, 2.0F);
+    final RoadNode thirdNode = new RoadNode(3L, 3.0F, 3.0F);
+    final RoadNode fourthNode = new RoadNode(4L, 4.0F, 4.0F);
+    final RoadNode fifthNode = new RoadNode(5L, 5.0F, 5.0F);
+    final RoadNode sixthNode = new RoadNode(6L, 6.0F, 6.0F);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -117,8 +117,8 @@ public final class OsmRoadBuilderTest {
     final double costBefore = edge.getCost();
 
     final RoadNode node = mGraph.getNodeById(6L).get();
-    node.setLatitude(100.0);
-    node.setLongitude(100.0);
+    node.setLatitude(100.0F);
+    node.setLongitude(100.0F);
 
     mBuilder.complete();
     Assert.assertTrue(edge.getCost() > costBefore);

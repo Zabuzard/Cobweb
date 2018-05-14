@@ -205,8 +205,8 @@ public class MemoryDatabase extends ADatabase {
   private void addOsmNode(final OsmNode node) {
     // Retrieve information
     final long id = node.getId();
-    final double latitude = node.getLatitude();
-    final double longitude = node.getLongitude();
+    final float latitude = (float) node.getLatitude();
+    final float longitude = (float) node.getLongitude();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
 

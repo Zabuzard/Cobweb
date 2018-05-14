@@ -33,8 +33,8 @@ public final class RoutingUtilTest {
   @SuppressWarnings("static-method")
   @Test
   public void testDistanceEquiRect() {
-    RoadNode first = new RoadNode(1L, 50.046725, -5.423972);
-    RoadNode second = new RoadNode(2L, 58.574237, -3.156773);
+    RoadNode first = new RoadNode(1L, 50.046725F, -5.423972F);
+    RoadNode second = new RoadNode(2L, 58.574237F, -3.156773F);
     Assert.assertEquals(0.0, RoutingUtil.distanceEquiRect(first, first), 0.0001);
     Assert.assertEquals(0.0, RoutingUtil.distanceEquiRect(second, second), 0.0001);
     Assert.assertEquals(960_000, RoutingUtil.distanceEquiRect(first, second), 1_000.0);
@@ -42,8 +42,8 @@ public final class RoutingUtilTest {
     Assert.assertEquals(RoutingUtil.distanceEquiRect(first, second), RoutingUtil.distanceEquiRect(second, first),
         0.0001);
 
-    first = new RoadNode(1L, 47.996452, 7.841485);
-    second = new RoadNode(2L, 47.996331, 7.841392);
+    first = new RoadNode(1L, 47.996452F, 7.841485F);
+    second = new RoadNode(2L, 47.996331F, 7.841392F);
     Assert.assertEquals(15, RoutingUtil.distanceEquiRect(first, second), 0.3);
     Assert.assertEquals(RoutingUtil.distanceEquiRect(first, second), RoutingUtil.distanceEquiRect(second, first),
         0.0001);

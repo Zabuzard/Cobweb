@@ -135,19 +135,19 @@ public final class MemoryDatabaseTest {
     Assert.assertFalse(nodeIds.contains(10L));
     Assert.assertTrue(nodeIds.contains(3L));
 
-    final Set<Double> latitudes =
+    final Set<Float> latitudes =
         allSpatialNodeData.stream().map(SpatialNodeData::getLatitude).collect(Collectors.toSet());
     Assert.assertEquals(3, latitudes.size());
-    Assert.assertTrue(latitudes.contains(10.0));
-    Assert.assertTrue(latitudes.contains(20.0));
-    Assert.assertTrue(latitudes.contains(30.0));
+    Assert.assertTrue(latitudes.contains(10.0F));
+    Assert.assertTrue(latitudes.contains(20.0F));
+    Assert.assertTrue(latitudes.contains(30.0F));
 
-    final Set<Double> longitudes =
+    final Set<Float> longitudes =
         allSpatialNodeData.stream().map(SpatialNodeData::getLongitude).collect(Collectors.toSet());
     Assert.assertEquals(3, longitudes.size());
-    Assert.assertTrue(longitudes.contains(10.0));
-    Assert.assertTrue(longitudes.contains(20.0));
-    Assert.assertTrue(longitudes.contains(30.0));
+    Assert.assertTrue(longitudes.contains(10.0F));
+    Assert.assertTrue(longitudes.contains(20.0F));
+    Assert.assertTrue(longitudes.contains(30.0F));
   }
 
   /**

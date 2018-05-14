@@ -20,7 +20,7 @@ public final class RouteElement {
    * A list of latitude and longitude coordinates belonging to this element.
    * Thus, the size of the arrays is <tt>2</tt>.
    */
-  private List<double[]> mGeom;
+  private List<float[]> mGeom;
   /**
    * The transportation mode belonging to this element.
    */
@@ -46,7 +46,7 @@ public final class RouteElement {
    *             element
    */
   public RouteElement(final ERouteElementType type, final ETransportationMode mode, final String name,
-      final List<double[]> geom) {
+      final List<float[]> geom) {
     mName = name;
     mGeom = geom;
 
@@ -64,12 +64,8 @@ public final class RouteElement {
    * @param geom A list of latitude and longitude coordinates belonging to this
    *             element. The size of the arrays must be <tt>2</tt>.
    */
-  public RouteElement(final ERouteElementType type, final String name, final List<double[]> geom) {
-    mName = name;
-    mGeom = geom;
-
-    setType(type);
-    setMode(ETransportationMode.IRRELEVANT);
+  public RouteElement(final ERouteElementType type, final String name, final List<float[]> geom) {
+    this(type, ETransportationMode.IRRELEVANT, name, geom);
   }
 
   /**
@@ -87,7 +83,7 @@ public final class RouteElement {
    *
    * @return A list of latitude and longitude coordinates
    */
-  public List<double[]> getGeom() {
+  public List<float[]> getGeom() {
     return mGeom;
   }
 

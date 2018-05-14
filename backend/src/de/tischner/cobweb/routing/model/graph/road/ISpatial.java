@@ -11,26 +11,26 @@ public interface ISpatial {
    *
    * @return The latitude of the object
    */
-  double getLatitude();
+  float getLatitude();
 
   /**
    * Gets the longitude of the object in degrees.
    *
    * @return The longitude of the object
    */
-  double getLongitude();
+  float getLongitude();
 
   /**
    * Sets the latitude of the object.
    *
    * @param latitude The latitude to set, in degrees
    */
-  void setLatitude(double latitude);
+  void setLatitude(float latitude);
 
   /**
    * Sets the longitude of the object.
    *
    * @param longitude The longitude to set, in degrees
    */
-  void setLongitude(double longitude);
+  void setLongitude(float longitude);
 }

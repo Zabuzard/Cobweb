@@ -25,7 +25,7 @@ public final class RouteElementTest {
   @Before
   public void setUp() {
     mElement = new RouteElement(ERouteElementType.PATH, ETransportationMode.BIKE, "Main street",
-        Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
+        Arrays.asList(new float[] { 1.0F, 1.0F }, new float[] { 2.0F, 2.0F }, new float[] { 4.0F, 4.0F }));
   }
 
   /**
@@ -34,16 +34,16 @@ public final class RouteElementTest {
    */
   @Test
   public void testGetGeom() {
-    final List<double[]> geom = mElement.getGeom();
+    final List<float[]> geom = mElement.getGeom();
     Assert.assertEquals(3, geom.size());
-    final Iterator<double[]> geomIter = geom.iterator();
+    final Iterator<float[]> geomIter = geom.iterator();
 
-    final double[] first = geomIter.next();
-    Assert.assertArrayEquals(new double[] { 1.0, 1.0 }, first, 0.0001);
-    final double[] second = geomIter.next();
-    Assert.assertArrayEquals(new double[] { 2.0, 2.0 }, second, 0.0001);
-    final double[] third = geomIter.next();
-    Assert.assertArrayEquals(new double[] { 4.0, 4.0 }, third, 0.0001);
+    final float[] first = geomIter.next();
+    Assert.assertArrayEquals(new float[] { 1.0F, 1.0F }, first, 0.0001F);
+    final float[] second = geomIter.next();
+    Assert.assertArrayEquals(new float[] { 2.0F, 2.0F }, second, 0.0001F);
+    final float[] third = geomIter.next();
+    Assert.assertArrayEquals(new float[] { 4.0F, 4.0F }, third, 0.0001F);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class RouteElementTest {
   public void testGetName() {
     Assert.assertEquals("Main street", mElement.getName());
     Assert.assertEquals("",
-        new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 0.0, 0.0 })).getName());
+        new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new float[] { 0.0F, 0.0F })).getName());
   }
 
   /**
@@ -84,11 +84,11 @@ public final class RouteElementTest {
   public void testRouteElementERouteElementTypeETransportationModeStringListOfdouble() {
     try {
       new RouteElement(ERouteElementType.PATH, ETransportationMode.BIKE, "Main street",
-          Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
+          Arrays.asList(new float[] { 1.0F, 1.0F }, new float[] { 2.0F, 2.0F }, new float[] { 4.0F, 4.0F }));
       new RouteElement(ERouteElementType.PATH, ETransportationMode.CAR, "",
-          Arrays.asList(new double[] { -1.0, -1.0 }, new double[] { 4.0, 4.0 }, new double[] { 0.0, 0.0 }));
+          Arrays.asList(new float[] { -1.0F, -1.0F }, new float[] { 4.0F, 4.0F }, new float[] { 0.0F, 0.0F }));
       new RouteElement(ERouteElementType.NODE, ETransportationMode.BIKE, "Main street 5",
-          Arrays.asList(new double[] { 1.0, 1.0 }));
+          Arrays.asList(new float[] { 1.0F, 1.0F }));
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -102,11 +102,11 @@ public final class RouteElementTest {
   @Test
   public void testRouteElementERouteElementTypeStringListOfdouble() {
     try {
-      new RouteElement(ERouteElementType.NODE, "Main street 5", Arrays.asList(new double[] { 1.0, 1.0 }));
-      new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { 0.0, 0.0 }));
-      new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new double[] { -5.0, -5.0 }));
+      new RouteElement(ERouteElementType.NODE, "Main street 5", Arrays.asList(new float[] { 1.0F, 1.0F }));
+      new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new float[] { 0.0F, 0.0F }));
+      new RouteElement(ERouteElementType.NODE, "", Arrays.asList(new float[] { -5.0F, -5.0F }));
       new RouteElement(ERouteElementType.PATH, "Main street",
-          Arrays.asList(new double[] { 1.0, 1.0 }, new double[] { 2.0, 2.0 }, new double[] { 4.0, 4.0 }));
+          Arrays.asList(new float[] { 1.0F, 1.0F }, new float[] { 2.0F, 2.0F }, new float[] { 4.0F, 4.0F }));
     } catch (final Exception e) {
       Assert.fail();
     }

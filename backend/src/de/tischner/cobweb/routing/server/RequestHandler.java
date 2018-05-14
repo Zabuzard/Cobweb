@@ -178,7 +178,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private RouteElement buildNode(final N node) {
     final String name = mDatabase.getNodeName(node.getId()).orElse("");
-    final double[] coordinates = new double[] { node.getLatitude(), node.getLongitude() };
+    final float[] coordinates = new float[] { node.getLatitude(), node.getLongitude() };
     return new RouteElement(ERouteElementType.NODE, name, Collections.singletonList(coordinates));
   }
 
@@ -191,18 +191,18 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   private RouteElement buildPath(final IPath<N, E> path) {
     // TODO The current way of constructing a name may be inappropriate
     final StringJoiner nameJoiner = new StringJoiner(", ");
-    final List<double[]> geom = new ArrayList<>(path.length() + 1);
+    final List<float[]> geom = new ArrayList<>(path.length() + 1);
 
     // Add the source
     final N source = path.getSource();
-    geom.add(new double[] { source.getLatitude(), source.getLongitude() });
+    geom.add(new float[] { source.getLatitude(), source.getLongitude() });
     mDatabase.getNodeName(source.getId()).ifPresent(nameJoiner::add);
 
     // Add all edge destinations
     long lastWayId = -1;
     for (final E edge : path) {
       final N edgeDestination = edge.getDestination();
-      geom.add(new double[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
+      geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
 
       final long wayId = edge.getId();
       if (wayId != lastWayId) {

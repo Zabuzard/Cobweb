@@ -23,8 +23,8 @@ public final class RoadEdgeTest {
    */
   @Before
   public void setUp() {
-    final RoadNode first = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode second = new RoadNode(2L, 2.0, 2.0);
+    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
     mEdge = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
   }
 
@@ -34,8 +34,8 @@ public final class RoadEdgeTest {
    */
   @Test
   public void testEqualsObject() {
-    final RoadNode first = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode second = new RoadNode(2L, 2.0, 2.0);
+    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
     RoadEdge<RoadNode> other = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
     Assert.assertEquals(mEdge, other);
 
@@ -91,8 +91,8 @@ public final class RoadEdgeTest {
    */
   @Test
   public void testHashCode() {
-    final RoadNode first = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode second = new RoadNode(2L, 2.0, 2.0);
+    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
     RoadEdge<RoadNode> other = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
     Assert.assertEquals(mEdge.hashCode(), other.hashCode());
 
@@ -113,8 +113,8 @@ public final class RoadEdgeTest {
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testRoadEdge() {
-    final RoadNode first = new RoadNode(1L, 1.0, 1.0);
-    final RoadNode second = new RoadNode(2L, 2.0, 2.0);
+    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
     try {
       new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
       new RoadEdge<>(-1L, first, second, EHighwayType.ROAD, 100);
@@ -141,15 +141,15 @@ public final class RoadEdgeTest {
    */
   @Test
   public void testUpdateCost() {
-    final RoadNode first = new RoadNode(1L, 0.0, 0.0);
-    final RoadNode second = new RoadNode(2L, 0.0, 0.0);
+    final RoadNode first = new RoadNode(1L, 0.0F, 0.0F);
+    final RoadNode second = new RoadNode(2L, 0.0F, 0.0F);
     mEdge = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
     Assert.assertEquals(0.0, mEdge.getCost(), 0.0001);
 
-    first.setLatitude(1.0);
-    first.setLongitude(1.0);
-    second.setLatitude(2.0);
-    second.setLongitude(2.0);
+    first.setLatitude(1.0F);
+    first.setLongitude(1.0F);
+    second.setLatitude(2.0F);
+    second.setLongitude(2.0F);
     mEdge.updateCost();
     Assert.assertTrue(mEdge.getCost() > 0);
   }

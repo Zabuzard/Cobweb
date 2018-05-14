@@ -64,8 +64,8 @@ public final class ExternalDatabase extends ADatabase {
   private static void queueOsmNode(final OsmNode node, final Connection connection) throws SQLException {
     // Retrieve information
     final long id = node.getId();
-    final double latitude = node.getLatitude();
-    final double longitude = node.getLongitude();
+    final float latitude = (float) node.getLatitude();
+    final float longitude = (float) node.getLongitude();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
     final String highway = tagToValue.get(OsmParseUtil.HIGHWAY_TAG);
@@ -73,8 +73,8 @@ public final class ExternalDatabase extends ADatabase {
     // Insert node data
     try (PreparedStatement nodeStatement = connection.prepareStatement(DatabaseUtil.QUERY_INSERT_NODE)) {
       nodeStatement.setLong(1, id);
-      nodeStatement.setDouble(2, latitude);
-      nodeStatement.setDouble(3, longitude);
+      nodeStatement.setFloat(2, latitude);
+      nodeStatement.setFloat(3, longitude);
       nodeStatement.executeUpdate();
     }
 
@@ -294,8 +294,8 @@ public final class ExternalDatabase extends ADatabase {
         try (ResultSet result = statement.executeQuery()) {
           while (result.next()) {
             final long id = result.getLong(1);
-            final double latitude = result.getDouble(2);
-            final double longitude = result.getDouble(3);
+            final float latitude = result.getFloat(2);
+            final float longitude = result.getFloat(3);
             nodeData.add(new SpatialNodeData(id, latitude, longitude));
           }
         }

@@ -14,11 +14,11 @@ public final class SpatialNodeData {
   /**
    * Latitude of the node.
    */
-  private final double mLatitude;
+  private final float mLatitude;
   /**
    * Longitude of the node.
    */
-  private final double mLongitude;
+  private final float mLongitude;
 
   /**
    * Creates a new spatial node data object with the given attributes.
@@ -27,7 +27,7 @@ public final class SpatialNodeData {
    * @param latitude  Latitude of the node
    * @param longitude Longitude of the node
    */
-  public SpatialNodeData(final long id, final double latitude, final double longitude) {
+  public SpatialNodeData(final long id, final float latitude, final float longitude) {
     mId = id;
     mLatitude = latitude;
     mLongitude = longitude;
@@ -47,7 +47,7 @@ public final class SpatialNodeData {
    *
    * @return The latitude of the node
    */
-  public double getLatitude() {
+  public float getLatitude() {
     return mLatitude;
   }
 
@@ -56,7 +56,7 @@ public final class SpatialNodeData {
    *
    * @return The longitude of the node
    */
-  public double getLongitude() {
+  public float getLongitude() {
     return mLongitude;
   }
 }

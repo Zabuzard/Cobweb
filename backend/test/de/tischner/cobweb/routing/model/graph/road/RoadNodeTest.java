@@ -20,7 +20,7 @@ public final class RoadNodeTest {
    */
   @Before
   public void setUp() {
-    mNode = new RoadNode(1L, 1.0, 1.0);
+    mNode = new RoadNode(1L, 1.0F, 1.0F);
   }
 
   /**
@@ -29,8 +29,8 @@ public final class RoadNodeTest {
    */
   @Test
   public void testEqualsObject() {
-    Assert.assertEquals(mNode, new RoadNode(1L, 1.0, 1.0));
-    Assert.assertNotEquals(mNode, new RoadNode(2L, 1.0, 1.0));
+    Assert.assertEquals(mNode, new RoadNode(1L, 1.0F, 1.0F));
+    Assert.assertNotEquals(mNode, new RoadNode(2L, 1.0F, 1.0F));
   }
 
   /**
@@ -48,7 +48,7 @@ public final class RoadNodeTest {
    */
   @Test
   public void testGetLatitude() {
-    Assert.assertEquals(1.0, mNode.getLatitude(), 0.0001);
+    Assert.assertEquals(1.0F, mNode.getLatitude(), 0.0001F);
   }
 
   /**
@@ -57,7 +57,7 @@ public final class RoadNodeTest {
    */
   @Test
   public void testGetLongitude() {
-    Assert.assertEquals(1.0, mNode.getLongitude(), 0.0001);
+    Assert.assertEquals(1.0F, mNode.getLongitude(), 0.0001F);
   }
 
   /**
@@ -66,21 +66,21 @@ public final class RoadNodeTest {
    */
   @Test
   public void testHashCode() {
-    Assert.assertEquals(mNode.hashCode(), new RoadNode(1L, 1.0, 1.0).hashCode());
-    Assert.assertNotEquals(mNode.hashCode(), new RoadNode(2L, 1.0, 1.0).hashCode());
+    Assert.assertEquals(mNode.hashCode(), new RoadNode(1L, 1.0F, 1.0F).hashCode());
+    Assert.assertNotEquals(mNode.hashCode(), new RoadNode(2L, 1.0F, 1.0F).hashCode());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#RoadNode(long, double, double)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#RoadNode(long, float, float)}.
    */
   @SuppressWarnings({ "static-method", "unused" })
   @Test
   public void testRoadNode() {
     try {
-      new RoadNode(1L, 1.0, 1.0);
-      new RoadNode(0L, 0.0, 0.0);
-      new RoadNode(-1L, -1.0, -1.0);
+      new RoadNode(1L, 1.0F, 1.0F);
+      new RoadNode(0L, 0.0F, 0.0F);
+      new RoadNode(-1L, -1.0F, -1.0F);
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -88,24 +88,24 @@ public final class RoadNodeTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#setLatitude(double)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#setLatitude(float)}.
    */
   @Test
   public void testSetLatitude() {
-    Assert.assertEquals(1.0, mNode.getLatitude(), 0.0001);
-    mNode.setLatitude(2.0);
-    Assert.assertEquals(2.0, mNode.getLatitude(), 0.0001);
+    Assert.assertEquals(1.0F, mNode.getLatitude(), 0.0001F);
+    mNode.setLatitude(2.0F);
+    Assert.assertEquals(2.0F, mNode.getLatitude(), 0.0001F);
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#setLongitude(double)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#setLongitude(float)}.
    */
   @Test
   public void testSetLongitude() {
-    Assert.assertEquals(1.0, mNode.getLongitude(), 0.0001);
-    mNode.setLongitude(2.0);
-    Assert.assertEquals(2.0, mNode.getLongitude(), 0.0001);
+    Assert.assertEquals(1.0F, mNode.getLongitude(), 0.0001F);
+    mNode.setLongitude(2.0F);
+    Assert.assertEquals(2.0F, mNode.getLongitude(), 0.0001F);
   }
 
 }
