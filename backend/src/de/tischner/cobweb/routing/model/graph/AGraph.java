@@ -4,11 +4,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
+
+import de.tischner.cobweb.util.ArraySet;
 
 /**
  * Abstract implementation of the {@link IGraph} model. Implements some utility
@@ -32,16 +33,10 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * The amount of edges in this graph.
    */
   private int mAmountOfEdges;
-  // TODO The value should be implemented using arrays under a certain size
-  // threshold since the in-degree for graphs is typically low, see Freiburg:
-  // {0=75, 1=64234, 2=588600, 3=57354, 4=6164, 5=32}
   /**
    * A map that connects nodes to their incoming edges.
    */
   private final Map<N, Set<E>> mNodeToIncomingEdges;
-  // TODO The value should be implemented using arrays under a certain size
-  // threshold since the out-degree for graphs is typically low, see Freiburg:
-  // {0=91, 1=64584, 2=587891, 3=57661, 4=6197, 5=35}
   /**
    * A map that connects nodes to their outgoing edges.
    */
@@ -64,8 +59,28 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    */
   @Override
   public boolean addEdge(final E edge) {
-    boolean wasAdded = getNodeToOutgoingEdges().computeIfAbsent(edge.getSource(), k -> new HashSet<>()).add(edge);
-    wasAdded |= getNodeToIncomingEdges().computeIfAbsent(edge.getDestination(), k -> new HashSet<>()).add(edge);
+    boolean wasAdded;
+
+    // Add edge to outgoing edges of its source
+    Set<E> outgoingEdges = getNodeToOutgoingEdges().get(edge.getSource());
+    if (outgoingEdges == null) {
+      outgoingEdges = new ArraySet<>(edge);
+      getNodeToOutgoingEdges().put(edge.getSource(), outgoingEdges);
+      wasAdded = true;
+    } else {
+      wasAdded = outgoingEdges.add(edge);
+    }
+
+    // Add edge to incoming edges of its destination
+    Set<E> incomingEdges = getNodeToIncomingEdges().get(edge.getDestination());
+    if (incomingEdges == null) {
+      incomingEdges = new ArraySet<>(edge);
+      getNodeToIncomingEdges().put(edge.getDestination(), incomingEdges);
+      wasAdded = true;
+    } else {
+      wasAdded |= incomingEdges.add(edge);
+    }
+
     if (wasAdded) {
       mAmountOfEdges++;
     }
