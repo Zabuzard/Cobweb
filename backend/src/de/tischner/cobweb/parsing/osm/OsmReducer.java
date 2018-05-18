@@ -8,10 +8,10 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
+import org.eclipse.collections.api.set.primitive.MutableLongSet;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public final class OsmReducer implements IOsmFileHandler {
    * Set containing the OSM IDs of the nodes to keep for the currently streamed
    * file.
    */
-  private Set<Long> mNodeIdsToKeep;
+  private MutableLongSet mNodeIdsToKeep;
   /**
    * The output stream to use for writing the reduced file to, only valid in the
    * second pass. Will be closed after usage.
@@ -210,7 +210,7 @@ public final class OsmReducer implements IOsmFileHandler {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("First pass for: " + file);
       }
-      mNodeIdsToKeep = new HashSet<>();
+      mNodeIdsToKeep = LongSets.mutable.empty();
       mFile = file;
     }
     return true;

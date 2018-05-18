@@ -2,11 +2,13 @@ package de.tischner.cobweb.routing.model.graph.road;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import de.tischner.cobweb.routing.model.graph.AGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
@@ -40,7 +42,7 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
   /**
    * A map connecting node IDs to their corresponding nodes.
    */
-  private final Map<Integer, N> mIdToNode;
+  private final MutableIntObjectMap<N> mIdToNode;
   /**
    * Whether or not the graph is currently reversed.
    */
@@ -58,7 +60,8 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
    * Creates a new initially empty road graph.
    */
   public RoadGraph() {
-    mIdToNode = new HashMap<>();
+    // TODO Exchange the map by some array
+    mIdToNode = IntObjectMaps.mutable.empty();
     mLastNodeId = LAST_ID;
     mLastWayId = LAST_ID;
   }

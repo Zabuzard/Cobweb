@@ -4,10 +4,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
 import de.tischner.cobweb.routing.algorithms.scc.ISccComputation;
 import de.tischner.cobweb.routing.algorithms.scc.StronglyConnectedComponent;
@@ -56,11 +57,11 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   /**
    * A map connecting nodes to their index.
    */
-  private final Map<N, Integer> mNodeToIndex;
+  private final MutableObjectIntMap<N> mNodeToIndex;
   /**
    * A map connecting nodes to their low link value.
    */
-  private final Map<N, Integer> mNodeToLowLink;
+  private final ObjectIntHashMap<N> mNodeToLowLink;
   /**
    * A collection containing all SCCs of the graph, if computed already. Else
    * empty.
@@ -74,8 +75,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
    */
   public ATarjan(final G graph) {
     mGraph = graph;
-    mNodeToIndex = new HashMap<>(graph.size());
-    mNodeToLowLink = new HashMap<>(graph.size());
+    mNodeToIndex = new ObjectIntHashMap<>(graph.size());
+    mNodeToLowLink = new ObjectIntHashMap<>(graph.size());
     mDeque = new ArrayDeque<>();
     mInDeque = new HashSet<>();
     mSccs = new ArrayList<>();

@@ -2,15 +2,21 @@ package de.tischner.cobweb.db;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import org.eclipse.collections.api.map.primitive.MutableIntLongMap;
+import org.eclipse.collections.api.map.primitive.MutableLongIntMap;
+import org.eclipse.collections.api.map.primitive.MutableLongObjectMap;
+import org.eclipse.collections.api.map.primitive.MutableObjectLongMap;
+import org.eclipse.collections.impl.factory.primitive.IntLongMaps;
+import org.eclipse.collections.impl.factory.primitive.LongIntMaps;
+import org.eclipse.collections.impl.factory.primitive.LongObjectMaps;
+import org.eclipse.collections.impl.factory.primitive.ObjectLongMaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,43 +49,43 @@ public class MemoryDatabase extends ADatabase {
   /**
    * Map connecting internal node IDs to their OSM IDs.
    */
-  private final Map<Integer, Long> mInternalToNodeId;
+  private final MutableIntLongMap mInternalToNodeId;
   /**
    * Map connecting internal way IDs to their OSM IDs.
    */
-  private final Map<Integer, Long> mInternalToWayId;
+  private final MutableIntLongMap mInternalToWayId;
   /**
    * Map connecting node names to their unique OSM IDs.
    */
-  private final Map<String, Long> mNameToNode;
+  private final MutableObjectLongMap<String> mNameToNode;
   /**
    * Map connecting way names to their unique OSM IDs.
    */
-  private final Map<String, Long> mNameToWay;
+  private final MutableObjectLongMap<String> mNameToWay;
   /**
    * Map connecting nodes IDs to their OSM name.
    */
-  private final Map<Long, String> mNodeToName;
+  private final MutableLongObjectMap<String> mNodeToName;
   /**
    * Map connecting node IDs to their spatial data.
    */
-  private final Map<Long, SpatialNodeData> mNodeToSpatialData;
+  private final MutableLongObjectMap<SpatialNodeData> mNodeToSpatialData;
   /**
    * Map connecting OSM node IDs to their internal IDs.
    */
-  private final Map<Long, Integer> mOsmToNodeId;
+  private final MutableLongIntMap mOsmToNodeId;
   /**
    * Map connecting OSM way IDs to their internal IDs.
    */
-  private final Map<Long, Integer> mOsmToWayId;
+  private final MutableLongIntMap mOsmToWayId;
   /**
    * Map connecting way IDs to their highway data.
    */
-  private final Map<Long, HighwayData> mWayToHighwayData;
+  private final MutableLongObjectMap<HighwayData> mWayToHighwayData;
   /**
    * Map connecting way IDs to their OSM names.
    */
-  private final Map<Long, String> mWayToName;
+  private final MutableLongObjectMap<String> mWayToName;
 
   /**
    * Creates a new empty database.<br>
@@ -88,16 +94,16 @@ public class MemoryDatabase extends ADatabase {
    * when finished using it.
    */
   public MemoryDatabase() {
-    mNameToNode = new HashMap<>();
-    mNodeToSpatialData = new HashMap<>();
-    mNameToWay = new HashMap<>();
-    mNodeToName = new HashMap<>();
-    mWayToName = new HashMap<>();
-    mWayToHighwayData = new HashMap<>();
-    mInternalToNodeId = new HashMap<>();
-    mInternalToWayId = new HashMap<>();
-    mOsmToNodeId = new HashMap<>();
-    mOsmToWayId = new HashMap<>();
+    mNameToNode = ObjectLongMaps.mutable.empty();
+    mNodeToSpatialData = LongObjectMaps.mutable.empty();
+    mNameToWay = ObjectLongMaps.mutable.empty();
+    mNodeToName = LongObjectMaps.mutable.empty();
+    mWayToName = LongObjectMaps.mutable.empty();
+    mWayToHighwayData = LongObjectMaps.mutable.empty();
+    mInternalToNodeId = IntLongMaps.mutable.empty();
+    mInternalToWayId = IntLongMaps.mutable.empty();
+    mOsmToNodeId = LongIntMaps.mutable.empty();
+    mOsmToWayId = LongIntMaps.mutable.empty();
   }
 
   /*
@@ -106,8 +112,7 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Collection<NodeNameData> getAllNodeNameData() {
-    return mNodeToName.entrySet().stream().map(entry -> new NodeNameData(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
+    return mNodeToName.keyValuesView().collect(entry -> new NodeNameData(entry.getOne(), entry.getTwo())).toList();
   }
 
   /*
@@ -132,7 +137,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Integer> getInternalNodeByOsm(final long osmId) {
-    return Optional.ofNullable(mOsmToNodeId.get(osmId));
+    if (mOsmToNodeId.containsKey(osmId)) {
+      return Optional.of(mOsmToNodeId.get(osmId));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -141,7 +149,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Integer> getInternalWayByOsm(final long osmId) {
-    return Optional.ofNullable(mOsmToWayId.get(osmId));
+    if (mOsmToWayId.containsKey(osmId)) {
+      return Optional.of(mOsmToWayId.get(osmId));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -150,7 +161,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getNodeByName(final String name) {
-    return Optional.ofNullable(mNameToNode.get(name));
+    if (mNameToNode.containsKey(name)) {
+      return Optional.of(mNameToNode.get(name));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -168,7 +182,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getOsmNodeByInternal(final int internalId) {
-    return Optional.ofNullable(mInternalToNodeId.get(internalId));
+    if (mInternalToNodeId.containsKey(internalId)) {
+      return Optional.of(mInternalToNodeId.get(internalId));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -177,7 +194,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getOsmWayByInternal(final int internalId) {
-    return Optional.ofNullable(mInternalToWayId.get(internalId));
+    if (mInternalToWayId.containsKey(internalId)) {
+      return Optional.of(mInternalToWayId.get(internalId));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -207,7 +227,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public Optional<Long> getWayByName(final String name) {
-    return Optional.ofNullable(mNameToWay.get(name));
+    if (mNameToWay.containsKey(name)) {
+      return Optional.of(mNameToWay.get(name));
+    }
+    return Optional.empty();
   }
 
   /*
@@ -236,6 +259,10 @@ public class MemoryDatabase extends ADatabase {
    */
   @Override
   public void offerIdMappings(final Stream<IdMapping> mappings, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Offering {} mappings to the database", size);
+    }
+
     mappings.forEach(mapping -> {
       if (mapping.isNode()) {
         mInternalToNodeId.put(mapping.getInternalId(), mapping.getOsmId());

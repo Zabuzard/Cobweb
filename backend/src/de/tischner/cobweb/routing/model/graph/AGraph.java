@@ -46,6 +46,7 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * Creates a new initially empty graph.
    */
   public AGraph() {
+    // TODO Exchange the maps by some arrays
     mNodeToIncomingEdges = new HashMap<>();
     mNodeToOutgoingEdges = new HashMap<>();
     mAmountOfEdges = 0;

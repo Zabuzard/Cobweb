@@ -1,9 +1,10 @@
 package de.tischner.cobweb.searching.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import de.tischner.cobweb.db.NodeNameData;
 import de.zabuza.lexisearch.indexing.IInvertedIndex;
@@ -45,13 +46,13 @@ public final class NodeNameSet implements IKeyRecordSet<IKeyRecord<String>, Stri
   /**
    * Map which connects record IDs to their records.
    */
-  private final Map<Integer, IKeyRecord<String>> mIdToRecord;
+  private final MutableIntObjectMap<IKeyRecord<String>> mIdToRecord;
 
   /**
    * Creates a new empty node name set.
    */
   public NodeNameSet() {
-    mIdToRecord = new HashMap<>();
+    mIdToRecord = IntObjectMaps.mutable.empty();
   }
 
   /*

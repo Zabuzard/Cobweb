@@ -2,11 +2,12 @@ package de.tischner.cobweb.routing.model.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
 
@@ -24,13 +25,13 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
   /**
    * A map connecting unique IDs to nodes.
    */
-  private final Map<Integer, BasicNode> mNodes;
+  private final MutableIntObjectMap<BasicNode> mNodes;
 
   /**
    * Creates a new initially empty graph.
    */
   public BasicGraph() {
-    mNodes = new HashMap<>();
+    mNodes = IntObjectMaps.mutable.empty();
   }
 
   /*

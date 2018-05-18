@@ -64,6 +64,7 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
    * @param landmarkProvider The provider to use for generation of the landmarks
    */
   public LandmarkMetric(final int amount, final G graph, final ILandmarkProvider<N> landmarkProvider) {
+    // TODO These nested maps need to be optimized for space
     mLandmarkToNodeDistance = new NestedMap<>();
     mNodeToLandmarkDistance = new NestedMap<>();
 

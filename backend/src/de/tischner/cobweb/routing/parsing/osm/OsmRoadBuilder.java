@@ -1,7 +1,9 @@
 package de.tischner.cobweb.routing.parsing.osm;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.collections.api.map.primitive.MutableLongIntMap;
+import org.eclipse.collections.impl.factory.primitive.LongIntMaps;
 
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
@@ -38,11 +40,11 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   /**
    * A map connecting OSM node IDs to the IDs used by the graph.
    */
-  private final Map<Long, Integer> mOsmToNodeId;
+  private final MutableLongIntMap mOsmToNodeId;
   /**
    * A map connecting OSM way IDs to the IDs used by the graph.
    */
-  private final Map<Long, Integer> mOsmToWayId;
+  private final MutableLongIntMap mOsmToWayId;
 
   /**
    * Creates a new OSM road builder which operates on the given graph.
@@ -54,8 +56,8 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   public OsmRoadBuilder(final G graph, final IUniqueIdGenerator idGenerator) {
     mGraph = graph;
     mIdGenerator = idGenerator;
-    mOsmToNodeId = new HashMap<>();
-    mOsmToWayId = new HashMap<>();
+    mOsmToNodeId = LongIntMaps.mutable.empty();
+    mOsmToWayId = LongIntMaps.mutable.empty();
   }
 
   /**
@@ -68,10 +70,10 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   @Override
   public RoadEdge<RoadNode> buildEdge(final OsmWay way, final long sourceIdOsm, final long destinationIdOsm)
       throws ParseException {
-    final int sourceId = mOsmToNodeId.computeIfAbsent(sourceIdOsm, key -> {
+    final int sourceId = mOsmToNodeId.getIfAbsentPut(sourceIdOsm, () -> {
       throw new ParseException();
     });
-    final int destinationId = mOsmToNodeId.computeIfAbsent(destinationIdOsm, key -> {
+    final int destinationId = mOsmToNodeId.getIfAbsentPut(destinationIdOsm, () -> {
       throw new ParseException();
     });
     final RoadNode source = mGraph.getNodeById(sourceId).orElseThrow(() -> new ParseException());
@@ -83,7 +85,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
     final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
 
     // Lookup if the way is already known or generate a new ID
-    final int wayId = mOsmToWayId.computeIfAbsent(way.getId(), key -> mIdGenerator.generateUniqueWayId());
+    final int wayId = mOsmToWayId.getIfAbsentPut(way.getId(), () -> mIdGenerator.generateUniqueWayId());
     return new RoadEdge<>(wayId, source, destination, type, maxSpeed);
   }
 
@@ -95,7 +97,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   @Override
   public RoadNode buildNode(final OsmNode node) {
     // Lookup if the node is already known or generate a new ID
-    final int nodeId = mOsmToNodeId.computeIfAbsent(node.getId(), key -> mIdGenerator.generateUniqueNodeId());
+    final int nodeId = mOsmToNodeId.getIfAbsentPut(node.getId(), () -> mIdGenerator.generateUniqueNodeId());
     return new RoadNode(nodeId, (float) node.getLatitude(), (float) node.getLongitude());
   }
 
