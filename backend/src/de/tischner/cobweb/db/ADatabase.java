@@ -3,6 +3,7 @@ package de.tischner.cobweb.db;
 import java.util.Collection;
 import java.util.stream.StreamSupport;
 
+import de.tischner.cobweb.routing.parsing.osm.IdMapping;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 
 /**
@@ -32,6 +33,17 @@ public abstract class ADatabase implements IRoutingDatabase, INameSearchDatabase
   @Override
   public Collection<SpatialNodeData> getSpatialNodeData(final Iterable<Long> nodeIds, final int size) {
     return getSpatialNodeData(StreamSupport.stream(nodeIds.spliterator(), false).mapToLong(l -> (long) l), size);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#offerIdMappings(java.lang.Iterable,
+   * int)
+   */
+  @Override
+  public void offerIdMappings(final Iterable<IdMapping> mappings, final int size) {
+    offerIdMappings(StreamSupport.stream(mappings.spliterator(), false), size);
   }
 
   /*

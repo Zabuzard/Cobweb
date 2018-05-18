@@ -18,14 +18,14 @@ public final class BasicNode implements INode, IHasId, Serializable {
   /**
    * The unique ID of the node.
    */
-  private final long mId;
+  private final int mId;
 
   /**
    * Creates a new basic node with the given unique ID.
    *
    * @param id The unique ID of the node
    */
-  public BasicNode(final long id) {
+  public BasicNode(final int id) {
     mId = id;
   }
 
@@ -56,7 +56,7 @@ public final class BasicNode implements INode, IHasId, Serializable {
    * @see de.tischner.cobweb.routing.model.graph.road.IHasId#getId()
    */
   @Override
-  public long getId() {
+  public int getId() {
     return mId;
   }
 
@@ -68,7 +68,7 @@ public final class BasicNode implements INode, IHasId, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (this.mId ^ (this.mId >>> 32));
+    result = prime * result + this.mId;
     return result;
   }
 

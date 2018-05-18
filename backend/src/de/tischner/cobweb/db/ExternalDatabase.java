@@ -25,6 +25,7 @@ import de.tischner.cobweb.config.IDatabaseConfigProvider;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
+import de.tischner.cobweb.routing.parsing.osm.IdMapping;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
@@ -48,6 +49,34 @@ public final class ExternalDatabase extends ADatabase {
    * The logger to use for logging.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(ExternalDatabase.class);
+
+  /**
+   * Pushes the given ID mapping to the database if not already contained.<br>
+   * <br>
+   * In case multiple mappings are to be pushed, auto-commit should be set to
+   * <tt>false</tt> before calling the method. The method will not force a
+   * commit on its own.
+   *
+   * @param mapping    The mapping to push to the database
+   * @param connection The connection to the database
+   * @throws SQLException If an SQL exception occurred while trying to execute
+   *                      the update
+   */
+  private static void queueMapping(final IdMapping mapping, final Connection connection) throws SQLException {
+    String query;
+    if (mapping.isNode()) {
+      query = DatabaseUtil.QUERY_INSERT_NODE_MAPPING;
+    } else {
+      query = DatabaseUtil.QUERY_INSERT_WAY_MAPPING;
+    }
+
+    // Insert mapping
+    try (PreparedStatement nodeStatement = connection.prepareStatement(query)) {
+      nodeStatement.setInt(1, mapping.getInternalId());
+      nodeStatement.setLong(2, mapping.getOsmId());
+      nodeStatement.executeUpdate();
+    }
+  }
 
   /**
    * Pushes the given OSM node to the database if not already contained.<br>
@@ -218,6 +247,50 @@ public final class ExternalDatabase extends ADatabase {
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getInternalNodeByOsm(long)
+   */
+  @Override
+  public Optional<Integer> getInternalNodeByOsm(final long osmId) {
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_INTERNAL_BY_OSM)) {
+        statement.setLong(1, osmId);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getInt(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting internal node by OSM: {}", osmId, e);
+      return Optional.empty();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getInternalWayByOsm(long)
+   */
+  @Override
+  public Optional<Integer> getInternalWayByOsm(final long osmId) {
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_INTERNAL_BY_OSM)) {
+        statement.setLong(1, osmId);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getInt(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting internal way by OSM: {}", osmId, e);
+      return Optional.empty();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
    */
   @Override
@@ -262,6 +335,50 @@ public final class ExternalDatabase extends ADatabase {
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getOsmNodeByInternal(int)
+   */
+  @Override
+  public Optional<Long> getOsmNodeByInternal(final int internalId) {
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_NODE_OSM_BY_INTERNAL)) {
+        statement.setInt(1, internalId);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getLong(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting OSM node by internal: {}", internalId, e);
+      return Optional.empty();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getOsmWayByInternal(int)
+   */
+  @Override
+  public Optional<Long> getOsmWayByInternal(final int internalId) {
+    try (Connection connection = createConnection()) {
+      try (PreparedStatement statement = connection.prepareStatement(DatabaseUtil.QUERY_WAY_OSM_BY_INTERNAL)) {
+        statement.setInt(1, internalId);
+        try (ResultSet result = statement.executeQuery()) {
+          if (result.next()) {
+            return Optional.of(result.getLong(1));
+          }
+          return Optional.empty();
+        }
+      }
+    } catch (final SQLException e) {
+      LOGGER.error("Error getting OSM way by internal: {}", internalId, e);
+      return Optional.empty();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
    * LongStream, int)
@@ -293,10 +410,11 @@ public final class ExternalDatabase extends ADatabase {
         // Execute the statement and collect the result
         try (ResultSet result = statement.executeQuery()) {
           while (result.next()) {
-            final long id = result.getLong(1);
-            final float latitude = result.getFloat(2);
-            final float longitude = result.getFloat(3);
-            nodeData.add(new SpatialNodeData(id, latitude, longitude));
+            final long osmId = result.getLong(1);
+            final int internalId = result.getInt(2);
+            final float latitude = result.getFloat(3);
+            final float longitude = result.getFloat(4);
+            nodeData.add(new SpatialNodeData(internalId, osmId, latitude, longitude));
           }
         }
       }
@@ -366,6 +484,37 @@ public final class ExternalDatabase extends ADatabase {
       ScriptExecutor.executeScript(initDbScript, createConnection());
     } catch (SQLException | IOException e) {
       throw new ParseException(e);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#offerIdMappings(java.util.stream.
+   * Stream, int)
+   */
+  @Override
+  public void offerIdMappings(final Stream<IdMapping> mappings, final int size) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Offering {} ID mappings to the database", size);
+    }
+    try (Connection connection = createConnection()) {
+      connection.setAutoCommit(false);
+
+      // Queue all queries
+      mappings.forEach(mapping -> {
+        try {
+          ExternalDatabase.queueMapping(mapping, connection);
+        } catch (final SQLException e) {
+          LOGGER.error("Error queueing mapping for database insertion: {}", mapping, e);
+        }
+      });
+
+      // Submit all queries
+      connection.commit();
+      connection.setAutoCommit(true);
+    } catch (final SQLException e) {
+      LOGGER.error("Error offering {} mappings to the database", size, e);
     }
   }
 

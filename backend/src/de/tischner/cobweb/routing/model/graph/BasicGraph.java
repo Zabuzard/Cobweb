@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
 
 /**
  * Basic implementation of a graph which operates on {@link BasicNode}s and
@@ -16,7 +16,7 @@ import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> implements ICanGetNodeById<BasicNode> {
+public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> implements IGetNodeById<BasicNode> {
   /**
    * The serial version UID.
    */
@@ -24,7 +24,7 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
   /**
    * A map connecting unique IDs to nodes.
    */
-  private final Map<Long, BasicNode> mNodes;
+  private final Map<Integer, BasicNode> mNodes;
 
   /**
    * Creates a new initially empty graph.
@@ -51,10 +51,10 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
   /*
    * (non-Javadoc)
    * @see de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#
-   * containsNodeWithId(long)
+   * containsNodeWithId(int)
    */
   @Override
-  public boolean containsNodeWithId(final long id) {
+  public boolean containsNodeWithId(final int id) {
     return mNodes.containsKey(id);
   }
 
@@ -62,10 +62,10 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
    * (non-Javadoc)
    * @see
    * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(
-   * long)
+   * int)
    */
   @Override
-  public Optional<BasicNode> getNodeById(final long id) {
+  public Optional<BasicNode> getNodeById(final int id) {
     return Optional.ofNullable(mNodes.get(id));
   }
 

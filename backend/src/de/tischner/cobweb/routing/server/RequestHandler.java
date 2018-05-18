@@ -19,7 +19,7 @@ import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
 import de.tischner.cobweb.routing.server.model.ERouteElementType;
@@ -45,7 +45,7 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * @param <G> Type of the graph
  */
 public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & ICanGetNodeById<N>> {
+    G extends IGraph<N, E> & IGetNodeById<N>> {
   /**
    * Logger used for logging
    */
@@ -108,12 +108,14 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final long startTime = System.nanoTime();
 
     // Get the source and destination
-    final Optional<N> sourceOptional = mGraph.getNodeById(request.getFrom());
+    final Optional<N> sourceOptional =
+        mDatabase.getInternalNodeByOsm(request.getFrom()).flatMap(id -> mGraph.getNodeById(id));
     if (!sourceOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
       return;
     }
-    final Optional<N> destinationOptional = mGraph.getNodeById(request.getTo());
+    final Optional<N> destinationOptional =
+        mDatabase.getInternalNodeByOsm(request.getTo()).flatMap(id -> mGraph.getNodeById(id));
     if (!destinationOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
       return;
@@ -133,6 +135,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final IPath<N, E> path = pathOptional.get();
     final Journey journey = buildJourney(request, path);
 
+    // TODO Should construction of the result be included in the time
+    // measurement or not? In particular the database lookups take some time.
     final long endTime = System.nanoTime();
 
     // Build and send response
@@ -177,7 +181,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @return The resulting route element
    */
   private RouteElement buildNode(final N node) {
-    final String name = mDatabase.getNodeName(node.getId()).orElse("");
+    final String name = mDatabase.getOsmNodeByInternal(node.getId()).flatMap(mDatabase::getNodeName).orElse("");
     final float[] coordinates = new float[] { node.getLatitude(), node.getLongitude() };
     return new RouteElement(ERouteElementType.NODE, name, Collections.singletonList(coordinates));
   }
@@ -196,17 +200,17 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     // Add the source
     final N source = path.getSource();
     geom.add(new float[] { source.getLatitude(), source.getLongitude() });
-    mDatabase.getNodeName(source.getId()).ifPresent(nameJoiner::add);
+    mDatabase.getOsmNodeByInternal(source.getId()).flatMap(mDatabase::getNodeName).ifPresent(nameJoiner::add);
 
     // Add all edge destinations
-    long lastWayId = -1;
+    int lastWayId = -1;
     for (final E edge : path) {
       final N edgeDestination = edge.getDestination();
       geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
 
-      final long wayId = edge.getId();
+      final int wayId = edge.getId();
       if (wayId != lastWayId) {
-        mDatabase.getWayName(wayId).ifPresent(nameJoiner::add);
+        mDatabase.getOsmWayByInternal(wayId).flatMap(mDatabase::getWayName).ifPresent(nameJoiner::add);
       }
       lastWayId = wayId;
     }

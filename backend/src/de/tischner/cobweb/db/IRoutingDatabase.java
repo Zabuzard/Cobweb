@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import de.tischner.cobweb.routing.parsing.osm.IdMapping;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 
 /**
@@ -44,6 +45,24 @@ public interface IRoutingDatabase {
   Collection<HighwayData> getHighwayData(LongStream wayIds, int size);
 
   /**
+   * Attempts to get the unique internal ID of a node by its OSM ID.
+   *
+   * @param osmId The unique OSM ID of the node
+   * @return The unique internal ID of the node or empty if no node with that
+   *         OSM ID could be found
+   */
+  Optional<Integer> getInternalNodeByOsm(long osmId);
+
+  /**
+   * Attempts to get the unique internal ID of a way by its OSM ID.
+   *
+   * @param osmId The unique OSM ID of the way
+   * @return The unique internal ID of the way or empty if no way with that OSM
+   *         ID could be found
+   */
+  Optional<Integer> getInternalWayByOsm(long osmId);
+
+  /**
    * Attempts to get the unique OSM ID of a node by its name.
    *
    * @param name The name of the node
@@ -60,6 +79,24 @@ public interface IRoutingDatabase {
    *         found
    */
   Optional<String> getNodeName(long id);
+
+  /**
+   * Attempts to get the unique OSM ID of a node by its internal ID.
+   *
+   * @param internalId The unique internal ID of the node
+   * @return The unique OSM ID of the node or empty if no node with that
+   *         internal ID could be found
+   */
+  Optional<Long> getOsmNodeByInternal(int internalId);
+
+  /**
+   * Attempts to get the unique OSM ID of a way by its internal ID.
+   *
+   * @param internalId The unique internal ID of the way
+   * @return The unique OSM ID of the way or empty if no way with that internal
+   *         ID could be found
+   */
+  Optional<Long> getOsmWayByInternal(int internalId);
 
   /**
    * Gets spatial data for all nodes in the database that match one of the given
@@ -115,6 +152,32 @@ public interface IRoutingDatabase {
    * after the database was shutdown, instead create a new one.
    */
   void initialize();
+
+  /**
+   * Offers ID mappings to the database. The database will save all data it did
+   * not already contain.<br>
+   * <br>
+   * To improve performance this method should be called with big amounts of
+   * mappings since a connection will be established for each call.
+   *
+   * @param mappings The mappings to offer
+   * @param size     The amount of mappings to offer, i.e. the size of
+   *                 <tt>mappings</tt>. This value must be set correctly.
+   */
+  void offerIdMappings(Iterable<IdMapping> mappings, int size);
+
+  /**
+   * Offers ID mappings to the database. The database will save all data it did
+   * not already contain.<br>
+   * <br>
+   * To improve performance this method should be called with big amounts of
+   * mappings since a connection will be established for each call.
+   *
+   * @param mappings The mappings to offer
+   * @param size     The amount of mappings to offer, i.e. the size of
+   *                 <tt>mappings</tt>. This value must be set correctly.
+   */
+  void offerIdMappings(Stream<IdMapping> mappings, int size);
 
   /**
    * Offers OSM entities to the database. The database will save all data it did

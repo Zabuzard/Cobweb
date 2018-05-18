@@ -1,6 +1,7 @@
 package de.tischner.cobweb.db;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import com.slimjars.dist.gnu.trove.list.TLongList;
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.parsing.osm.IdMapping;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.impl.Node;
@@ -50,14 +52,23 @@ public final class MemoryDatabaseTest {
     wayTags.add(new Tag("maxspeed", "100"));
     wayTags.add(new Tag("name", "Main street"));
 
-    entities.add(new Node(1, 10, 10, nodeTags));
-    entities.add(new Node(2, 20, 20));
-    entities.add(new Node(3, 30, 30));
-    entities.add(new Way(1, wayNodes, wayTags));
-    entities.add(new Node(4, 40, 40));
-    entities.add(new Node(5, 50, 50));
+    entities.add(new Node(1L, 10.0, 10.0, nodeTags));
+    entities.add(new Node(2L, 20.0, 20.0));
+    entities.add(new Node(3L, 30.0, 30.0));
+    entities.add(new Way(1L, wayNodes, wayTags));
+    entities.add(new Node(4L, 40.0, 40.0));
+    entities.add(new Node(5L, 50.0, 50.0));
 
     mMemoryDatabase.offerOsmEntities(entities, 6);
+
+    final ArrayList<IdMapping> mappings = new ArrayList<>();
+    mappings.add(new IdMapping(1L, 0, true));
+    mappings.add(new IdMapping(2L, 1, true));
+    mappings.add(new IdMapping(3L, 2, true));
+    mappings.add(new IdMapping(4L, 3, true));
+    mappings.add(new IdMapping(5L, 4, true));
+    mappings.add(new IdMapping(1L, 0, false));
+    mMemoryDatabase.offerIdMappings(mappings, 6);
   }
 
   /**
@@ -86,6 +97,36 @@ public final class MemoryDatabaseTest {
     Assert.assertEquals(1L, highwayData.getWayId());
     Assert.assertEquals(EHighwayType.MOTORWAY, highwayData.getType());
     Assert.assertEquals(100, highwayData.getMaxSpeed());
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#getInternalNodeByOsm(long)}.
+   */
+  @Test
+  public final void testGetInternalNodeByOsm() {
+    final Optional<Integer> internalId = mMemoryDatabase.getInternalNodeByOsm(1L);
+    Assert.assertTrue(internalId.isPresent());
+    Assert.assertEquals(0, internalId.get().intValue());
+
+    Assert.assertFalse(mMemoryDatabase.getInternalNodeByOsm(10L).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getInternalNodeByOsm(-100L).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getInternalNodeByOsm(0L).isPresent());
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#getInternalWayByOsm(long)}.
+   */
+  @Test
+  public final void testGetInternalWayByOsm() {
+    final Optional<Integer> internalId = mMemoryDatabase.getInternalWayByOsm(1L);
+    Assert.assertTrue(internalId.isPresent());
+    Assert.assertEquals(0, internalId.get().intValue());
+
+    Assert.assertFalse(mMemoryDatabase.getInternalWayByOsm(10L).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getInternalWayByOsm(-100L).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getInternalWayByOsm(0L).isPresent());
   }
 
   /**
@@ -120,6 +161,36 @@ public final class MemoryDatabaseTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#getOsmNodeByInternal(int)}.
+   */
+  @Test
+  public final void testGetOsmNodeByInternal() {
+    final Optional<Long> osmId = mMemoryDatabase.getOsmNodeByInternal(0);
+    Assert.assertTrue(osmId.isPresent());
+    Assert.assertEquals(1L, osmId.get().longValue());
+
+    Assert.assertFalse(mMemoryDatabase.getOsmNodeByInternal(10).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getOsmNodeByInternal(-100).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getOsmNodeByInternal(-1).isPresent());
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#getOsmWayByInternal(int)}.
+   */
+  @Test
+  public final void testGetOsmWayByInternal() {
+    final Optional<Long> osmId = mMemoryDatabase.getOsmWayByInternal(0);
+    Assert.assertTrue(osmId.isPresent());
+    Assert.assertEquals(1L, osmId.get().longValue());
+
+    Assert.assertFalse(mMemoryDatabase.getOsmWayByInternal(10).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getOsmWayByInternal(-100).isPresent());
+    Assert.assertFalse(mMemoryDatabase.getOsmWayByInternal(-1).isPresent());
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.db.MemoryDatabase#getSpatialNodeData(java.util.stream.LongStream, int)}.
    */
   @Test
@@ -128,7 +199,7 @@ public final class MemoryDatabaseTest {
         mMemoryDatabase.getSpatialNodeData(LongStream.of(1L, 2L, 10L, 3L), 3);
     Assert.assertEquals(3, allSpatialNodeData.size());
 
-    final Set<Long> nodeIds = allSpatialNodeData.stream().map(SpatialNodeData::getId).collect(Collectors.toSet());
+    final Set<Long> nodeIds = allSpatialNodeData.stream().map(SpatialNodeData::getOsmId).collect(Collectors.toSet());
     Assert.assertEquals(3, nodeIds.size());
     Assert.assertTrue(nodeIds.contains(1L));
     Assert.assertTrue(nodeIds.contains(2L));
@@ -189,6 +260,21 @@ public final class MemoryDatabaseTest {
   public final void testMemoryDatabase() {
     try {
       new MemoryDatabase();
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.db.MemoryDatabase#offerIdMappings(java.util.stream.Stream, int)}.
+   */
+  @Test
+  public final void testOfferIdMappingsStreamOfIdMappingInt() {
+    try {
+      mMemoryDatabase.offerIdMappings(Collections.emptyList(), 0);
+      mMemoryDatabase.offerIdMappings(Collections.singletonList(new IdMapping(10L, 1, true)), 1);
+      mMemoryDatabase.offerIdMappings(Arrays.asList(new IdMapping(10L, 1, true), new IdMapping(5L, 8, false)), 1);
     } catch (final Exception e) {
       Assert.fail();
     }

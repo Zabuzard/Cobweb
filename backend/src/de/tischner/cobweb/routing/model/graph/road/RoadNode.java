@@ -18,7 +18,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   /**
    * The unique ID of this node.
    */
-  private final long mId;
+  private final int mId;
   /**
    * The latitude of this node, in degrees.
    */
@@ -35,7 +35,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
    * @param latitude  The latitude of this node, in degrees
    * @param longitude The longitude of this node, in degrees
    */
-  public RoadNode(final long id, final float latitude, final float longitude) {
+  public RoadNode(final int id, final float latitude, final float longitude) {
     mId = id;
     mLatitude = latitude;
     mLongitude = longitude;
@@ -57,7 +57,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
       return false;
     }
     final RoadNode other = (RoadNode) obj;
-    if (mId != other.mId) {
+    if (this.mId != other.mId) {
       return false;
     }
     return true;
@@ -67,7 +67,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
    * Gets the unique ID of this node.
    */
   @Override
-  public long getId() {
+  public int getId() {
     return mId;
   }
 
@@ -97,7 +97,7 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (mId ^ (mId >>> 32));
+    result = prime * result + this.mId;
     return result;
   }
 

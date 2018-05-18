@@ -32,7 +32,7 @@ public final class DijkstraTest {
   /**
    * Counter used for generating unique edge IDs.
    */
-  private long mEdgeIdCounter;
+  private int mEdgeIdCounter;
   /**
    * The graph used for testing.
    */
@@ -44,12 +44,12 @@ public final class DijkstraTest {
   @Before
   public void setUp() {
     mGraph = new BasicGraph();
-    final BasicNode firstNode = new BasicNode(1L);
-    final BasicNode secondNode = new BasicNode(2L);
-    final BasicNode thirdNode = new BasicNode(3L);
-    final BasicNode fourthNode = new BasicNode(4L);
-    final BasicNode fifthNode = new BasicNode(5L);
-    final BasicNode sixthNode = new BasicNode(6L);
+    final BasicNode firstNode = new BasicNode(1);
+    final BasicNode secondNode = new BasicNode(2);
+    final BasicNode thirdNode = new BasicNode(3);
+    final BasicNode fourthNode = new BasicNode(4);
+    final BasicNode fifthNode = new BasicNode(5);
+    final BasicNode sixthNode = new BasicNode(6);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -77,11 +77,11 @@ public final class DijkstraTest {
    */
   @Test
   public void testComputeSearchSpaceCollectionOfNN() {
-    final List<Long> searchSpace =
-        mDijkstra.computeSearchSpace(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get()).stream()
+    final List<Integer> searchSpace =
+        mDijkstra.computeSearchSpace(mGraph.getNodeById(1).get(), mGraph.getNodeById(4).get()).stream()
             .map(IHasId::getId).collect(Collectors.toList());
     Assert.assertEquals(6, searchSpace.size());
-    Assert.assertEquals(Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L), searchSpace);
+    Assert.assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6), searchSpace);
   }
 
   /**
@@ -91,19 +91,19 @@ public final class DijkstraTest {
   @Test
   public void testComputeShortestPathCollectionOfNN() {
     final Optional<IPath<BasicNode, BasicEdge<BasicNode>>> possiblePath =
-        mDijkstra.computeShortestPath(mGraph.getNodeById(1L).get(), mGraph.getNodeById(4L).get());
+        mDijkstra.computeShortestPath(mGraph.getNodeById(1).get(), mGraph.getNodeById(4).get());
     Assert.assertTrue(possiblePath.isPresent());
     final IPath<BasicNode, BasicEdge<BasicNode>> path = possiblePath.get();
 
     Assert.assertEquals(3.0, path.getTotalCost(), 0.0001);
-    Assert.assertEquals(1L, path.getSource().getId());
-    Assert.assertEquals(4L, path.getDestination().getId());
+    Assert.assertEquals(1, path.getSource().getId());
+    Assert.assertEquals(4, path.getDestination().getId());
     Assert.assertEquals(3, path.length());
 
     final Iterator<BasicEdge<BasicNode>> nodeIter = path.iterator();
-    Assert.assertEquals(2L, nodeIter.next().getDestination().getId());
-    Assert.assertEquals(3L, nodeIter.next().getDestination().getId());
-    Assert.assertEquals(4L, nodeIter.next().getDestination().getId());
+    Assert.assertEquals(2, nodeIter.next().getDestination().getId());
+    Assert.assertEquals(3, nodeIter.next().getDestination().getId());
+    Assert.assertEquals(4, nodeIter.next().getDestination().getId());
 
     Assert.assertFalse(nodeIter.hasNext());
   }
@@ -114,17 +114,17 @@ public final class DijkstraTest {
    */
   @Test
   public void testComputeShortestPathCostCollectionOfNN() {
-    final BasicNode first = mGraph.getNodeById(1L).get();
-    final BasicNode fourth = mGraph.getNodeById(4L).get();
+    final BasicNode first = mGraph.getNodeById(1).get();
+    final BasicNode fourth = mGraph.getNodeById(4).get();
     Optional<Double> result = mDijkstra.computeShortestPathCost(Collections.singletonList(first), fourth);
     Assert.assertTrue(result.isPresent());
     Assert.assertEquals(3.0, result.get(), 0.0001);
 
     mGraph = new BasicGraph();
-    final BasicNode firstNode = new BasicNode(1L);
-    final BasicNode secondNode = new BasicNode(2L);
-    final BasicNode thirdNode = new BasicNode(3L);
-    final BasicNode fourthNode = new BasicNode(4L);
+    final BasicNode firstNode = new BasicNode(1);
+    final BasicNode secondNode = new BasicNode(2);
+    final BasicNode thirdNode = new BasicNode(3);
+    final BasicNode fourthNode = new BasicNode(4);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -157,14 +157,14 @@ public final class DijkstraTest {
   @Test
   public void testComputeShortestPathCostsReachableCollectionOfN() {
     final Map<BasicNode, ? extends IHasPathCost> nodeToDistance =
-        mDijkstra.computeShortestPathCostsReachable(Collections.singletonList(mGraph.getNodeById(1L).get()));
+        mDijkstra.computeShortestPathCostsReachable(Collections.singletonList(mGraph.getNodeById(1).get()));
     Assert.assertEquals(6, nodeToDistance.size());
-    Assert.assertEquals(0.0, nodeToDistance.get(mGraph.getNodeById(1L).get()).getPathCost(), 0.0001);
-    Assert.assertEquals(1.0, nodeToDistance.get(mGraph.getNodeById(2L).get()).getPathCost(), 0.0001);
-    Assert.assertEquals(2.0, nodeToDistance.get(mGraph.getNodeById(3L).get()).getPathCost(), 0.0001);
-    Assert.assertEquals(3.0, nodeToDistance.get(mGraph.getNodeById(4L).get()).getPathCost(), 0.0001);
-    Assert.assertEquals(4.0, nodeToDistance.get(mGraph.getNodeById(5L).get()).getPathCost(), 0.0001);
-    Assert.assertEquals(4.0, nodeToDistance.get(mGraph.getNodeById(6L).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(0.0, nodeToDistance.get(mGraph.getNodeById(1).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(1.0, nodeToDistance.get(mGraph.getNodeById(2).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(2.0, nodeToDistance.get(mGraph.getNodeById(3).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(3.0, nodeToDistance.get(mGraph.getNodeById(4).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(4.0, nodeToDistance.get(mGraph.getNodeById(5).get()).getPathCost(), 0.0001);
+    Assert.assertEquals(4.0, nodeToDistance.get(mGraph.getNodeById(6).get()).getPathCost(), 0.0001);
   }
 
   /**

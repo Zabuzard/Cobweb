@@ -20,7 +20,7 @@ public final class RoadGraphTest {
   /**
    * Counter used for generating unique edge IDs.
    */
-  private long mEdgeIdCounter;
+  private int mEdgeIdCounter;
   /**
    * The graph used for testing.
    */
@@ -32,12 +32,12 @@ public final class RoadGraphTest {
   @Before
   public void setUp() {
     mGraph = new RoadGraph<>();
-    final RoadNode firstNode = new RoadNode(1L, 1.0F, 1.0F);
-    final RoadNode secondNode = new RoadNode(2L, 2.0F, 2.0F);
-    final RoadNode thirdNode = new RoadNode(3L, 3.0F, 3.0F);
-    final RoadNode fourthNode = new RoadNode(4L, 4.0F, 4.0F);
-    final RoadNode fifthNode = new RoadNode(5L, 5.0F, 5.0F);
-    final RoadNode sixthNode = new RoadNode(6L, 6.0F, 6.0F);
+    final RoadNode firstNode = new RoadNode(1, 1.0F, 1.0F);
+    final RoadNode secondNode = new RoadNode(2, 2.0F, 2.0F);
+    final RoadNode thirdNode = new RoadNode(3, 3.0F, 3.0F);
+    final RoadNode fourthNode = new RoadNode(4, 4.0F, 4.0F);
+    final RoadNode fifthNode = new RoadNode(5, 5.0F, 5.0F);
+    final RoadNode sixthNode = new RoadNode(6, 6.0F, 6.0F);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -64,7 +64,7 @@ public final class RoadGraphTest {
   @Test
   public void testAddEdge() {
     final RoadEdge<RoadNode> edge =
-        new RoadEdge<>(40L, new RoadNode(1L, 1.0F, 1.0F), new RoadNode(2L, 2.0F, 2.0F), EHighwayType.MOTORWAY, 100);
+        new RoadEdge<>(40, new RoadNode(1, 1.0F, 1.0F), new RoadNode(2, 2.0F, 2.0F), EHighwayType.MOTORWAY, 100);
     Assert.assertFalse(mGraph.containsEdge(edge));
     Assert.assertTrue(mGraph.addEdge(edge));
     Assert.assertTrue(mGraph.containsEdge(edge));
@@ -79,35 +79,59 @@ public final class RoadGraphTest {
   @Test
   public void testAddNode() {
     Assert.assertEquals(6, mGraph.size());
-    mGraph.addNode(new RoadNode(10L, 10.0F, 10.0F));
+    mGraph.addNode(new RoadNode(10, 10.0F, 10.0F));
     Assert.assertEquals(7, mGraph.size());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#containsNodeWithId(long)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#containsNodeWithId(int)}.
    */
   @Test
   public void testContainsNodeWithId() {
-    Assert.assertTrue(mGraph.containsNodeWithId(1L));
-    Assert.assertTrue(mGraph.containsNodeWithId(5L));
-    Assert.assertFalse(mGraph.containsNodeWithId(8L));
-    Assert.assertFalse(mGraph.containsNodeWithId(-2L));
+    Assert.assertTrue(mGraph.containsNodeWithId(1));
+    Assert.assertTrue(mGraph.containsNodeWithId(5));
+    Assert.assertFalse(mGraph.containsNodeWithId(8));
+    Assert.assertFalse(mGraph.containsNodeWithId(-2));
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#getNodeById(long)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#generateUniqueNodeId()}.
+   */
+  @Test
+  public void testGenerateUniqueNodeId() {
+    Assert.assertEquals(0, mGraph.generateUniqueNodeId());
+    Assert.assertEquals(1, mGraph.generateUniqueNodeId());
+    Assert.assertEquals(2, mGraph.generateUniqueNodeId());
+    // Testing the whole range takes too long (1-2 seconds)
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#generateUniqueWayId()}.
+   */
+  @Test
+  public void testGenerateUniqueWayId() {
+    Assert.assertEquals(0, mGraph.generateUniqueWayId());
+    Assert.assertEquals(1, mGraph.generateUniqueWayId());
+    Assert.assertEquals(2, mGraph.generateUniqueWayId());
+    // Testing the whole range takes too long (1-2 seconds)
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#getNodeById(int)}.
    */
   @Test
   public void testGetNodeById() {
-    Assert.assertTrue(mGraph.getNodeById(1L).isPresent());
-    Assert.assertEquals(1L, mGraph.getNodeById(1L).get().getId());
-    Assert.assertTrue(mGraph.getNodeById(5L).isPresent());
-    Assert.assertEquals(5L, mGraph.getNodeById(5L).get().getId());
+    Assert.assertTrue(mGraph.getNodeById(1).isPresent());
+    Assert.assertEquals(1, mGraph.getNodeById(1).get().getId());
+    Assert.assertTrue(mGraph.getNodeById(5).isPresent());
+    Assert.assertEquals(5, mGraph.getNodeById(5).get().getId());
 
-    Assert.assertFalse(mGraph.getNodeById(8L).isPresent());
-    Assert.assertFalse(mGraph.getNodeById(-2L).isPresent());
+    Assert.assertFalse(mGraph.getNodeById(8).isPresent());
+    Assert.assertFalse(mGraph.getNodeById(-2).isPresent());
   }
 
   /**
@@ -116,14 +140,14 @@ public final class RoadGraphTest {
    */
   @Test
   public void testGetNodes() {
-    final Set<Long> nodeIds = mGraph.getNodes().stream().map(IHasId::getId).collect(Collectors.toSet());
+    final Set<Integer> nodeIds = mGraph.getNodes().stream().map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertEquals(6, nodeIds.size());
-    Assert.assertTrue(nodeIds.contains(1L));
-    Assert.assertTrue(nodeIds.contains(2L));
-    Assert.assertTrue(nodeIds.contains(3L));
-    Assert.assertTrue(nodeIds.contains(4L));
-    Assert.assertTrue(nodeIds.contains(5L));
-    Assert.assertTrue(nodeIds.contains(6L));
+    Assert.assertTrue(nodeIds.contains(1));
+    Assert.assertTrue(nodeIds.contains(2));
+    Assert.assertTrue(nodeIds.contains(3));
+    Assert.assertTrue(nodeIds.contains(4));
+    Assert.assertTrue(nodeIds.contains(5));
+    Assert.assertTrue(nodeIds.contains(6));
 
     Assert.assertTrue(new BasicGraph().getNodes().isEmpty());
   }
@@ -147,15 +171,15 @@ public final class RoadGraphTest {
    */
   @Test
   public void testRemoveNode() {
-    final RoadNode node = new RoadNode(10L, 10.0F, 10.0F);
+    final RoadNode node = new RoadNode(10, 10.0F, 10.0F);
     Assert.assertEquals(6, mGraph.size());
     Assert.assertFalse(mGraph.removeNode(node));
     Assert.assertEquals(6, mGraph.size());
     mGraph.addNode(node);
     Assert.assertEquals(7, mGraph.size());
-    Assert.assertTrue(mGraph.containsNodeWithId(10L));
+    Assert.assertTrue(mGraph.containsNodeWithId(10));
     Assert.assertTrue(mGraph.removeNode(node));
-    Assert.assertFalse(mGraph.containsNodeWithId(10L));
+    Assert.assertFalse(mGraph.containsNodeWithId(10));
     Assert.assertEquals(6, mGraph.size());
   }
 
@@ -165,11 +189,11 @@ public final class RoadGraphTest {
    */
   @Test
   public void testReverse() {
-    final RoadNode first = new RoadNode(1L, 1.0F, 1.0F);
-    final RoadNode second = new RoadNode(2L, 2.0F, 2.0F);
-    final RoadNode third = new RoadNode(3L, 3.0F, 3.0F);
-    final RoadEdge<RoadNode> firstEdge = new RoadEdge<>(1L, first, second, EHighwayType.MOTORWAY, 100);
-    final RoadEdge<RoadNode> secondEdge = new RoadEdge<>(2L, second, third, EHighwayType.MOTORWAY, 100);
+    final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
+    final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
+    final RoadNode third = new RoadNode(3, 3.0F, 3.0F);
+    final RoadEdge<RoadNode> firstEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
+    final RoadEdge<RoadNode> secondEdge = new RoadEdge<>(2, second, third, EHighwayType.MOTORWAY, 100);
     mGraph = new RoadGraph<>();
     mGraph.addNode(first);
     mGraph.addNode(second);
@@ -182,10 +206,10 @@ public final class RoadGraphTest {
     Assert.assertTrue(mGraph.containsEdge(firstEdge));
     Assert.assertTrue(mGraph.containsEdge(secondEdge));
 
-    final Set<Long> destinationIds =
+    final Set<Integer> destinationIds =
         mGraph.getEdges().map(IEdge::getDestination).map(IHasId::getId).collect(Collectors.toSet());
-    Assert.assertTrue(destinationIds.contains(1L));
-    Assert.assertTrue(destinationIds.contains(2L));
+    Assert.assertTrue(destinationIds.contains(1));
+    Assert.assertTrue(destinationIds.contains(2));
   }
 
   /**

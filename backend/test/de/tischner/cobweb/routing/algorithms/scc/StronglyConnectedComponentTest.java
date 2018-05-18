@@ -24,11 +24,11 @@ public final class StronglyConnectedComponentTest {
   @Before
   public void setUp() {
     mScc = new StronglyConnectedComponent<>();
-    final BasicNode root = new BasicNode(2L);
-    mScc.addNode(new BasicNode(1L));
+    final BasicNode root = new BasicNode(2);
+    mScc.addNode(new BasicNode(1));
     mScc.addNode(root);
-    mScc.addNode(new BasicNode(3L));
-    mScc.addNode(new BasicNode(4L));
+    mScc.addNode(new BasicNode(3));
+    mScc.addNode(new BasicNode(4));
     mScc.setRootNode(root);
   }
 
@@ -38,7 +38,7 @@ public final class StronglyConnectedComponentTest {
    */
   @Test
   public void testAddNode() {
-    final BasicNode node = new BasicNode(10L);
+    final BasicNode node = new BasicNode(10);
     Assert.assertFalse(mScc.getNodes().contains(node));
     Assert.assertTrue(mScc.addNode(node));
     Assert.assertTrue(mScc.getNodes().contains(node));
@@ -52,7 +52,7 @@ public final class StronglyConnectedComponentTest {
    */
   @Test
   public void testGetNodes() {
-    final BasicNode node = new BasicNode(10L);
+    final BasicNode node = new BasicNode(10);
     Assert.assertFalse(mScc.getNodes().contains(node));
     Assert.assertEquals(4, mScc.getNodes().size());
 
@@ -81,7 +81,7 @@ public final class StronglyConnectedComponentTest {
   public void testSetRootNode() {
     Assert.assertEquals(2L, mScc.getRootNode().getId());
 
-    final BasicNode node = new BasicNode(10L);
+    final BasicNode node = new BasicNode(10);
     mScc.addNode(node);
     mScc.setRootNode(node);
     Assert.assertEquals(10L, mScc.getRootNode().getId());
@@ -98,7 +98,7 @@ public final class StronglyConnectedComponentTest {
   public void testSize() {
     Assert.assertEquals(4, mScc.size());
 
-    mScc.addNode(new BasicNode(10L));
+    mScc.addNode(new BasicNode(10));
     Assert.assertEquals(5, mScc.size());
 
     final StronglyConnectedComponent<BasicNode> otherScc = new StronglyConnectedComponent<>();

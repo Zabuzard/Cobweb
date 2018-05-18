@@ -239,7 +239,7 @@ public final class Application {
    *                        configuration files
    */
   private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
-    final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph);
+    final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph, mGraph);
     final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
     try {
       final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder, mDatabase, mConfig);
@@ -285,6 +285,7 @@ public final class Application {
     dataParser.parseData();
     final Instant parseEndTime = Instant.now();
     mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
+    dataParser.clearHandler();
 
     serializeGraphIfDesired(graphSizeBefore);
 

@@ -17,7 +17,7 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputati
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
@@ -53,7 +53,7 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * @param <G> Type of the graph
  */
 public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & ICanGetNodeById<N>> implements Runnable {
+    G extends IGraph<N, E> & IGetNodeById<N>> implements Runnable {
   /**
    * Logger used for logging.
    */

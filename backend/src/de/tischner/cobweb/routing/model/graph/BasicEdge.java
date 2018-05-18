@@ -29,7 +29,7 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
   /**
    * The unique ID of the edge.
    */
-  private final long mId;
+  private final int mId;
 
   /**
    * The source node of the edge.
@@ -44,7 +44,7 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
    * @param destination The destination node of the edge
    * @param cost        The cost of the edge, i.e. its weight
    */
-  public BasicEdge(final long id, final N source, final N destination, final double cost) {
+  public BasicEdge(final int id, final N source, final N destination, final double cost) {
     mId = id;
     mSource = source;
     mDestination = destination;
@@ -96,7 +96,7 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
    * @see de.tischner.cobweb.routing.model.graph.road.IHasId#getId()
    */
   @Override
-  public long getId() {
+  public int getId() {
     return mId;
   }
 
@@ -117,7 +117,7 @@ public final class BasicEdge<N extends INode> implements IEdge<N>, IHasId, Seria
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (this.mId ^ (this.mId >>> 32));
+    result = prime * result + this.mId;
     return result;
   }
 

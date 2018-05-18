@@ -88,6 +88,13 @@ public final class DataParser {
   }
 
   /**
+   * Unregisters all registered handler from this parser.
+   */
+  public void clearHandler() {
+    mOsmHandler.clear();
+  }
+
+  /**
    * Parses all data given by the configuration provider, like OSM and GTFS
    * data. Notifies all registered handler when parsing elements.<br>
    * <br>

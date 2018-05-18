@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
+import de.tischner.cobweb.routing.parsing.osm.IdMapping;
 import de.topobyte.osm4j.core.model.iface.OsmEntity;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
@@ -40,6 +41,14 @@ public class MemoryDatabase extends ADatabase {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
   /**
+   * Map connecting internal node IDs to their OSM IDs.
+   */
+  private final Map<Integer, Long> mInternalToNodeId;
+  /**
+   * Map connecting internal way IDs to their OSM IDs.
+   */
+  private final Map<Integer, Long> mInternalToWayId;
+  /**
    * Map connecting node names to their unique OSM IDs.
    */
   private final Map<String, Long> mNameToNode;
@@ -55,6 +64,14 @@ public class MemoryDatabase extends ADatabase {
    * Map connecting node IDs to their spatial data.
    */
   private final Map<Long, SpatialNodeData> mNodeToSpatialData;
+  /**
+   * Map connecting OSM node IDs to their internal IDs.
+   */
+  private final Map<Long, Integer> mOsmToNodeId;
+  /**
+   * Map connecting OSM way IDs to their internal IDs.
+   */
+  private final Map<Long, Integer> mOsmToWayId;
   /**
    * Map connecting way IDs to their highway data.
    */
@@ -77,6 +94,10 @@ public class MemoryDatabase extends ADatabase {
     mNodeToName = new HashMap<>();
     mWayToName = new HashMap<>();
     mWayToHighwayData = new HashMap<>();
+    mInternalToNodeId = new HashMap<>();
+    mInternalToWayId = new HashMap<>();
+    mOsmToNodeId = new HashMap<>();
+    mOsmToWayId = new HashMap<>();
   }
 
   /*
@@ -107,6 +128,24 @@ public class MemoryDatabase extends ADatabase {
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getInternalNodeByOsm(long)
+   */
+  @Override
+  public Optional<Integer> getInternalNodeByOsm(final long osmId) {
+    return Optional.ofNullable(mOsmToNodeId.get(osmId));
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getInternalWayByOsm(long)
+   */
+  @Override
+  public Optional<Integer> getInternalWayByOsm(final long osmId) {
+    return Optional.ofNullable(mOsmToWayId.get(osmId));
+  }
+
+  /*
+   * (non-Javadoc)
    * @see de.tischner.cobweb.db.IRoutingDatabase#getNodeByName(java.lang.String)
    */
   @Override
@@ -125,6 +164,24 @@ public class MemoryDatabase extends ADatabase {
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getOsmNodeByInternal(int)
+   */
+  @Override
+  public Optional<Long> getOsmNodeByInternal(final int internalId) {
+    return Optional.ofNullable(mInternalToNodeId.get(internalId));
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.db.IRoutingDatabase#getOsmWayByInternal(int)
+   */
+  @Override
+  public Optional<Long> getOsmWayByInternal(final int internalId) {
+    return Optional.ofNullable(mInternalToWayId.get(internalId));
+  }
+
+  /*
+   * (non-Javadoc)
    * @see
    * de.tischner.cobweb.db.IRoutingDatabase#getSpatialNodeData(java.util.stream.
    * LongStream, int)
@@ -135,7 +192,12 @@ public class MemoryDatabase extends ADatabase {
       LOGGER.debug("Getting spatial data for {} nodes", size);
     }
     final List<SpatialNodeData> result = new ArrayList<>(size);
-    nodeIds.mapToObj(mNodeToSpatialData::get).filter(data -> !Objects.isNull(data)).forEach(result::add);
+    nodeIds.mapToObj(mNodeToSpatialData::get).filter(data -> !Objects.isNull(data)).forEach(data -> {
+      // Fetch internal ID of the node
+      final SpatialNodeData fullData = new SpatialNodeData(mOsmToNodeId.get(data.getOsmId()), data.getOsmId(),
+          data.getLatitude(), data.getLongitude());
+      result.add(fullData);
+    });
     return result;
   }
 
@@ -164,6 +226,25 @@ public class MemoryDatabase extends ADatabase {
   @Override
   public void initialize() {
     // Do nothing
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * de.tischner.cobweb.db.IRoutingDatabase#offerIdMappings(java.util.stream.
+   * Stream, int)
+   */
+  @Override
+  public void offerIdMappings(final Stream<IdMapping> mappings, final int size) {
+    mappings.forEach(mapping -> {
+      if (mapping.isNode()) {
+        mInternalToNodeId.put(mapping.getInternalId(), mapping.getOsmId());
+        mOsmToNodeId.put(mapping.getOsmId(), mapping.getInternalId());
+      } else {
+        mInternalToWayId.put(mapping.getInternalId(), mapping.getOsmId());
+        mOsmToWayId.put(mapping.getOsmId(), mapping.getInternalId());
+      }
+    });
   }
 
   /*
@@ -204,19 +285,19 @@ public class MemoryDatabase extends ADatabase {
    */
   private void addOsmNode(final OsmNode node) {
     // Retrieve information
-    final long id = node.getId();
+    final long osmId = node.getId();
     final float latitude = (float) node.getLatitude();
     final float longitude = (float) node.getLongitude();
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(node);
     final String name = tagToValue.get(OsmParseUtil.NAME_TAG);
 
-    // Insert node data
-    mNodeToSpatialData.put(id, new SpatialNodeData(id, latitude, longitude));
+    // Insert node data, internal ID is implicitly fetched at request time
+    mNodeToSpatialData.put(osmId, new SpatialNodeData(-1, osmId, latitude, longitude));
 
     // Insert tag data
     if (name != null) {
-      mNameToNode.put(name, id);
-      mNodeToName.put(id, name);
+      mNameToNode.put(name, osmId);
+      mNodeToName.put(osmId, name);
     }
   }
 

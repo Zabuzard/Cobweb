@@ -1,12 +1,14 @@
 package de.tischner.cobweb.routing.parsing.osm;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.tischner.cobweb.routing.model.graph.IGraph;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IUniqueIdGenerator;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -21,22 +23,39 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * is called.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <G> The type of the graph which must be able to get nodes by their ID
+ * @param <G> The type of the graph which must be able to get nodes by their IDs
  */
-public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & ICanGetNodeById<RoadNode>>
+public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & IGetNodeById<RoadNode>>
     implements IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> {
   /**
    * The graph to operate on.
    */
   private final G mGraph;
+  /**
+   * A generator which provides unique IDs for nodes and ways.
+   */
+  private final IUniqueIdGenerator mIdGenerator;
+  /**
+   * A map connecting OSM node IDs to the IDs used by the graph.
+   */
+  private final Map<Long, Integer> mOsmToNodeId;
+  /**
+   * A map connecting OSM way IDs to the IDs used by the graph.
+   */
+  private final Map<Long, Integer> mOsmToWayId;
 
   /**
    * Creates a new OSM road builder which operates on the given graph.
    *
-   * @param graph The graph to operate on
+   * @param graph       The graph to operate on
+   * @param idGenerator The generator to use for generating unique IDs for nodes
+   *                    and ways
    */
-  public OsmRoadBuilder(final G graph) {
+  public OsmRoadBuilder(final G graph, final IUniqueIdGenerator idGenerator) {
     mGraph = graph;
+    mIdGenerator = idGenerator;
+    mOsmToNodeId = new HashMap<>();
+    mOsmToWayId = new HashMap<>();
   }
 
   /**
@@ -47,8 +66,14 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    * {@link #complete()} is called.
    */
   @Override
-  public RoadEdge<RoadNode> buildEdge(final OsmWay way, final long sourceId, final long destinationId)
+  public RoadEdge<RoadNode> buildEdge(final OsmWay way, final long sourceIdOsm, final long destinationIdOsm)
       throws ParseException {
+    final int sourceId = mOsmToNodeId.computeIfAbsent(sourceIdOsm, key -> {
+      throw new ParseException();
+    });
+    final int destinationId = mOsmToNodeId.computeIfAbsent(destinationIdOsm, key -> {
+      throw new ParseException();
+    });
     final RoadNode source = mGraph.getNodeById(sourceId).orElseThrow(() -> new ParseException());
     final RoadNode destination = mGraph.getNodeById(destinationId).orElseThrow(() -> new ParseException());
 
@@ -57,7 +82,9 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
     final EHighwayType type = OsmParseUtil.parseHighwayType(tagToValue);
     final int maxSpeed = OsmParseUtil.parseMaxSpeed(tagToValue);
 
-    return new RoadEdge<>(way.getId(), source, destination, type, maxSpeed);
+    // Lookup if the way is already known or generate a new ID
+    final int wayId = mOsmToWayId.computeIfAbsent(way.getId(), key -> mIdGenerator.generateUniqueWayId());
+    return new RoadEdge<>(wayId, source, destination, type, maxSpeed);
   }
 
   /*
@@ -67,7 +94,9 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    */
   @Override
   public RoadNode buildNode(final OsmNode node) {
-    return new RoadNode(node.getId(), (float) node.getLatitude(), (float) node.getLongitude());
+    // Lookup if the node is already known or generate a new ID
+    final int nodeId = mOsmToNodeId.computeIfAbsent(node.getId(), key -> mIdGenerator.generateUniqueNodeId());
+    return new RoadNode(nodeId, (float) node.getLatitude(), (float) node.getLongitude());
   }
 
   /**

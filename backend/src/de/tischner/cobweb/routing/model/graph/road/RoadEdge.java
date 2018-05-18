@@ -39,7 +39,7 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
    * The ID of this edge which is unique to the way it belongs to. A way can
    * consist of several edges.
    */
-  private final long mId;
+  private final int mId;
   /**
    * The maximal speed allowed on this edge, in <tt>km/h</tt>.
    */
@@ -70,7 +70,7 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
    *                    {@link EHighwayType#ROAD} if unknown
    * @param maxSpeed    The maximal speed allowed on this edge, in <tt>km/h</tt>
    */
-  public RoadEdge(final long id, final N source, final N destination, final EHighwayType type, final int maxSpeed) {
+  public RoadEdge(final int id, final N source, final N destination, final EHighwayType type, final int maxSpeed) {
     mId = id;
     mSource = source;
     mDestination = destination;
@@ -144,7 +144,7 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
    * can consist of several edges.
    */
   @Override
-  public long getId() {
+  public int getId() {
     return mId;
   }
 
@@ -169,7 +169,7 @@ public final class RoadEdge<N extends INode & IHasId & ISpatial & Serializable>
     final int prime = 31;
     int result = 1;
     result = prime * result + ((this.mDestination == null) ? 0 : this.mDestination.hashCode());
-    result = prime * result + (int) (this.mId ^ (this.mId >>> 32));
+    result = prime * result + this.mId;
     result = prime * result + ((this.mSource == null) ? 0 : this.mSource.hashCode());
     result = prime * result + ((this.mType == null) ? 0 : this.mType.hashCode());
     return result;

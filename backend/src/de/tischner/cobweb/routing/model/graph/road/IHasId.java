@@ -20,5 +20,5 @@ public interface IHasId {
    *
    * @return The ID of the object
    */
-  long getId();
+  int getId();
 }

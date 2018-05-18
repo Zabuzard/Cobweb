@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,7 +27,12 @@ import de.tischner.cobweb.routing.model.graph.INode;
  */
 public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
     E extends IEdge<N> & IHasId & IReversedConsumer & Serializable> extends AGraph<N, E>
-    implements ICanGetNodeById<N>, IReversedProvider {
+    implements IGetNodeById<N>, IReversedProvider, IUniqueIdGenerator {
+  /**
+   * The unique ID for the last possible entity. Is used to determine when the
+   * generator is out of IDs.
+   */
+  private static final int LAST_ID = -1;
   /**
    * The serial version UID.
    */
@@ -34,17 +40,27 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
   /**
    * A map connecting node IDs to their corresponding nodes.
    */
-  private final Map<Long, N> mIdToNode;
+  private final Map<Integer, N> mIdToNode;
   /**
    * Whether or not the graph is currently reversed.
    */
   private boolean mIsReversed;
+  /**
+   * The unique ID used for the last node.
+   */
+  private int mLastNodeId;
+  /**
+   * The unique ID used for the last way.
+   */
+  private int mLastWayId;
 
   /**
    * Creates a new initially empty road graph.
    */
   public RoadGraph() {
     mIdToNode = new HashMap<>();
+    mLastNodeId = LAST_ID;
+    mLastWayId = LAST_ID;
   }
 
   /*
@@ -67,7 +83,7 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
    */
   @Override
   public boolean addNode(final N node) {
-    final Long id = node.getId();
+    final int id = node.getId();
     if (mIdToNode.containsKey(id)) {
       return false;
     }
@@ -78,21 +94,39 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
   /*
    * (non-Javadoc)
    * @see de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#
-   * containsNodeWithId(long)
+   * containsNodeWithId(int)
    */
   @Override
-  public boolean containsNodeWithId(final long id) {
+  public boolean containsNodeWithId(final int id) {
     return mIdToNode.containsKey(id);
+  }
+
+  @Override
+  public int generateUniqueNodeId() throws NoSuchElementException {
+    mLastNodeId++;
+    if (mLastNodeId == LAST_ID) {
+      throw new NoSuchElementException();
+    }
+    return mLastNodeId;
+  }
+
+  @Override
+  public int generateUniqueWayId() throws NoSuchElementException {
+    mLastWayId++;
+    if (mLastWayId == LAST_ID) {
+      throw new NoSuchElementException();
+    }
+    return mLastWayId;
   }
 
   /*
    * (non-Javadoc)
    * @see
    * de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById#getNodeById(
-   * long)
+   * int)
    */
   @Override
-  public Optional<N> getNodeById(final long id) {
+  public Optional<N> getNodeById(final int id) {
     return Optional.ofNullable(mIdToNode.get(id));
   }
 
@@ -126,7 +160,7 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
    */
   @Override
   public boolean removeNode(final N node) {
-    final Long id = node.getId();
+    final int id = node.getId();
     if (!mIdToNode.containsKey(id)) {
       return false;
     }

@@ -29,19 +29,19 @@ public final class EdgePathTest {
   private static EdgePath<BasicNode, BasicEdge<BasicNode>> buildPath(final boolean reversely) {
     final EdgePath<BasicNode, BasicEdge<BasicNode>> path = new EdgePath<>(reversely);
 
-    final BasicNode firstNode = new BasicNode(1L);
-    final BasicNode secondNode = new BasicNode(2L);
-    final BasicNode thirdNode = new BasicNode(3L);
-    final BasicNode fourthNode = new BasicNode(4L);
+    final BasicNode firstNode = new BasicNode(1);
+    final BasicNode secondNode = new BasicNode(2);
+    final BasicNode thirdNode = new BasicNode(3);
+    final BasicNode fourthNode = new BasicNode(4);
 
     if (reversely) {
-      path.addEdge(new BasicEdge<>(1L, secondNode, firstNode, 1.0));
-      path.addEdge(new BasicEdge<>(2L, thirdNode, secondNode, 2.0));
-      path.addEdge(new BasicEdge<>(3L, fourthNode, thirdNode, 1.0));
+      path.addEdge(new BasicEdge<>(1, secondNode, firstNode, 1.0));
+      path.addEdge(new BasicEdge<>(2, thirdNode, secondNode, 2.0));
+      path.addEdge(new BasicEdge<>(3, fourthNode, thirdNode, 1.0));
     } else {
-      path.addEdge(new BasicEdge<>(1L, firstNode, secondNode, 1.0));
-      path.addEdge(new BasicEdge<>(2L, secondNode, thirdNode, 2.0));
-      path.addEdge(new BasicEdge<>(3L, thirdNode, fourthNode, 1.0));
+      path.addEdge(new BasicEdge<>(1, firstNode, secondNode, 1.0));
+      path.addEdge(new BasicEdge<>(2, secondNode, thirdNode, 2.0));
+      path.addEdge(new BasicEdge<>(3, thirdNode, fourthNode, 1.0));
     }
 
     return path;
@@ -67,7 +67,7 @@ public final class EdgePathTest {
   @Test
   public void testAddEdge() {
     Assert.assertEquals(3, mPath.length());
-    mPath.addEdge(new BasicEdge<>(4L, new BasicNode(10L), new BasicNode(11L), 1.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0));
     Assert.assertEquals(4, mPath.length());
   }
 
@@ -109,9 +109,9 @@ public final class EdgePathTest {
    */
   @Test
   public void testGetDestination() {
-    Assert.assertEquals(4L, mPath.getDestination().getId());
+    Assert.assertEquals(4, mPath.getDestination().getId());
     final EdgePath<BasicNode, BasicEdge<BasicNode>> reversePath = EdgePathTest.buildPath(true);
-    Assert.assertEquals(1L, reversePath.getDestination().getId());
+    Assert.assertEquals(1, reversePath.getDestination().getId());
   }
 
   /**
@@ -120,9 +120,9 @@ public final class EdgePathTest {
    */
   @Test
   public void testGetSource() {
-    Assert.assertEquals(1L, mPath.getSource().getId());
+    Assert.assertEquals(1, mPath.getSource().getId());
     final EdgePath<BasicNode, BasicEdge<BasicNode>> reversePath = EdgePathTest.buildPath(true);
-    Assert.assertEquals(4L, reversePath.getSource().getId());
+    Assert.assertEquals(4, reversePath.getSource().getId());
   }
 
   /**
@@ -133,7 +133,7 @@ public final class EdgePathTest {
   public void testGetTotalCost() {
     Assert.assertEquals(4.0, mPath.getTotalCost(), 0.0001);
 
-    mPath.addEdge(new BasicEdge<>(4L, new BasicNode(10L), new BasicNode(11L), 3.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 3.0));
     Assert.assertEquals(7.0, mPath.getTotalCost(), 0.0001);
   }
 
@@ -153,13 +153,13 @@ public final class EdgePathTest {
    */
   @Test
   public void testIterator() {
-    final List<Long> expectedIds = Arrays.asList(1L, 2L, 3L);
-    final List<Long> ids =
+    final List<Integer> expectedIds = Arrays.asList(1, 2, 3);
+    final List<Integer> ids =
         StreamSupport.stream(mPath.spliterator(), false).map(IHasId::getId).collect(Collectors.toList());
     Assert.assertEquals(expectedIds, ids);
 
-    final List<Long> reverseExpectedIds = Arrays.asList(3L, 2L, 1L);
-    final List<Long> reverseIds = StreamSupport.stream(EdgePathTest.buildPath(true).spliterator(), false)
+    final List<Integer> reverseExpectedIds = Arrays.asList(3, 2, 1);
+    final List<Integer> reverseIds = StreamSupport.stream(EdgePathTest.buildPath(true).spliterator(), false)
         .map(IHasId::getId).collect(Collectors.toList());
     Assert.assertEquals(reverseExpectedIds, reverseIds);
   }
@@ -171,7 +171,7 @@ public final class EdgePathTest {
   @Test
   public void testLength() {
     Assert.assertEquals(3, mPath.length());
-    mPath.addEdge(new BasicEdge<>(4L, new BasicNode(10L), new BasicNode(11L), 1.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0));
     Assert.assertEquals(4, mPath.length());
   }
 

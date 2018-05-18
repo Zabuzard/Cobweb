@@ -8,9 +8,13 @@ package de.tischner.cobweb.db;
  */
 public final class SpatialNodeData {
   /**
+   * Unique ID of the node used by the graph.
+   */
+  private final int mId;
+  /**
    * Unique OSM ID of the node.
    */
-  private final long mId;
+  private final long mIdOsm;
   /**
    * Latitude of the node.
    */
@@ -23,22 +27,24 @@ public final class SpatialNodeData {
   /**
    * Creates a new spatial node data object with the given attributes.
    *
-   * @param id        Unique OSM ID of the node
+   * @param id        Unique ID of the node used by the graph
+   * @param idOsm     Unique OSM ID of the node
    * @param latitude  Latitude of the node
    * @param longitude Longitude of the node
    */
-  public SpatialNodeData(final long id, final float latitude, final float longitude) {
+  public SpatialNodeData(final int id, final long idOsm, final float latitude, final float longitude) {
     mId = id;
+    mIdOsm = idOsm;
     mLatitude = latitude;
     mLongitude = longitude;
   }
 
   /**
-   * Gets the unique OSM ID of the node.
+   * Gets the unique ID of the node used by the graph.
    *
    * @return The node ID
    */
-  public long getId() {
+  public int getId() {
     return mId;
   }
 
@@ -58,5 +64,14 @@ public final class SpatialNodeData {
    */
   public float getLongitude() {
     return mLongitude;
+  }
+
+  /**
+   * Gets the unique OSM ID of the node.
+   *
+   * @return The node ID
+   */
+  public long getOsmId() {
+    return mIdOsm;
   }
 }

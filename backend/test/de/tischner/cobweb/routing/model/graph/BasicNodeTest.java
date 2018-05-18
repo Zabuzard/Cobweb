@@ -21,20 +21,20 @@ public final class BasicNodeTest {
    */
   @Before
   public void setUp() {
-    mNode = new BasicNode(1L);
+    mNode = new BasicNode(1);
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.BasicNode#BasicNode(long)}.
+   * {@link de.tischner.cobweb.routing.model.graph.BasicNode#BasicNode(int)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testBasicNode() {
     try {
-      new BasicNode(1L);
-      new BasicNode(0L);
-      new BasicNode(-1L);
+      new BasicNode(1);
+      new BasicNode(0);
+      new BasicNode(-1);
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -46,8 +46,8 @@ public final class BasicNodeTest {
    */
   @Test
   public void testEqualsObject() {
-    Assert.assertEquals(mNode, new BasicNode(1L));
-    Assert.assertNotEquals(mNode, new BasicNode(2L));
+    Assert.assertEquals(mNode, new BasicNode(1));
+    Assert.assertNotEquals(mNode, new BasicNode(2));
   }
 
   /**
@@ -56,7 +56,7 @@ public final class BasicNodeTest {
    */
   @Test
   public void testGetId() {
-    Assert.assertEquals(1L, mNode.getId());
+    Assert.assertEquals(1, mNode.getId());
   }
 
   /**
@@ -65,8 +65,8 @@ public final class BasicNodeTest {
    */
   @Test
   public void testHashCode() {
-    Assert.assertEquals(mNode.hashCode(), new BasicNode(1L).hashCode());
-    Assert.assertNotEquals(mNode.hashCode(), new BasicNode(2L).hashCode());
+    Assert.assertEquals(mNode.hashCode(), new BasicNode(1).hashCode());
+    Assert.assertNotEquals(mNode.hashCode(), new BasicNode(2).hashCode());
   }
 
 }

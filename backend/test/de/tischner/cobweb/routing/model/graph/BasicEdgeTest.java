@@ -21,20 +21,20 @@ public final class BasicEdgeTest {
    */
   @Before
   public void setUp() {
-    mEdge = new BasicEdge<>(1L, new BasicNode(1L), new BasicNode(2L), 1.0);
+    mEdge = new BasicEdge<>(1, new BasicNode(1), new BasicNode(2), 1.0);
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.BasicEdge#BasicEdge(long, de.tischner.cobweb.routing.model.graph.INode, de.tischner.cobweb.routing.model.graph.INode, double)}.
+   * {@link de.tischner.cobweb.routing.model.graph.BasicEdge#BasicEdge(int, de.tischner.cobweb.routing.model.graph.INode, de.tischner.cobweb.routing.model.graph.INode, double)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testBasicEdge() {
     try {
-      new BasicEdge<>(1L, new BasicNode(1L), new BasicNode(2L), 1.0);
-      new BasicEdge<>(1L, new BasicNode(1L), new BasicNode(2L), 0.0);
-      new BasicEdge<>(1L, new BasicNode(1L), new BasicNode(2L), -1.0);
+      new BasicEdge<>(1, new BasicNode(1), new BasicNode(2), 1.0);
+      new BasicEdge<>(1, new BasicNode(1), new BasicNode(2), 0.0);
+      new BasicEdge<>(1, new BasicNode(1), new BasicNode(2), -1.0);
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -46,10 +46,10 @@ public final class BasicEdgeTest {
    */
   @Test
   public void testEqualsObject() {
-    BasicEdge<BasicNode> other = new BasicEdge<>(1L, new BasicNode(2L), new BasicNode(3L), 3.0);
+    BasicEdge<BasicNode> other = new BasicEdge<>(1, new BasicNode(2), new BasicNode(3), 3.0);
     Assert.assertEquals(mEdge, other);
 
-    other = new BasicEdge<>(2L, new BasicNode(1L), new BasicNode(2L), 1.0);
+    other = new BasicEdge<>(2, new BasicNode(1), new BasicNode(2), 1.0);
     Assert.assertNotEquals(mEdge, other);
   }
 
@@ -68,7 +68,7 @@ public final class BasicEdgeTest {
    */
   @Test
   public void testGetDestination() {
-    Assert.assertEquals(2L, mEdge.getDestination().getId());
+    Assert.assertEquals(2, mEdge.getDestination().getId());
   }
 
   /**
@@ -77,7 +77,7 @@ public final class BasicEdgeTest {
    */
   @Test
   public void testGetId() {
-    Assert.assertEquals(1L, mEdge.getId());
+    Assert.assertEquals(1, mEdge.getId());
   }
 
   /**
@@ -86,7 +86,7 @@ public final class BasicEdgeTest {
    */
   @Test
   public void testGetSource() {
-    Assert.assertEquals(1L, mEdge.getSource().getId());
+    Assert.assertEquals(1, mEdge.getSource().getId());
   }
 
   /**
@@ -95,10 +95,10 @@ public final class BasicEdgeTest {
    */
   @Test
   public void testHashCode() {
-    BasicEdge<BasicNode> other = new BasicEdge<>(1L, new BasicNode(2L), new BasicNode(3L), 3.0);
+    BasicEdge<BasicNode> other = new BasicEdge<>(1, new BasicNode(2), new BasicNode(3), 3.0);
     Assert.assertEquals(mEdge.hashCode(), other.hashCode());
 
-    other = new BasicEdge<>(2L, new BasicNode(1L), new BasicNode(2L), 1.0);
+    other = new BasicEdge<>(2, new BasicNode(1), new BasicNode(2), 1.0);
     Assert.assertNotEquals(mEdge.hashCode(), other.hashCode());
   }
 

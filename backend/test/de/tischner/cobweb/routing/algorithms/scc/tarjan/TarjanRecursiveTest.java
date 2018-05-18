@@ -28,7 +28,7 @@ public final class TarjanRecursiveTest {
   /**
    * Counter used for generating unique edge IDs.
    */
-  private long mEdgeIdCounter;
+  private int mEdgeIdCounter;
   /**
    * The Tarjan instance used for testing.
    */
@@ -40,12 +40,12 @@ public final class TarjanRecursiveTest {
   @Before
   public void setUp() {
     final BasicGraph graph = new BasicGraph();
-    final BasicNode firstNode = new BasicNode(1L);
-    final BasicNode secondNode = new BasicNode(2L);
-    final BasicNode thirdNode = new BasicNode(3L);
-    final BasicNode fourthNode = new BasicNode(4L);
-    final BasicNode fifthNode = new BasicNode(5L);
-    final BasicNode sixthNode = new BasicNode(6L);
+    final BasicNode firstNode = new BasicNode(1);
+    final BasicNode secondNode = new BasicNode(2);
+    final BasicNode thirdNode = new BasicNode(3);
+    final BasicNode fourthNode = new BasicNode(4);
+    final BasicNode fifthNode = new BasicNode(5);
+    final BasicNode sixthNode = new BasicNode(6);
 
     graph.addNode(firstNode);
     graph.addNode(secondNode);
@@ -64,10 +64,10 @@ public final class TarjanRecursiveTest {
     addEdgeInBothDirections(graph, fifthNode, sixthNode);
     addEdgeInBothDirections(graph, sixthNode, fourthNode);
 
-    final BasicNode seventhNode = new BasicNode(7L);
-    final BasicNode eighthNode = new BasicNode(8L);
-    final BasicNode ninthNode = new BasicNode(9L);
-    final BasicNode tenthNode = new BasicNode(10L);
+    final BasicNode seventhNode = new BasicNode(7);
+    final BasicNode eighthNode = new BasicNode(8);
+    final BasicNode ninthNode = new BasicNode(9);
+    final BasicNode tenthNode = new BasicNode(10);
 
     graph.addNode(seventhNode);
     graph.addNode(eighthNode);
@@ -90,14 +90,14 @@ public final class TarjanRecursiveTest {
   @Test
   public void testGetLargestScc() {
     final StronglyConnectedComponent<BasicNode> scc = mTarjan.getLargestScc();
-    final Set<Long> ids = scc.getNodes().stream().map(IHasId::getId).collect(Collectors.toSet());
+    final Set<Integer> ids = scc.getNodes().stream().map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertEquals(6, ids.size());
-    Assert.assertTrue(ids.contains(1L));
-    Assert.assertTrue(ids.contains(2L));
-    Assert.assertTrue(ids.contains(3L));
-    Assert.assertTrue(ids.contains(4L));
-    Assert.assertTrue(ids.contains(5L));
-    Assert.assertTrue(ids.contains(6L));
+    Assert.assertTrue(ids.contains(1));
+    Assert.assertTrue(ids.contains(2));
+    Assert.assertTrue(ids.contains(3));
+    Assert.assertTrue(ids.contains(4));
+    Assert.assertTrue(ids.contains(5));
+    Assert.assertTrue(ids.contains(6));
   }
 
   /**
@@ -113,24 +113,25 @@ public final class TarjanRecursiveTest {
     Assert.assertTrue(sizes.contains(3));
     Assert.assertTrue(sizes.contains(1));
 
-    final Set<Long> smallScc = sccs.stream().filter(scc -> scc.size() == 1).map(StronglyConnectedComponent::getNodes)
+    final Set<Integer> smallScc = sccs.stream().filter(scc -> scc.size() == 1).map(StronglyConnectedComponent::getNodes)
         .findAny().orElse(new HashSet<>()).stream().map(IHasId::getId).collect(Collectors.toSet());
-    Assert.assertTrue(smallScc.contains(10L));
+    Assert.assertTrue(smallScc.contains(10));
 
-    final Set<Long> middleScc = sccs.stream().filter(scc -> scc.size() == 3).map(StronglyConnectedComponent::getNodes)
-        .findAny().orElse(new HashSet<>()).stream().map(IHasId::getId).collect(Collectors.toSet());
-    Assert.assertTrue(middleScc.contains(7L));
-    Assert.assertTrue(middleScc.contains(8L));
-    Assert.assertTrue(middleScc.contains(9L));
+    final Set<Integer> middleScc =
+        sccs.stream().filter(scc -> scc.size() == 3).map(StronglyConnectedComponent::getNodes).findAny()
+            .orElse(new HashSet<>()).stream().map(IHasId::getId).collect(Collectors.toSet());
+    Assert.assertTrue(middleScc.contains(7));
+    Assert.assertTrue(middleScc.contains(8));
+    Assert.assertTrue(middleScc.contains(9));
 
-    final Set<Long> largeScc = sccs.stream().filter(scc -> scc.size() == 6).map(StronglyConnectedComponent::getNodes)
+    final Set<Integer> largeScc = sccs.stream().filter(scc -> scc.size() == 6).map(StronglyConnectedComponent::getNodes)
         .findAny().orElse(new HashSet<>()).stream().map(IHasId::getId).collect(Collectors.toSet());
-    Assert.assertTrue(largeScc.contains(1L));
-    Assert.assertTrue(largeScc.contains(2L));
-    Assert.assertTrue(largeScc.contains(3L));
-    Assert.assertTrue(largeScc.contains(4L));
-    Assert.assertTrue(largeScc.contains(5L));
-    Assert.assertTrue(largeScc.contains(6L));
+    Assert.assertTrue(largeScc.contains(1));
+    Assert.assertTrue(largeScc.contains(2));
+    Assert.assertTrue(largeScc.contains(3));
+    Assert.assertTrue(largeScc.contains(4));
+    Assert.assertTrue(largeScc.contains(5));
+    Assert.assertTrue(largeScc.contains(6));
   }
 
   /**

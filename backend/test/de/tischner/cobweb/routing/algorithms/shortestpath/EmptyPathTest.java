@@ -25,7 +25,7 @@ public final class EmptyPathTest {
    */
   @Before
   public void setUp() {
-    mPath = new EmptyPath<>(new BasicNode(1L));
+    mPath = new EmptyPath<>(new BasicNode(1));
   }
 
   /**
@@ -36,7 +36,7 @@ public final class EmptyPathTest {
   @Test
   public void testEmptyPath() {
     try {
-      new EmptyPath<>(new RoadNode(1L, 1.0F, 1.0F));
+      new EmptyPath<>(new RoadNode(1, 1.0F, 1.0F));
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -48,7 +48,7 @@ public final class EmptyPathTest {
    */
   @Test
   public void testGetDestination() {
-    Assert.assertEquals(1L, mPath.getDestination().getId());
+    Assert.assertEquals(1, mPath.getDestination().getId());
   }
 
   /**
@@ -57,7 +57,7 @@ public final class EmptyPathTest {
    */
   @Test
   public void testGetSource() {
-    Assert.assertEquals(1L, mPath.getSource().getId());
+    Assert.assertEquals(1, mPath.getSource().getId());
   }
 
   /**

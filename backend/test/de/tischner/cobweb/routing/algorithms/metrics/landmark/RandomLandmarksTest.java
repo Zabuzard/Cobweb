@@ -22,18 +22,18 @@ public class RandomLandmarksTest {
   @Test
   public void testGetLandmarks() {
     final BasicGraph graph = new BasicGraph();
-    final BasicNode first = new BasicNode(1L);
-    final BasicNode second = new BasicNode(2L);
-    final BasicNode third = new BasicNode(3L);
-    final BasicNode fourth = new BasicNode(4L);
+    final BasicNode first = new BasicNode(1);
+    final BasicNode second = new BasicNode(2);
+    final BasicNode third = new BasicNode(3);
+    final BasicNode fourth = new BasicNode(4);
     graph.addNode(first);
     graph.addNode(second);
     graph.addNode(third);
     graph.addNode(fourth);
-    graph.addEdge(new BasicEdge<>(1L, first, second, 1.0));
-    graph.addEdge(new BasicEdge<>(1L, second, third, 1.0));
-    graph.addEdge(new BasicEdge<>(1L, third, fourth, 1.0));
-    graph.addEdge(new BasicEdge<>(1L, fourth, first, 1.0));
+    graph.addEdge(new BasicEdge<>(1, first, second, 1.0));
+    graph.addEdge(new BasicEdge<>(1, second, third, 1.0));
+    graph.addEdge(new BasicEdge<>(1, third, fourth, 1.0));
+    graph.addEdge(new BasicEdge<>(1, fourth, first, 1.0));
 
     final RandomLandmarks<BasicNode, BasicGraph> landmarks = new RandomLandmarks<>(graph);
 

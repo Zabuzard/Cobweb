@@ -20,7 +20,7 @@ public final class SpatialNodeDataTest {
    */
   @Before
   public void setUp() {
-    mSpatialNodeData = new SpatialNodeData(1L, 10.0F, 5.0F);
+    mSpatialNodeData = new SpatialNodeData(2, 1L, 10.0F, 5.0F);
   }
 
   /**
@@ -28,7 +28,7 @@ public final class SpatialNodeDataTest {
    */
   @Test
   public final void testGetId() {
-    Assert.assertEquals(1L, mSpatialNodeData.getId());
+    Assert.assertEquals(2, mSpatialNodeData.getId());
   }
 
   /**
@@ -50,16 +50,24 @@ public final class SpatialNodeDataTest {
   }
 
   /**
+   * Test method for {@link de.tischner.cobweb.db.SpatialNodeData#getOsmId()}.
+   */
+  @Test
+  public final void testGetOsmId() {
+    Assert.assertEquals(1L, mSpatialNodeData.getOsmId());
+  }
+
+  /**
    * Test method for
-   * {@link de.tischner.cobweb.db.SpatialNodeData#SpatialNodeData(long, float, float)}.
+   * {@link de.tischner.cobweb.db.SpatialNodeData#SpatialNodeData(int, long, float, float)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public final void testSpatialNodeData() {
     try {
-      new SpatialNodeData(1L, 10.0F, 5.0F);
-      new SpatialNodeData(-10L, -10.0F, -5.0F);
-      new SpatialNodeData(0L, 0.0F, 0.0F);
+      new SpatialNodeData(2, 1L, 10.0F, 5.0F);
+      new SpatialNodeData(-2, -10L, -10.0F, -5.0F);
+      new SpatialNodeData(0, 0L, 0.0F, 0.0F);
     } catch (final Exception e) {
       Assert.fail();
     }

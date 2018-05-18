@@ -20,7 +20,7 @@ public final class RoadNodeTest {
    */
   @Before
   public void setUp() {
-    mNode = new RoadNode(1L, 1.0F, 1.0F);
+    mNode = new RoadNode(1, 1.0F, 1.0F);
   }
 
   /**
@@ -29,8 +29,8 @@ public final class RoadNodeTest {
    */
   @Test
   public void testEqualsObject() {
-    Assert.assertEquals(mNode, new RoadNode(1L, 1.0F, 1.0F));
-    Assert.assertNotEquals(mNode, new RoadNode(2L, 1.0F, 1.0F));
+    Assert.assertEquals(mNode, new RoadNode(1, 1.0F, 1.0F));
+    Assert.assertNotEquals(mNode, new RoadNode(2, 1.0F, 1.0F));
   }
 
   /**
@@ -39,7 +39,7 @@ public final class RoadNodeTest {
    */
   @Test
   public void testGetId() {
-    Assert.assertEquals(1L, mNode.getId());
+    Assert.assertEquals(1, mNode.getId());
   }
 
   /**
@@ -66,21 +66,21 @@ public final class RoadNodeTest {
    */
   @Test
   public void testHashCode() {
-    Assert.assertEquals(mNode.hashCode(), new RoadNode(1L, 1.0F, 1.0F).hashCode());
-    Assert.assertNotEquals(mNode.hashCode(), new RoadNode(2L, 1.0F, 1.0F).hashCode());
+    Assert.assertEquals(mNode.hashCode(), new RoadNode(1, 1.0F, 1.0F).hashCode());
+    Assert.assertNotEquals(mNode.hashCode(), new RoadNode(2, 1.0F, 1.0F).hashCode());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#RoadNode(long, float, float)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadNode#RoadNode(int, float, float)}.
    */
   @SuppressWarnings({ "static-method", "unused" })
   @Test
   public void testRoadNode() {
     try {
-      new RoadNode(1L, 1.0F, 1.0F);
-      new RoadNode(0L, 0.0F, 0.0F);
-      new RoadNode(-1L, -1.0F, -1.0F);
+      new RoadNode(1, 1.0F, 1.0F);
+      new RoadNode(0, 0.0F, 0.0F);
+      new RoadNode(-1, -1.0F, -1.0F);
     } catch (final Exception e) {
       Assert.fail();
     }

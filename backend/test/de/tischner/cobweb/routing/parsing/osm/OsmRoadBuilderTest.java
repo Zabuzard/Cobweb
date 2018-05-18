@@ -30,7 +30,7 @@ public final class OsmRoadBuilderTest {
   /**
    * Counter used for generating unique edge IDs.
    */
-  private long mEdgeIdCounter;
+  private int mEdgeIdCounter;
   /**
    * The graph used for testing.
    */
@@ -42,12 +42,13 @@ public final class OsmRoadBuilderTest {
   @Before
   public void setUp() {
     mGraph = new RoadGraph<>();
-    final RoadNode firstNode = new RoadNode(1L, 1.0F, 1.0F);
-    final RoadNode secondNode = new RoadNode(2L, 2.0F, 2.0F);
-    final RoadNode thirdNode = new RoadNode(3L, 3.0F, 3.0F);
-    final RoadNode fourthNode = new RoadNode(4L, 4.0F, 4.0F);
-    final RoadNode fifthNode = new RoadNode(5L, 5.0F, 5.0F);
-    final RoadNode sixthNode = new RoadNode(6L, 6.0F, 6.0F);
+    mBuilder = new OsmRoadBuilder<>(mGraph, mGraph);
+    final RoadNode firstNode = mBuilder.buildNode(new Node(1, 1.0F, 1.0F));
+    final RoadNode secondNode = mBuilder.buildNode(new Node(2, 2.0F, 2.0F));
+    final RoadNode thirdNode = mBuilder.buildNode(new Node(3, 3.0F, 3.0F));
+    final RoadNode fourthNode = mBuilder.buildNode(new Node(4, 4.0F, 4.0F));
+    final RoadNode fifthNode = mBuilder.buildNode(new Node(5, 5.0F, 5.0F));
+    final RoadNode sixthNode = mBuilder.buildNode(new Node(6, 6.0F, 6.0F));
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -65,8 +66,6 @@ public final class OsmRoadBuilderTest {
     addEdgeInBothDirections(mGraph, fifthNode, secondNode);
     addEdgeInBothDirections(mGraph, fifthNode, sixthNode);
     addEdgeInBothDirections(mGraph, sixthNode, fourthNode);
-
-    mBuilder = new OsmRoadBuilder<>(mGraph);
   }
 
   /**
@@ -82,9 +81,9 @@ public final class OsmRoadBuilderTest {
     final OsmWay way = new Way(20L, nodes, Arrays.asList(new Tag("highway", "motorway"), new Tag("maxspeed", "100")));
 
     final RoadEdge<RoadNode> edge = mBuilder.buildEdge(way, 1L, 6L);
-    Assert.assertEquals(1L, edge.getSource().getId());
-    Assert.assertEquals(6L, edge.getDestination().getId());
-    Assert.assertEquals(20L, edge.getId());
+    Assert.assertEquals(0, edge.getSource().getId());
+    Assert.assertEquals(5, edge.getDestination().getId());
+    Assert.assertEquals(0, edge.getId());
     Assert.assertTrue(edge.getCost() > 0.0);
   }
 
@@ -95,7 +94,7 @@ public final class OsmRoadBuilderTest {
   @Test
   public void testBuildNode() {
     final RoadNode node = mBuilder.buildNode(new Node(20L, 20.0, 20.0));
-    Assert.assertEquals(20L, node.getId());
+    Assert.assertEquals(6, node.getId());
     Assert.assertEquals(20.0, node.getLatitude(), 0.0001);
     Assert.assertEquals(20.0, node.getLongitude(), 0.0001);
   }
@@ -116,7 +115,7 @@ public final class OsmRoadBuilderTest {
     mGraph.addEdge(edge);
     final double costBefore = edge.getCost();
 
-    final RoadNode node = mGraph.getNodeById(6L).get();
+    final RoadNode node = mGraph.getNodeById(5).get();
     node.setLatitude(100.0F);
     node.setLongitude(100.0F);
 
@@ -126,13 +125,14 @@ public final class OsmRoadBuilderTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder#OsmRoadBuilder(de.tischner.cobweb.routing.model.graph.IGraph)}.
+   * {@link de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder#OsmRoadBuilder(de.tischner.cobweb.routing.model.graph.IGraph, de.tischner.cobweb.routing.model.graph.road.IUniqueIdGenerator)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testOsmRoadBuilder() {
+    final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph = new RoadGraph<>();
     try {
-      new OsmRoadBuilder<>(new RoadGraph<>());
+      new OsmRoadBuilder<>(graph, graph);
     } catch (final Exception e) {
       Assert.fail();
     }

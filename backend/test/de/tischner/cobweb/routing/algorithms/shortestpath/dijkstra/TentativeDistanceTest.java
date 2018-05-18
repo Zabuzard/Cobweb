@@ -24,9 +24,9 @@ public final class TentativeDistanceTest {
    */
   @Before
   public void setUp() {
-    final BasicNode first = new BasicNode(1L);
-    final BasicNode second = new BasicNode(2L);
-    mElement = new TentativeDistance<>(second, new BasicEdge<>(1L, first, second, 1.0), 1.0, 3.0);
+    final BasicNode first = new BasicNode(1);
+    final BasicNode second = new BasicNode(2);
+    mElement = new TentativeDistance<>(second, new BasicEdge<>(1, first, second, 1.0), 1.0, 3.0);
   }
 
   /**
@@ -36,11 +36,11 @@ public final class TentativeDistanceTest {
   @Test
   public void testCompareTo() {
     TentativeDistance<BasicNode, BasicEdge<BasicNode>> other =
-        new TentativeDistance<>(new BasicNode(3L), null, 2.0, 1.0);
+        new TentativeDistance<>(new BasicNode(3), null, 2.0, 1.0);
     Assert.assertTrue(mElement.compareTo(other) > 0);
     Assert.assertTrue(other.compareTo(mElement) < 0);
 
-    other = new TentativeDistance<>(new BasicNode(3L), null, 2.0, 2.0);
+    other = new TentativeDistance<>(new BasicNode(3), null, 2.0, 2.0);
 
     Assert.assertEquals(0, mElement.compareTo(other));
     Assert.assertEquals(0, other.compareTo(mElement));
@@ -61,7 +61,7 @@ public final class TentativeDistanceTest {
    */
   @Test
   public void testGetNode() {
-    Assert.assertEquals(2L, mElement.getNode().getId());
+    Assert.assertEquals(2, mElement.getNode().getId());
   }
 
   /**
@@ -71,7 +71,7 @@ public final class TentativeDistanceTest {
   @Test
   public void testGetParentEdge() {
     Assert.assertEquals(1L, mElement.getParentEdge().getId());
-    Assert.assertNull(new TentativeDistance<>(new BasicNode(3L), null, 0.0, 3.0).getParentEdge());
+    Assert.assertNull(new TentativeDistance<>(new BasicNode(3), null, 0.0, 3.0).getParentEdge());
   }
 
   /**
@@ -99,10 +99,10 @@ public final class TentativeDistanceTest {
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testTentativeDistanceNEDouble() {
-    final BasicNode first = new BasicNode(1L);
-    final BasicNode second = new BasicNode(2L);
+    final BasicNode first = new BasicNode(1);
+    final BasicNode second = new BasicNode(2);
     try {
-      new TentativeDistance<>(second, new BasicEdge<>(1L, first, second, 1.0), 1.0);
+      new TentativeDistance<>(second, new BasicEdge<>(1, first, second, 1.0), 1.0);
       new TentativeDistance<>(second, null, 0.0);
     } catch (final Exception e) {
       Assert.fail();
@@ -116,10 +116,10 @@ public final class TentativeDistanceTest {
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testTentativeDistanceNEDoubleDouble() {
-    final BasicNode first = new BasicNode(1L);
-    final BasicNode second = new BasicNode(2L);
+    final BasicNode first = new BasicNode(1);
+    final BasicNode second = new BasicNode(2);
     try {
-      new TentativeDistance<>(second, new BasicEdge<>(1L, first, second, 1.0), 1.0, 3.0);
+      new TentativeDistance<>(second, new BasicEdge<>(1, first, second, 1.0), 1.0, 3.0);
       new TentativeDistance<>(second, null, 0.0, 3.0);
     } catch (final Exception e) {
       Assert.fail();

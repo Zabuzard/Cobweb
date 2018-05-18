@@ -20,7 +20,7 @@ import de.tischner.cobweb.parsing.osm.OsmParseUtil;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.road.ICanGetNodeById;
+import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.road.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.ISpatial;
 import de.topobyte.osm4j.core.model.iface.OsmBounds;
@@ -39,7 +39,16 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * which are accepted by a given road filter, nodes and relations are rejected.
  * Nodes will be constructed from ways instead and meta data of nodes will be
  * fetched from a given database. The node and edge instances itself are created
- * using a given builder.
+ * using a given builder.<br>
+ * <br>
+ * <i>Implementation note</i>: In order to ensure that, when requesting spatial
+ * data, no nodes are lost, it must be ensured that node mappings are already in
+ * the database when pushing the requests. The current implementation ensures
+ * this by giving both a buffer of the same size, always flushing both at the
+ * same time. First the mappings, directly after the spatial data requests.
+ * Therefore, it is also important that node and way ID mappings are kept in
+ * different buffer. Else it would not be ensured that the ID mapping buffer is
+ * full exactly when the spatial data buffer is full.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the node
@@ -47,10 +56,10 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * @param <G> Type of the graph
  */
 public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & ICanGetNodeById<N>> implements IOsmFileHandler {
+    G extends IGraph<N, E> & IGetNodeById<N>> implements IOsmFileHandler {
   /**
-   * The size of the node ID buffer. If the buffer reaches the limit spatial
-   * node data from all buffered node IDs is requested from the database.
+   * The size of the buffers. If a buffer reaches the limit the buffered
+   * entities are submitted to the database.
    */
   private static final int BUFFER_SIZE = 100_000;
   /**
@@ -58,18 +67,23 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(OsmRoadHandler.class);
   /**
-   * The buffer to use for buffering node IDs for which spatial node data is to
-   * be requested from the database. The buffer is used to avoid requesting data
-   * for every node in a single connection to the database.
+   * The buffer to use for buffering node ID mappings which are to be submitted
+   * to the database. The buffer is used to avoid submitting data for every
+   * mapping in a single connection to the database.
    */
-  private final long[] mBufferedRequests;
+  private final IdMapping[] mBufferedNodeMappings;
   /**
-   * The current index to use in the node ID buffer. It points to the index
-   * where the next node ID can be inserted. So it is always one greater than
-   * the index of the last inserted node ID. By that it represents the current
-   * size of the buffer.
+   * The buffer to use for buffering OSM node IDs for which spatial node data is
+   * to be requested from the database. The buffer is used to avoid requesting
+   * data for every node in a single connection to the database.
    */
-  private int mBufferIndex;
+  private final long[] mBufferedSpatialRequests;
+  /**
+   * The buffer to use for buffering way ID mappings which are to be submitted
+   * to the database. The buffer is used to avoid submitting data for every
+   * mapping in a single connection to the database.
+   */
+  private final IdMapping[] mBufferedWayMappings;
   /**
    * Builder to use for constructing edges and nodes that are to be inserted
    * into the graph.
@@ -88,16 +102,37 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private final G mGraph;
   /**
+   * The current index to use in the node mapping buffer. It points to the index
+   * where the next node mapping can be inserted. So it is always one greater
+   * than the index of the last inserted node mapping. By that it represents the
+   * current size of the buffer.
+   */
+  private int mNodeMappingBufferIndex;
+  /**
    * The handler to use which determines the OSM files that contain more recent
    * or new data than the data already stored in the graph. Will only be used if
    * the configuration has set the use of a graph cache.
    */
   private final RecentHandler mRecentHandler;
   /**
+   * The current index to use in the OSM node ID buffer. It points to the index
+   * where the next node ID can be inserted. So it is always one greater than
+   * the index of the last inserted node ID. By that it represents the current
+   * size of the buffer.
+   */
+  private int mSpatialRequestBufferIndex;
+  /**
    * Whether or not a graph cache is to be used. This determines if OSM files
    * should be filtered by a {@link RecentHandler} or not.
    */
   private final boolean mUseGraphCache;
+  /**
+   * The current index to use in the way mapping buffer. It points to the index
+   * where the next way mapping can be inserted. So it is always one greater
+   * than the index of the last inserted way mapping. By that it represents the
+   * current size of the buffer.
+   */
+  private int mWayMappingBufferIndex;
 
   /**
    * Creates a new OSM road handler which operates on the given graph using the
@@ -123,7 +158,11 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     mFilter = filter;
     mBuilder = builder;
     mDatabase = database;
-    mBufferedRequests = new long[BUFFER_SIZE];
+    // It is important that both buffer have the same size to ensure
+    // mappings are inside the database when requesting spatial data
+    mBufferedNodeMappings = new IdMapping[BUFFER_SIZE];
+    mBufferedWayMappings = new IdMapping[BUFFER_SIZE];
+    mBufferedSpatialRequests = new long[BUFFER_SIZE];
 
     mUseGraphCache = config.useGraphCache();
     if (mUseGraphCache) {
@@ -139,8 +178,10 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    */
   @Override
   public void complete() throws IOException {
-    // Submit buffer
-    submitBufferedRequests();
+    // Submit buffers, note that the order is important
+    submitBufferedNodeMappings();
+    submitBufferedWayMappings();
+    submitBufferedSpatialRequests();
 
     mBuilder.complete();
     if (mUseGraphCache) {
@@ -199,34 +240,51 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
     final int wayDirection = OsmParseUtil.parseWayDirection(tagToValue);
 
+    Integer internalWayId = null;
+
     // Iterate all nodes
-    long sourceId = -1;
+    long sourceIdOsm = -1;
+    boolean isFirstIteration = true;
     for (int i = 0; i < way.getNumberOfNodes(); i++) {
-      final long destinationId = way.getNodeId(i);
+      final long destinationIdOsm = way.getNodeId(i);
       // Attempt to add the current node, spatial data is unknown at first
-      final Node destinationNode = new Node(destinationId, 0.0, 0.0);
-      final boolean wasAdded = mGraph.addNode(mBuilder.buildNode(destinationNode));
-      // Request spatial data of the node
+      final Node destinationNode = new Node(destinationIdOsm, 0.0, 0.0);
+      final N node = mBuilder.buildNode(destinationNode);
+      final boolean wasAdded = mGraph.addNode(node);
+      // Request spatial data of the node and register the ID mapping
       if (wasAdded) {
-        queueSpatialNodeRequest(destinationId);
+        // It is important that the mappings are in the database when
+        // requesting spatial data.
+        queueNodeIdMapping(destinationIdOsm, node.getId());
+        queueSpatialNodeRequest(destinationIdOsm);
       }
 
       // Update and yield the first iteration
-      if (sourceId == -1) {
-        sourceId = destinationId;
+      if (isFirstIteration) {
+        sourceIdOsm = destinationIdOsm;
+        isFirstIteration = false;
         continue;
       }
 
       // Create an edge
       if (wayDirection >= 0) {
-        mGraph.addEdge(mBuilder.buildEdge(way, sourceId, destinationId));
+        final E edge = mBuilder.buildEdge(way, sourceIdOsm, destinationIdOsm);
+        internalWayId = edge.getId();
+        mGraph.addEdge(edge);
       }
       if (wayDirection <= 0) {
-        mGraph.addEdge(mBuilder.buildEdge(way, destinationId, sourceId));
+        final E edge = mBuilder.buildEdge(way, destinationIdOsm, sourceIdOsm);
+        internalWayId = edge.getId();
+        mGraph.addEdge(edge);
       }
 
       // Update for the next iteration
-      sourceId = destinationId;
+      sourceIdOsm = destinationIdOsm;
+    }
+
+    // Queue way ID mapping
+    if (internalWayId != null) {
+      queueWayIdMapping(way.getId(), internalWayId);
     }
   }
 
@@ -267,23 +325,88 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
   }
 
   /**
+   * Queues a node ID mapping which is to be pushed to the database. The data is
+   * buffered and the buffer is submitted using
+   * {@link #submitBufferedNodeMappings()}.
+   *
+   * @param osmId      The unique OSM ID of the mapping to queue
+   * @param internalId The internal ID of the mapping to queue
+   */
+  private void queueNodeIdMapping(final long osmId, final int internalId) {
+    // If buffer is full, submit it
+    if (mNodeMappingBufferIndex >= mBufferedNodeMappings.length) {
+      submitBufferedNodeMappings();
+    }
+
+    // Collect the mapping, index has changed due to submit
+    mBufferedNodeMappings[mNodeMappingBufferIndex] = new IdMapping(osmId, internalId, true);
+
+    // Increase index
+    mNodeMappingBufferIndex++;
+  }
+
+  /**
    * Queues a spatial node data request for the given node. The request is
    * buffered and the buffer is submitted using
-   * {@link #submitBufferedRequests()}.
+   * {@link #submitBufferedSpatialRequests()}.
    *
-   * @param nodeId The unique ID of the node to queue a request for
+   * @param nodeIdOsm The unique OSM ID of the node to queue a request for
    */
-  private void queueSpatialNodeRequest(final long nodeId) {
+  private void queueSpatialNodeRequest(final long nodeIdOsm) {
     // If buffer is full, submit it
-    if (mBufferIndex >= mBufferedRequests.length) {
-      submitBufferedRequests();
+    if (mSpatialRequestBufferIndex >= mBufferedSpatialRequests.length) {
+      submitBufferedSpatialRequests();
     }
 
     // Collect the node, index has changed due to submit
-    mBufferedRequests[mBufferIndex] = nodeId;
+    mBufferedSpatialRequests[mSpatialRequestBufferIndex] = nodeIdOsm;
 
     // Increase index
-    mBufferIndex++;
+    mSpatialRequestBufferIndex++;
+  }
+
+  /**
+   * Queues a way ID mapping which is to be pushed to the database. The data is
+   * buffered and the buffer is submitted using
+   * {@link #submitBufferedWayMappings()}.
+   *
+   * @param osmId      The unique OSM ID of the mapping to queue
+   * @param internalId The internal ID of the mapping to queue
+   */
+  private void queueWayIdMapping(final long osmId, final int internalId) {
+    // If buffer is full, submit it
+    if (mWayMappingBufferIndex >= mBufferedWayMappings.length) {
+      submitBufferedWayMappings();
+    }
+
+    // Collect the mapping, index has changed due to submit
+    mBufferedWayMappings[mWayMappingBufferIndex] = new IdMapping(osmId, internalId, false);
+
+    // Increase index
+    mWayMappingBufferIndex++;
+  }
+
+  /**
+   * Submits the buffered node ID mappings. The mappings are send to the given
+   * database.<br>
+   * <br>
+   * Afterwards, the buffer index is reset to implicitly clear the buffer.
+   * Ideally, this method is only used when the buffer is full.
+   */
+  private void submitBufferedNodeMappings() {
+    // Send all buffered mappings up to the current index
+    final int size = mNodeMappingBufferIndex;
+    if (size == 0) {
+      return;
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Submitting node ID mappings of size: {}", size);
+    }
+    mDatabase.offerIdMappings(Arrays.stream(mBufferedNodeMappings, 0, size), size);
+
+    // Reset index since buffer is empty again
+    mNodeMappingBufferIndex = 0;
   }
 
   /**
@@ -294,9 +417,9 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
    * Afterwards, the buffer index is reset to implicitly clear the buffer.
    * Ideally, this method is only used when the buffer is full.
    */
-  private void submitBufferedRequests() {
+  private void submitBufferedSpatialRequests() {
     // Send all buffered requests up to the current index
-    final int size = mBufferIndex;
+    final int size = mSpatialRequestBufferIndex;
     if (size == 0) {
       return;
     }
@@ -305,10 +428,36 @@ public final class OsmRoadHandler<N extends INode & IHasId & ISpatial, E extends
       LOGGER.debug("Submitting buffered requests of size: {}", size);
     }
     final Collection<SpatialNodeData> nodeData =
-        mDatabase.getSpatialNodeData(Arrays.stream(mBufferedRequests, 0, size), size);
+        mDatabase.getSpatialNodeData(Arrays.stream(mBufferedSpatialRequests, 0, size), size);
+    if (nodeData.size() < size) {
+      LOGGER.error("Database did not deliver spatial data for all {} nodes, lost: {}", size, size - nodeData.size());
+    }
     nodeData.forEach(this::insertSpatialData);
 
     // Reset index since buffer is empty again
-    mBufferIndex = 0;
+    mSpatialRequestBufferIndex = 0;
+  }
+
+  /**
+   * Submits the buffered way ID mappings. The mappings are send to the given
+   * database.<br>
+   * <br>
+   * Afterwards, the buffer index is reset to implicitly clear the buffer.
+   * Ideally, this method is only used when the buffer is full.
+   */
+  private void submitBufferedWayMappings() {
+    // Send all buffered mappings up to the current index
+    final int size = mWayMappingBufferIndex;
+    if (size == 0) {
+      return;
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Submitting way ID mappings of size: {}", size);
+    }
+    mDatabase.offerIdMappings(Arrays.stream(mBufferedWayMappings, 0, size), size);
+
+    // Reset index since buffer is empty again
+    mWayMappingBufferIndex = 0;
   }
 }

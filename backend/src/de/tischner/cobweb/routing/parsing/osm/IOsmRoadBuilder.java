@@ -19,13 +19,14 @@ public interface IOsmRoadBuilder<N extends INode & IHasId & ISpatial, E extends 
    * Builds an edge which connects the source and destination nodes with the
    * given unique IDs.
    *
-   * @param way           The OSM way this edge is part of
-   * @param sourceId      The unique ID of the source node this edge connects
-   * @param destinationId The unique ID of the destination node this edge
-   *                      connects
+   * @param way              The OSM way this edge is part of
+   * @param sourceIdOsm      The unique OSM ID of the source node this edge
+   *                         connects
+   * @param destinationIdOsm The unique OSM ID of the destination node this edge
+   *                         connects
    * @return The constructed edge
    */
-  E buildEdge(OsmWay way, long sourceId, long destinationId);
+  E buildEdge(OsmWay way, long sourceIdOsm, long destinationIdOsm);
 
   /**
    * Builds a node which represents the given OSM node. The node must share the
