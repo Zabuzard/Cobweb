@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +28,8 @@ public final class ReverseIteratorTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ReverseIterator#hasNext()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.ReverseIterator#hasNext()}.
    */
   @Test
   public void testHasNext() {
@@ -45,7 +46,8 @@ public final class ReverseIteratorTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ReverseIterator#next()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.ReverseIterator#next()}.
    */
   @Test
   public void testNext() {
@@ -67,7 +69,7 @@ public final class ReverseIteratorTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ReverseIterator#ReverseIterator(java.util.List)}.
+   * {@link de.tischner.cobweb.util.collections.ReverseIterator#ReverseIterator(java.util.List)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test

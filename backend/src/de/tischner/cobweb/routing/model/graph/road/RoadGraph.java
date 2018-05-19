@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
@@ -14,6 +15,8 @@ import de.tischner.cobweb.routing.model.graph.AGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
+import de.tischner.cobweb.util.collections.ArrayMap;
+import de.tischner.cobweb.util.collections.HybridArrayHashSet;
 
 /**
  * Implementation of a {@link IGraph} model which consists of road nodes and
@@ -55,15 +58,30 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
    * The unique ID used for the last way.
    */
   private int mLastWayId;
+  /**
+   * A map that connects nodes to their incoming edges.
+   */
+  private final Map<N, Set<E>> mNodeToIncomingEdges;
+  /**
+   * A map that connects nodes to their outgoing edges.
+   */
+  private final Map<N, Set<E>> mNodeToOutgoingEdges;
 
   /**
    * Creates a new initially empty road graph.
    */
   public RoadGraph() {
-    // TODO Exchange the map by some array
+    // TODO The map could be exchanged by an array. However, from a design-view
+    // it is problematic that IDs could have gaps and thus methods like
+    // getNodes() which return a Collection and not only a Stream get
+    // problematic due to possible null values encoding gaps.
     mIdToNode = IntObjectMaps.mutable.empty();
     mLastNodeId = LAST_ID;
     mLastWayId = LAST_ID;
+
+    // Assume node IDs are close to each other and have no, or only few, gaps.
+    mNodeToIncomingEdges = new ArrayMap<>();
+    mNodeToOutgoingEdges = new ArrayMap<>();
   }
 
   /*
@@ -120,6 +138,20 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
       throw new NoSuchElementException();
     }
     return mLastWayId;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.routing.model.graph.AGraph#getEdges()
+   */
+  @Override
+  public Stream<E> getEdges() {
+    if (mNodeToOutgoingEdges instanceof ArrayMap) {
+      final ArrayMap<N, Set<E>> asArrayMap = (ArrayMap<N, Set<E>>) mNodeToOutgoingEdges;
+      // Fall back to streamValues() since ArrayMap does not support values()
+      return asArrayMap.streamValues().flatMap(Collection::stream);
+    }
+    return super.getEdges();
   }
 
   /*
@@ -190,14 +222,25 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
 
   /*
    * (non-Javadoc)
+   * @see de.tischner.cobweb.routing.model.graph.AGraph#constructEdgeSetWith(de.
+   * tischner.cobweb.routing.model.graph.IEdge)
+   */
+  @Override
+  protected Set<E> constructEdgeSetWith(final E edge) {
+    // Assume that edge sets only contain a very limited amount of edges.
+    return new HybridArrayHashSet<>(edge);
+  }
+
+  /*
+   * (non-Javadoc)
    * @see de.tischner.cobweb.routing.model.graph.AGraph#getNodeToIncomingEdges()
    */
   @Override
   protected Map<N, Set<E>> getNodeToIncomingEdges() {
     if (mIsReversed) {
-      return super.getNodeToOutgoingEdges();
+      return mNodeToOutgoingEdges;
     }
-    return super.getNodeToIncomingEdges();
+    return mNodeToIncomingEdges;
   }
 
   /*
@@ -207,9 +250,9 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
   @Override
   protected Map<N, Set<E>> getNodeToOutgoingEdges() {
     if (mIsReversed) {
-      return super.getNodeToIncomingEdges();
+      return mNodeToIncomingEdges;
     }
-    return super.getNodeToOutgoingEdges();
+    return mNodeToOutgoingEdges;
   }
 
 }

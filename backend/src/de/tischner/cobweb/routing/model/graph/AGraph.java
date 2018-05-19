@@ -3,13 +3,10 @@ package de.tischner.cobweb.routing.model.graph;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
-
-import de.tischner.cobweb.util.ArraySet;
 
 /**
  * Abstract implementation of the {@link IGraph} model. Implements some utility
@@ -33,22 +30,11 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * The amount of edges in this graph.
    */
   private int mAmountOfEdges;
-  /**
-   * A map that connects nodes to their incoming edges.
-   */
-  private final Map<N, Set<E>> mNodeToIncomingEdges;
-  /**
-   * A map that connects nodes to their outgoing edges.
-   */
-  private final Map<N, Set<E>> mNodeToOutgoingEdges;
 
   /**
    * Creates a new initially empty graph.
    */
   public AGraph() {
-    // TODO Exchange the maps by some arrays
-    mNodeToIncomingEdges = new HashMap<>();
-    mNodeToOutgoingEdges = new HashMap<>();
     mAmountOfEdges = 0;
   }
 
@@ -65,7 +51,7 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
     // Add edge to outgoing edges of its source
     Set<E> outgoingEdges = getNodeToOutgoingEdges().get(edge.getSource());
     if (outgoingEdges == null) {
-      outgoingEdges = new ArraySet<>(edge);
+      outgoingEdges = constructEdgeSetWith(edge);
       getNodeToOutgoingEdges().put(edge.getSource(), outgoingEdges);
       wasAdded = true;
     } else {
@@ -75,7 +61,7 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
     // Add edge to incoming edges of its destination
     Set<E> incomingEdges = getNodeToIncomingEdges().get(edge.getDestination());
     if (incomingEdges == null) {
-      incomingEdges = new ArraySet<>(edge);
+      incomingEdges = constructEdgeSetWith(edge);
       getNodeToIncomingEdges().put(edge.getDestination(), incomingEdges);
       wasAdded = true;
     } else {
@@ -116,7 +102,7 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    */
   @Override
   public Stream<E> getEdges() {
-    return mNodeToOutgoingEdges.values().stream().flatMap(Collection::stream);
+    return getNodeToOutgoingEdges().values().stream().flatMap(Collection::stream);
   }
 
   /*
@@ -220,6 +206,15 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
   }
 
   /**
+   * Constructs a set which is used to hold edges. The set must initially
+   * contain the given edge.
+   *
+   * @param edge The edge to add to the set
+   * @return The constructed set which contains the given edge
+   */
+  protected abstract Set<E> constructEdgeSetWith(E edge);
+
+  /**
    * Gets a map that connects nodes to their incoming edges. The map is backed
    * by the graph, changes will be reflected in the graph.<br>
    * <br>
@@ -229,9 +224,7 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    *
    * @return A map connecting nodes to their incoming edges
    */
-  protected Map<N, Set<E>> getNodeToIncomingEdges() {
-    return mNodeToIncomingEdges;
-  }
+  protected abstract Map<N, Set<E>> getNodeToIncomingEdges();
 
   /**
    * Gets a map that connects nodes to their outgoing edges. The map is backed
@@ -243,7 +236,5 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    *
    * @return A map connecting nodes to their outgoing edges
    */
-  protected Map<N, Set<E>> getNodeToOutgoingEdges() {
-    return mNodeToOutgoingEdges;
-  }
+  protected abstract Map<N, Set<E>> getNodeToOutgoingEdges();
 }

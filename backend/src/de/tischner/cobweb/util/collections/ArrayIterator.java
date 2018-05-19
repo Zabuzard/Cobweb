@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

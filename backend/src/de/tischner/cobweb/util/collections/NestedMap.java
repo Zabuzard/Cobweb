@@ -1,10 +1,12 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
 
 /**
  * Nested hash map which uses two keys in a nested structure for storing values.
@@ -21,12 +23,36 @@ public final class NestedMap<K1, K2, V> {
    * keys.
    */
   private final Map<K1, Map<K2, V>> mK1ToK2ToV;
+  /**
+   * The initial capacity to use when creating maps which connect the second key
+   * to the value or <tt>-1</tt> if a default value should be used.
+   */
+  private int mNestedInitialCapacity;
 
   /**
    * Creates a new empty nested map.
    */
   public NestedMap() {
-    mK1ToK2ToV = new HashMap<>();
+    this(Maps.mutable.withInitialCapacity(50));
+  }
+
+  /**
+   * Creates a new empty nested map with an initial capacity.
+   *
+   * @param initialCapacity The initial capacity of the map
+   */
+  public NestedMap(final int initialCapacity) {
+    this(Maps.mutable.withInitialCapacity(initialCapacity));
+  }
+
+  /**
+   * Creates a new nested map which uses the given map.
+   *
+   * @param nestedMap The nested map to use
+   */
+  private NestedMap(final Map<K1, Map<K2, V>> nestedMap) {
+    mK1ToK2ToV = nestedMap;
+    mNestedInitialCapacity = -1;
   }
 
   /**
@@ -49,13 +75,29 @@ public final class NestedMap<K1, K2, V> {
   }
 
   /**
+   * Whether the map contains an entry for the given keys.
+   *
+   * @param key1 The first key
+   * @param key2 The second key
+   * @return <tt>True</tt> if the map contains an entry for the keys,
+   *         <tt>false</tt> otherwise
+   */
+  public boolean contains(final K1 key1, final K2 key2) {
+    final Map<K2, V> k2ToV = mK1ToK2ToV.get(key1);
+    if (k2ToV == null) {
+      return false;
+    }
+    return k2ToV.containsKey(key2);
+  }
+
+  /**
    * Returns an iterable object which contains all entries of this map. The
    * result will be constructed on call.
    *
    * @return An iterable object which contains all entries of this map
    */
   public Iterable<Triple<K1, K2, V>> entrySet() {
-    final ArrayList<Triple<K1, K2, V>> result = new ArrayList<>();
+    final List<Triple<K1, K2, V>> result = Lists.mutable.empty();
     for (final Entry<K1, Map<K2, V>> entryOuter : mK1ToK2ToV.entrySet()) {
       for (final Entry<K2, V> entryInner : entryOuter.getValue().entrySet()) {
         result.add(new Triple<>(entryOuter.getKey(), entryInner.getKey(), entryInner.getValue()));
@@ -150,7 +192,7 @@ public final class NestedMap<K1, K2, V> {
    *         if there was no mapping for the keys.
    */
   public V put(final K1 key1, final K2 key2, final V value) {
-    return mK1ToK2ToV.computeIfAbsent(key1, k -> new HashMap<>()).put(key2, value);
+    return mK1ToK2ToV.computeIfAbsent(key1, k -> buildMap()).put(key2, value);
   }
 
   /**
@@ -189,7 +231,22 @@ public final class NestedMap<K1, K2, V> {
     if (k2ToV == null) {
       return null;
     }
-    return k2ToV.remove(k2);
+    final V value = k2ToV.remove(k2);
+    if (k2ToV.isEmpty()) {
+      mK1ToK2ToV.remove(k1);
+    }
+    return value;
+  }
+
+  /**
+   * The initial capacity to use when creating maps which connect the second key
+   * to the value or <tt>-1</tt> if a default value should be used.
+   *
+   * @param initialCapacity The initial capacity to use or <tt>-1</tt> for a
+   *                        default value
+   */
+  public void setNestedInitialCapacity(final int initialCapacity) {
+    mNestedInitialCapacity = initialCapacity;
   }
 
   /*
@@ -199,5 +256,17 @@ public final class NestedMap<K1, K2, V> {
   @Override
   public String toString() {
     return mK1ToK2ToV.toString();
+  }
+
+  /**
+   * Builds a new map which connects the second key to values.
+   *
+   * @return The constructed map
+   */
+  private Map<K2, V> buildMap() {
+    if (mNestedInitialCapacity == -1) {
+      return Maps.mutable.empty();
+    }
+    return Maps.mutable.withInitialCapacity(mNestedInitialCapacity);
   }
 }

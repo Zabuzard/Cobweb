@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +12,7 @@ public final class ArrayIteratorTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArrayIterator#ArrayIterator(java.lang.Object[])}.
+   * {@link de.tischner.cobweb.util.collections.ArrayIterator#ArrayIterator(java.lang.Object[])}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -27,7 +27,7 @@ public final class ArrayIteratorTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArrayIterator#ArrayIterator(java.lang.Object[], int, int)}.
+   * {@link de.tischner.cobweb.util.collections.ArrayIterator#ArrayIterator(java.lang.Object[], int, int)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -47,7 +47,8 @@ public final class ArrayIteratorTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArrayIterator#hasNext()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.ArrayIterator#hasNext()}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -65,7 +66,8 @@ public final class ArrayIteratorTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArrayIterator#next()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.ArrayIterator#next()}.
    */
   @SuppressWarnings("static-method")
   @Test

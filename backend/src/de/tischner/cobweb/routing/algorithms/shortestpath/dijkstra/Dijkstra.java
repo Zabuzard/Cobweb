@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 import de.tischner.cobweb.routing.algorithms.shortestpath.AShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
@@ -162,8 +161,10 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
    */
   protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<N> sources,
       final N pathDestination) {
-    // NOTE If RAM allows, the maps could be exchanged by arrays after mapping
-    // the real node IDs to dummy IDs without gaps.
+    // TODO Evaluate if maps should be exchanged against ArrayMap if Dijkstra is
+    // about to settle all reachable nodes. Note that node IDs may have gaps
+    // since the set of reachable nodes is in general not equal to all nodes of
+    // the graph.
     final Map<N, TentativeDistance<N, E>> nodeToDistance = new HashMap<>(sources.size());
     final Map<N, TentativeDistance<N, E>> nodeToSettledDistance = new HashMap<>(sources.size());
     final PriorityQueue<TentativeDistance<N, E>> activeNodes = new PriorityQueue<>(sources.size());
@@ -199,8 +200,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
       }
 
       // Relax all outgoing edges
-      final Set<E> edges = mGraph.getOutgoingEdges(node);
-      for (final E edge : edges) {
+      for (final E edge : mGraph.getOutgoingEdges(node)) {
         // Skip the edge if it should not be considered
         if (!considerEdgeForRelaxation(edge, pathDestination)) {
           continue;

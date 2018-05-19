@@ -54,12 +54,6 @@
         <attribute name="Main-Class" value="${Main-class}" />
       </manifest>
     </jar>
-    <jar destfile="${dist-dir}/${jar-name}-${version}-standalone.jar" basedir="${bin-dir}" excludes="**/*Test.class">
-	  <zipgroupfileset dir="${lib-base-dir}" includes="**/*.jar"/>
-      <manifest>
-        <attribute name="Main-Class" value="${Main-class}" />
-      </manifest>
-    </jar>
     <jar destfile="${dist-dir}/${jar-name}-${version}-test.jar" basedir="${bin-dir}">
 	  <zipgroupfileset dir="${lib-base-dir}" includes="**/*.jar"/>
 	  <zipgroupfileset dir="${lib-test-dir}" includes="**/*.jar"/>
@@ -71,6 +65,19 @@
     <jar destfile="${dist-dir}/${jar-name}-${version}-doc.jar">
       <fileset dir="${doc-dir}"/>
     </jar>
+	<jar jarfile="${dist-dir}/external-libs.jar">
+	  <zipgroupfileset dir="${lib-base-dir}">
+	    <include name="**/*.jar"/>
+	  </zipgroupfileset>
+	</jar>
+	<sleep seconds="1"/>
+    <jar destfile="${dist-dir}/${jar-name}-${version}-standalone.jar" basedir="${bin-dir}" excludes="**/*Test.class">
+	  <zipfileset src="${dist-dir}/external-libs.jar" excludes="*,/META-INF/*"/>
+      <manifest>
+        <attribute name="Main-Class" value="${Main-class}"/>
+      </manifest>
+    </jar>
+	<delete file="${dist-dir}/external-libs.jar" failonerror="false"/>
   </target>
 
   <target name="checkstyle">

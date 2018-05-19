@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Implementation of a {@link Set} which uses arrays as long as the size is
@@ -20,11 +21,12 @@ import java.util.Set;
  * and {@link #remove(Object)} operate slower.<br>
  * <br>
  * When creating instances prefer to <b>not</b> repeatedly call
- * {@link #add(Object)}. Instead, consider using {@link #ArraySet(Collection)}
- * or {@link #addAll(Collection)}. <b>Do not use</b> this set if it is known
- * that the resulting size exceeds the threshold. Or, alternatively use
- * {@link #ArraySet(Collection)} and {@link #addAll(Collection)} to force the
- * switch-over to the regular {@link Set} as soon as possible.<br>
+ * {@link #add(Object)}. Instead, consider using
+ * {@link #HybridArrayHashSet(Collection)} or {@link #addAll(Collection)}. <b>Do
+ * not use</b> this set if it is known that the resulting size exceeds the
+ * threshold. Or, alternatively use {@link #HybridArrayHashSet(Collection)} and
+ * {@link #addAll(Collection)} to force the switch-over to the regular
+ * {@link Set} as soon as possible.<br>
  * <br>
  * The internal array does not use any buffer or capacity for future
  * modifications. Every modification, when in <i>array-mode</i>, will create a
@@ -33,12 +35,16 @@ import java.util.Set;
  * <b>Never</b> alternately use {@link #add(Object)} and {@link #remove(Object)}
  * when the size is around the threshold where the class switches from
  * <i>array-</i> to <i>set-mode</i>. The class does not offer any protection for
- * this scenario, it will copy over all elements for each such call.
+ * this scenario, it will copy over all elements for each such call.<br>
+ * <br>
+ * For iteration prefer using internal iteration using
+ * {@link #forEach(java.util.function.Consumer)} instead of external iteration
+ * by {@link #iterator()}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <E> Type of the elements contained in this set
  */
-public final class ArraySet<E> implements Set<E>, Serializable {
+public final class HybridArrayHashSet<E> implements Set<E>, Serializable {
   /**
    * The serial version UID.
    */
@@ -59,9 +65,10 @@ public final class ArraySet<E> implements Set<E>, Serializable {
 
   /**
    * Creates a new empty set. If possible, consider using
-   * {@link #ArraySet(Collection)} or at least {@link #ArraySet(Object)}.
+   * {@link #HybridArrayHashSet(Collection)} or at least
+   * {@link #HybridArrayHashSet(Object)}.
    */
-  public ArraySet() {
+  public HybridArrayHashSet() {
     mArray = new Object[0];
   }
 
@@ -70,7 +77,7 @@ public final class ArraySet<E> implements Set<E>, Serializable {
    *
    * @param c The elements the set should contain
    */
-  public ArraySet(final Collection<E> c) {
+  public HybridArrayHashSet(final Collection<E> c) {
     if (c.size() > THRESHOLD) {
       mSet = new HashSet<>(c);
     } else {
@@ -80,11 +87,11 @@ public final class ArraySet<E> implements Set<E>, Serializable {
 
   /**
    * Creates a new set with the given element. If possible, consider using
-   * {@link #ArraySet(Collection)}.
+   * {@link #HybridArrayHashSet(Collection)}.
    *
    * @param e The element the set should contain
    */
-  public ArraySet(final E e) {
+  public HybridArrayHashSet(final E e) {
     mArray = new Object[] { e };
   }
 
@@ -95,7 +102,7 @@ public final class ArraySet<E> implements Set<E>, Serializable {
    * @param elements The elements the set should contain
    */
   @SafeVarargs
-  public ArraySet(final E... elements) {
+  public HybridArrayHashSet(final E... elements) {
     if (elements == null || elements.length == 0) {
       mArray = new Object[0];
       return;
@@ -120,7 +127,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     }
     // Check if the element is contained already
     boolean isContained = false;
-    for (final Object element : mArray) {
+    for (int i = 0; i < mArray.length; i++) {
+      final Object element = mArray[i];
       if (e == null ? element == null : e.equals(element)) {
         isContained = true;
         break;
@@ -133,8 +141,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     // Switch over to set
     if (mArray.length == THRESHOLD) {
       mSet = new HashSet<>();
-      for (final Object element : mArray) {
-        mSet.add((E) element);
+      for (int i = 0; i < mArray.length; i++) {
+        mSet.add((E) mArray[i]);
       }
       mArray = null;
       return mSet.add(e);
@@ -161,8 +169,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     // Eliminate duplicates
     final HashSet<E> elementsToAdd = new HashSet<>(c);
     // Remove everything which is already contained
-    for (final Object element : mArray) {
-      elementsToAdd.remove(element);
+    for (int i = 0; i < mArray.length; i++) {
+      elementsToAdd.remove(mArray[i]);
     }
 
     if (elementsToAdd.isEmpty()) {
@@ -173,8 +181,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     if (resultingSize > THRESHOLD) {
       // Switch over to set
       mSet = elementsToAdd;
-      for (final Object element : mArray) {
-        mSet.add((E) element);
+      for (int i = 0; i < mArray.length; i++) {
+        mSet.add((E) mArray[i]);
       }
       mArray = null;
       return true;
@@ -211,8 +219,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
       return mSet.contains(o);
     }
 
-    for (final Object element : mArray) {
-
+    for (int i = 0; i < mArray.length; i++) {
+      final Object element = mArray[i];
       if (o == null ? element == null : o.equals(element)) {
         return true;
       }
@@ -232,7 +240,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
 
     outer: for (final Object o : c) {
       for (int i = 0; i < mArray.length; i++) {
-        if (o == null ? mArray[i] == null : o.equals(mArray[i])) {
+        final Object element = mArray[i];
+        if (o == null ? element == null : o.equals(element)) {
           // Was found, continue with the next element
           continue outer;
         }
@@ -241,6 +250,22 @@ public final class ArraySet<E> implements Set<E>, Serializable {
       return false;
     }
     return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Iterable#forEach(java.util.function.Consumer)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public void forEach(final Consumer<? super E> action) {
+    if (useSet()) {
+      mSet.forEach(action);
+      return;
+    }
+    for (int i = 0; i < mArray.length; i++) {
+      action.accept((E) mArray[i]);
+    }
   }
 
   /*
@@ -289,7 +314,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     // Search the index of the element if contained
     int indexOfElement = -1;
     for (int i = 0; i < mArray.length; i++) {
-      if (o == null ? mArray[i] == null : o.equals(mArray[i])) {
+      final Object element = mArray[i];
+      if (o == null ? element == null : o.equals(element)) {
         indexOfElement = i;
         break;
       }
@@ -328,8 +354,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
 
     // Determine the resulting size
     int resultingSize = mArray.length;
-    for (final Object element : mArray) {
-      if (c.contains(element)) {
+    for (int i = 0; i < mArray.length; i++) {
+      if (c.contains(mArray[i])) {
         resultingSize--;
       }
     }
@@ -339,8 +365,8 @@ public final class ArraySet<E> implements Set<E>, Serializable {
     // Create the new array
     final Object[] elements = new Object[resultingSize];
     int indexToPush = 0;
-    for (final Object element2 : mArray) {
-      final Object element = element2;
+    for (int i = 0; i < mArray.length; i++) {
+      final Object element = mArray[i];
       if (!c.contains(element)) {
         elements[indexToPush++] = element;
       }

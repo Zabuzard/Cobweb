@@ -2,8 +2,13 @@ package de.tischner.cobweb.routing.model.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
@@ -26,12 +31,22 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
    * A map connecting unique IDs to nodes.
    */
   private final MutableIntObjectMap<BasicNode> mNodes;
+  /**
+   * A map that connects nodes to their incoming edges.
+   */
+  private final Map<BasicNode, Set<BasicEdge<BasicNode>>> mNodeToIncomingEdges;
+  /**
+   * A map that connects nodes to their outgoing edges.
+   */
+  private final Map<BasicNode, Set<BasicEdge<BasicNode>>> mNodeToOutgoingEdges;
 
   /**
    * Creates a new initially empty graph.
    */
   public BasicGraph() {
     mNodes = IntObjectMaps.mutable.empty();
+    mNodeToIncomingEdges = new HashMap<>();
+    mNodeToOutgoingEdges = new HashMap<>();
   }
 
   /*
@@ -114,6 +129,34 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
 
     currentEdges.forEach(this::removeEdge);
     reversedEdges.forEach(this::addEdge);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.routing.model.graph.AGraph#constructEdgeSetWith(de.
+   * tischner.cobweb.routing.model.graph.IEdge)
+   */
+  @Override
+  protected Set<BasicEdge<BasicNode>> constructEdgeSetWith(final BasicEdge<BasicNode> edge) {
+    return new HashSet<>(Collections.singletonList(edge));
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.routing.model.graph.AGraph#getNodeToIncomingEdges()
+   */
+  @Override
+  protected Map<BasicNode, Set<BasicEdge<BasicNode>>> getNodeToIncomingEdges() {
+    return mNodeToIncomingEdges;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see de.tischner.cobweb.routing.model.graph.AGraph#getNodeToOutgoingEdges()
+   */
+  @Override
+  protected Map<BasicNode, Set<BasicEdge<BasicNode>>> getNodeToOutgoingEdges() {
+    return mNodeToOutgoingEdges;
   }
 
 }

@@ -127,7 +127,7 @@ public class MemoryDatabase extends ADatabase {
       LOGGER.debug("Getting highway data for {} ways", size);
     }
     final List<HighwayData> result = new ArrayList<>(size);
-    wayIds.mapToObj(mWayToHighwayData::get).filter(data -> !Objects.isNull(data)).forEach(result::add);
+    wayIds.mapToObj(mWayToHighwayData::get).filter(Objects::nonNull).forEach(result::add);
     return result;
   }
 
@@ -212,7 +212,7 @@ public class MemoryDatabase extends ADatabase {
       LOGGER.debug("Getting spatial data for {} nodes", size);
     }
     final List<SpatialNodeData> result = new ArrayList<>(size);
-    nodeIds.mapToObj(mNodeToSpatialData::get).filter(data -> !Objects.isNull(data)).forEach(data -> {
+    nodeIds.mapToObj(mNodeToSpatialData::get).filter(Objects::nonNull).forEach(data -> {
       // Fetch internal ID of the node
       final SpatialNodeData fullData = new SpatialNodeData(mOsmToNodeId.get(data.getOsmId()), data.getOsmId(),
           data.getLatitude(), data.getLongitude());

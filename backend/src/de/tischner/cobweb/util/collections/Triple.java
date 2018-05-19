@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 /**
  * Object for generic triples which hold three objects of given types.

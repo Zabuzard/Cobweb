@@ -6,7 +6,7 @@ import java.util.Iterator;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
-import de.tischner.cobweb.util.ReverseIterator;
+import de.tischner.cobweb.util.collections.ReverseIterator;
 
 /**
  * Implementation of a {@link IPath} which connects edges.<br>

@@ -84,7 +84,8 @@ public final class DatabaseUtil {
    * Prefix of the SQL query to fetch spatial node data for given node IDs.
    */
   static final String QUERY_SPATIAL_NODE_DATA_PREFIX =
-      "SELECT mappings.osm_id, mappings.internal_id, nodes.latitude, nodes.longitude FROM osm_nodes AS nodes, osm_node_mappings AS mappings WHERE nodes.id = mappings.osm_id AND nodes.id IN (";
+      "SELECT mappings.osm_id, mappings.internal_id, nodes.latitude, nodes.longitude FROM osm_nodes AS nodes,"
+          + " osm_node_mappings AS mappings WHERE nodes.id = mappings.osm_id AND nodes.id IN (";
   /**
    * SQL query to fetch the id of a way by its name. Contains a placeholder
    * value for the way name.

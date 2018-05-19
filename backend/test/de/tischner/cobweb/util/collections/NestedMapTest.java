@@ -1,7 +1,7 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +32,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#addAll(de.tischner.cobweb.util.NestedMap)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#addAll(de.tischner.cobweb.util.collections.NestedMap)}.
    */
   @Test
   public void testAddAll() {
@@ -47,7 +47,8 @@ public final class NestedMapTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.NestedMap#clear()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#clear()}.
    */
   @Test
   public void testClear() {
@@ -62,21 +63,32 @@ public final class NestedMapTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.NestedMap#entrySet()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#contains(Object, Object)}.
    */
   @Test
-  public void testEntrySet() {
-    final Iterator<Triple<Integer, String, Boolean>> entryIter = mMap.entrySet().iterator();
-    Assert.assertTrue(entryIter.hasNext());
-    Assert.assertEquals(new Triple<>(1, "a", true), entryIter.next());
-    Assert.assertTrue(entryIter.hasNext());
-    Assert.assertEquals(new Triple<>(1, "b", false), entryIter.next());
-    Assert.assertFalse(entryIter.hasNext());
+  public void testContains() {
+    Assert.assertFalse(mMap.contains(2, "a"));
+    Assert.assertTrue(mMap.contains(1, "a"));
+    Assert.assertTrue(mMap.contains(1, "b"));
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#equals(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#entrySet()}.
+   */
+  @Test
+  public void testEntrySet() {
+    final HashSet<Triple<Integer, String, Boolean>> entries = new HashSet<>();
+    mMap.entrySet().iterator().forEachRemaining(entries::add);
+    Assert.assertEquals(2, entries.size());
+    Assert.assertTrue(entries.contains(new Triple<>(1, "a", true)));
+    Assert.assertTrue(entries.contains(new Triple<>(1, "b", false)));
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
@@ -95,7 +107,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#get(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#get(java.lang.Object)}.
    */
   @Test
   public void testGetK1() {
@@ -109,7 +121,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#get(java.lang.Object, java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#get(java.lang.Object, java.lang.Object)}.
    */
   @Test
   public void testGetK1K2() {
@@ -119,7 +131,8 @@ public final class NestedMapTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.NestedMap#hashCode()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -137,7 +150,8 @@ public final class NestedMapTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.NestedMap#keySet()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#keySet()}.
    */
   @Test
   public void testKeySet() {
@@ -147,7 +161,8 @@ public final class NestedMapTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.NestedMap#NestedMap()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#NestedMap()}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -161,7 +176,23 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#put(java.lang.Object, java.lang.Object, java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#NestedMap(int)}.
+   */
+  @SuppressWarnings({ "unused", "static-method" })
+  @Test
+  public void testNestedMapInt() {
+    try {
+      new NestedMap<>(10);
+      new NestedMap<>(100);
+      new NestedMap<>(0);
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#put(java.lang.Object, java.lang.Object, java.lang.Object)}.
    */
   @Test
   public void testPutK1K2V() {
@@ -173,7 +204,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#put(java.lang.Object, java.util.Map)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#put(java.lang.Object, java.util.Map)}.
    */
   @Test
   public void testPutK1MapOfK2V() {
@@ -187,7 +218,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#remove(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#remove(java.lang.Object)}.
    */
   @Test
   public void testRemoveK1() {
@@ -204,7 +235,7 @@ public final class NestedMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.NestedMap#remove(java.lang.Object, java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.NestedMap#remove(java.lang.Object, java.lang.Object)}.
    */
   @Test
   public void testRemoveK1K2() {
@@ -212,6 +243,21 @@ public final class NestedMapTest {
     Assert.assertNull(mMap.remove(1, "a"));
     mMap.put(1, "a", false);
     Assert.assertEquals(false, mMap.remove(1, "a"));
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.NestedMap#setNestedInitialCapacity(int)}.
+   */
+  @Test
+  public void testSetNestedInitialCapacity() {
+    try {
+      mMap.setNestedInitialCapacity(10);
+      mMap.setNestedInitialCapacity(100);
+      mMap.setNestedInitialCapacity(0);
+    } catch (final Exception e) {
+      Assert.fail();
+    }
   }
 
 }

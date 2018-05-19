@@ -14,7 +14,7 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.util.NestedMap;
+import de.tischner.cobweb.util.collections.NestedDoubleMap;
 
 /**
  * Implements the a metric for nodes by using landmarks.<br>
@@ -41,12 +41,12 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
    * Nested map that connects landmarks to all other nodes and the corresponding
    * shortest path distance.
    */
-  private final NestedMap<N, N, Double> mLandmarkToNodeDistance;
+  private final NestedDoubleMap<N, N> mLandmarkToNodeDistance;
   /**
    * Nested map that connects all nodes to the landmarks and the corresponding
    * shortest path distance.
    */
-  private final NestedMap<N, N, Double> mNodeToLandmarkDistance;
+  private final NestedDoubleMap<N, N> mNodeToLandmarkDistance;
 
   /**
    * Creates a new landmark metric that uses the given amount of landmarks
@@ -64,9 +64,11 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
    * @param landmarkProvider The provider to use for generation of the landmarks
    */
   public LandmarkMetric(final int amount, final G graph, final ILandmarkProvider<N> landmarkProvider) {
-    // TODO These nested maps need to be optimized for space
-    mLandmarkToNodeDistance = new NestedMap<>();
-    mNodeToLandmarkDistance = new NestedMap<>();
+    // TODO Evaluate whether double can be exchanged by float for distances to
+    // optimize space
+    mLandmarkToNodeDistance = new NestedDoubleMap<>(amount);
+    mNodeToLandmarkDistance = new NestedDoubleMap<>(graph.size());
+    mNodeToLandmarkDistance.setNestedInitialCapacity(amount);
 
     initialize(amount, graph, landmarkProvider, new Dijkstra<>(graph));
   }
@@ -81,15 +83,17 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
   public double distance(final N first, final N second) {
     double greatestDistance = 0.0;
     for (final N landmark : mLandmarks) {
-      final Double firstToLandmark = mNodeToLandmarkDistance.get(first, landmark);
-      final Double secondToLandmark = mNodeToLandmarkDistance.get(second, landmark);
-      final Double landmarkToSecond = mLandmarkToNodeDistance.get(landmark, second);
-      final Double landmarkToFirst = mLandmarkToNodeDistance.get(landmark, first);
-
       // Ignore the landmark if anyone can not reach it
-      if (firstToLandmark == null || secondToLandmark == null || landmarkToSecond == null || landmarkToFirst == null) {
+      if (!mNodeToLandmarkDistance.contains(first, landmark) || !mNodeToLandmarkDistance.contains(second, landmark)
+          || !mLandmarkToNodeDistance.contains(landmark, second)
+          || !mLandmarkToNodeDistance.contains(landmark, first)) {
         continue;
       }
+
+      final double firstToLandmark = mNodeToLandmarkDistance.get(first, landmark);
+      final double secondToLandmark = mNodeToLandmarkDistance.get(second, landmark);
+      final double landmarkToSecond = mLandmarkToNodeDistance.get(landmark, second);
+      final double landmarkToFirst = mLandmarkToNodeDistance.get(landmark, first);
 
       final double landmarkBehindDestination = firstToLandmark - secondToLandmark;
       final double landmarkBeforeSource = landmarkToSecond - landmarkToFirst;
@@ -128,6 +132,7 @@ public final class LandmarkMetric<N extends INode, E extends IEdge<N>, G extends
     }
     for (final N landmark : mLandmarks) {
       final Map<N, ? extends IHasPathCost> nodeToDistance = computation.computeShortestPathCostsReachable(landmark);
+      mLandmarkToNodeDistance.setNestedInitialCapacity(nodeToDistance.size());
       for (final Entry<N, ? extends IHasPathCost> entry : nodeToDistance.entrySet()) {
         mLandmarkToNodeDistance.put(landmark, entry.getKey(), entry.getValue().getPathCost());
       }

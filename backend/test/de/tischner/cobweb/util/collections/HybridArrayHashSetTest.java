@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,32 +10,32 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test for the class {@link ArraySet}.
+ * Test for the class {@link HybridArrayHashSet}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class ArraySetTest {
+public final class HybridArrayHashSetTest {
   /**
    * The set in array-mode used for testing.
    */
-  private ArraySet<Integer> mArrayMode;
+  private HybridArrayHashSet<Integer> mArrayMode;
   /**
    * The set in set-mode used for testing.
    */
-  private ArraySet<Integer> mSetMode;
+  private HybridArrayHashSet<Integer> mSetMode;
 
   /**
    * Setups array set instances for testing.
    */
   @Before
   public void setUp() {
-    mArrayMode = new ArraySet<>(1, 2, 3, null);
-    mSetMode = new ArraySet<>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null);
+    mArrayMode = new HybridArrayHashSet<>(1, 2, 3, null);
+    mSetMode = new HybridArrayHashSet<>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null);
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#add(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#add(java.lang.Object)}.
    */
   @Test
   public void testAdd() {
@@ -73,7 +73,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#addAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#addAll(java.util.Collection)}.
    */
   @Test
   public void testAddAll() {
@@ -103,13 +103,14 @@ public final class ArraySetTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#ArraySet()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#HybridArrayHashSet()}.
    */
   @SuppressWarnings({ "static-method" })
   @Test
   public void testArraySet() {
     try {
-      Assert.assertTrue(new ArraySet<>().isEmpty());
+      Assert.assertTrue(new HybridArrayHashSet<>().isEmpty());
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -117,51 +118,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#ArraySet(java.util.Collection)}.
-   */
-  @SuppressWarnings("static-method")
-  @Test
-  public void testArraySetCollectionOfE() {
-    try {
-      Assert.assertEquals(3, new ArraySet<>(Arrays.asList(1, 2, 3)).size());
-      Assert.assertEquals(1, new ArraySet<>(Collections.singletonList(1)).size());
-      Assert.assertTrue(new ArraySet<>(Collections.emptyList()).isEmpty());
-    } catch (final Exception e) {
-      Assert.fail();
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#ArraySet(java.lang.Object)}.
-   */
-  @SuppressWarnings({ "static-method" })
-  @Test
-  public void testArraySetE() {
-    try {
-      Assert.assertEquals(1, new ArraySet<>(1).size());
-    } catch (final Exception e) {
-      Assert.fail();
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#ArraySet(Object...)}.
-   */
-  @SuppressWarnings("static-method")
-  @Test
-  public void testArraySetEArray() {
-    try {
-      Assert.assertEquals(3, new ArraySet<>(1, 2, 3).size());
-      Assert.assertTrue(new ArraySet<>(new Integer[0]).isEmpty());
-    } catch (final Exception e) {
-      Assert.fail();
-    }
-  }
-
-  /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#clear()}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#clear()}.
    */
   @Test
   public void testClear() {
@@ -176,7 +133,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#contains(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#contains(java.lang.Object)}.
    */
   @Test
   public void testContains() {
@@ -191,7 +148,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#containsAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#containsAll(java.util.Collection)}.
    */
   @Test
   public void testContainsAll() {
@@ -209,17 +166,81 @@ public final class ArraySetTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#isEmpty()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#forEach(java.util.function.Consumer)}.
+   */
+  @Test
+  public void testForEach() {
+    Set<Integer> values = new HashSet<>();
+    mArrayMode.forEach(values::add);
+    Assert.assertTrue(values.containsAll(Arrays.asList(1, 2, 3, null)));
+    Assert.assertEquals(4, values.size());
+
+    values = new HashSet<>();
+    mSetMode.forEach(values::add);
+    Assert.assertTrue(values.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null)));
+    Assert.assertEquals(11, values.size());
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#HybridArrayHashSet(java.util.Collection)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testHybridArrayHashSetCollectionOfE() {
+    try {
+      Assert.assertEquals(3, new HybridArrayHashSet<>(Arrays.asList(1, 2, 3)).size());
+      Assert.assertEquals(1, new HybridArrayHashSet<>(Collections.singletonList(1)).size());
+      Assert.assertTrue(new HybridArrayHashSet<>(Collections.emptyList()).isEmpty());
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#HybridArrayHashSet(java.lang.Object)}.
+   */
+  @SuppressWarnings({ "static-method" })
+  @Test
+  public void testHybridArrayHashSetE() {
+    try {
+      Assert.assertEquals(1, new HybridArrayHashSet<>(1).size());
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#HybridArrayHashSet(Object...)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testHybridArrayHashSetEArray() {
+    try {
+      Assert.assertEquals(3, new HybridArrayHashSet<>(1, 2, 3).size());
+      Assert.assertTrue(new HybridArrayHashSet<>(new Integer[0]).isEmpty());
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#isEmpty()}.
    */
   @Test
   public void testIsEmpty() {
     Assert.assertFalse(mArrayMode.isEmpty());
     Assert.assertFalse(mSetMode.isEmpty());
-    Assert.assertTrue(new ArraySet<>().isEmpty());
+    Assert.assertTrue(new HybridArrayHashSet<>().isEmpty());
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#iterator()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#iterator()}.
    */
   @Test
   public void testIterator() {
@@ -236,7 +257,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#remove(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#remove(java.lang.Object)}.
    */
   @Test
   public void testRemove() {
@@ -277,7 +298,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#removeAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#removeAll(java.util.Collection)}.
    */
   @Test
   public void testRemoveAll() {
@@ -314,7 +335,7 @@ public final class ArraySetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.ArraySet#retainAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#retainAll(java.util.Collection)}.
    */
   @Test
   public void testRetainAll() {
@@ -344,7 +365,8 @@ public final class ArraySetTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#size()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#size()}.
    */
   @Test
   public void testSize() {
@@ -353,7 +375,8 @@ public final class ArraySetTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#toArray()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#toArray()}.
    */
   @Test
   public void testToArray() {
@@ -364,7 +387,8 @@ public final class ArraySetTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.ArraySet#toArray(Object[])}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.HybridArrayHashSet#toArray(Object[])}.
    */
   @Test
   public void testToArrayTArray() {

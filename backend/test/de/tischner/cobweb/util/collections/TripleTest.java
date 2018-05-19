@@ -1,4 +1,4 @@
-package de.tischner.cobweb.util;
+package de.tischner.cobweb.util.collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +25,7 @@ public final class TripleTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.Triple#equals(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.Triple#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
@@ -48,7 +48,8 @@ public final class TripleTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.Triple#getFirst()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.Triple#getFirst()}.
    */
   @Test
   public void testGetFirst() {
@@ -57,7 +58,8 @@ public final class TripleTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.Triple#getSecond()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.Triple#getSecond()}.
    */
   @Test
   public void testGetSecond() {
@@ -66,7 +68,8 @@ public final class TripleTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.Triple#getThird()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.Triple#getThird()}.
    */
   @Test
   public void testGetThird() {
@@ -75,7 +78,8 @@ public final class TripleTest {
   }
 
   /**
-   * Test method for {@link de.tischner.cobweb.util.Triple#hashCode()}.
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.Triple#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -99,7 +103,7 @@ public final class TripleTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.Triple#Triple(java.lang.Object, java.lang.Object, java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.Triple#Triple(java.lang.Object, java.lang.Object, java.lang.Object)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
