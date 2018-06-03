@@ -1,4 +1,4 @@
-package de.tischner.cobweb.routing.model.graph.road;
+package de.tischner.cobweb.routing.model.graph.transit;
 
 import java.io.Serializable;
 
@@ -7,12 +7,12 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 
 /**
- * Implementation of an {@link INode} which represents a node on a road. As such
- * it has spatial data and a unique ID.
+ * Implementation of an {@link INode} which represents a node on a transit
+ * network. As such it has spatial data, a unique ID and belongs to a station.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
+public final class TransitNode implements INode, IHasId, ISpatial, Serializable {
   /**
    * The serial version UID.
    */
@@ -31,22 +31,19 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
   private float mLongitude;
 
   /**
-   * Creates a new road node with the given ID and spatial data.
+   * Creates a new transit node with the given ID and spatial data.
    *
    * @param id        The unique ID of this node
    * @param latitude  The latitude of this node, in degrees
    * @param longitude The longitude of this node, in degrees
    */
-  public RoadNode(final int id, final float latitude, final float longitude) {
+  public TransitNode(final int id, final float latitude, final float longitude) {
     mId = id;
     mLatitude = latitude;
     mLongitude = longitude;
+    // TODO Add station logic
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(final Object obj) {
     if (this == obj) {
@@ -55,10 +52,10 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof RoadNode)) {
+    if (!(obj instanceof TransitNode)) {
       return false;
     }
-    final RoadNode other = (RoadNode) obj;
+    final TransitNode other = (TransitNode) obj;
     if (this.mId != other.mId) {
       return false;
     }
@@ -73,28 +70,16 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
     return mId;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLatitude()
-   */
   @Override
   public float getLatitude() {
     return mLatitude;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.routing.model.graph.road.ISpatial#getLongitude()
-   */
   @Override
   public float getLongitude() {
     return mLongitude;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -103,30 +88,16 @@ public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLatitude(float)
-   */
   @Override
   public void setLatitude(final float latitude) {
     mLatitude = latitude;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.tischner.cobweb.routing.model.graph.road.ISpatial#setLongitude(float)
-   */
   @Override
   public void setLongitude(final float longitude) {
     mLongitude = longitude;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();

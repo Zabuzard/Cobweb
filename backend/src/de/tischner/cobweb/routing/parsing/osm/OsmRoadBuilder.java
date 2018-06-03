@@ -8,9 +8,9 @@ import org.eclipse.collections.impl.factory.primitive.LongIntMaps;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
+import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
-import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.road.IUniqueIdGenerator;
+import de.tischner.cobweb.routing.model.graph.road.IRoadIdGenerator;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -36,7 +36,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   /**
    * A generator which provides unique IDs for nodes and ways.
    */
-  private final IUniqueIdGenerator mIdGenerator;
+  private final IRoadIdGenerator mIdGenerator;
   /**
    * A map connecting OSM node IDs to the IDs used by the graph.
    */
@@ -53,7 +53,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    * @param idGenerator The generator to use for generating unique IDs for nodes
    *                    and ways
    */
-  public OsmRoadBuilder(final G graph, final IUniqueIdGenerator idGenerator) {
+  public OsmRoadBuilder(final G graph, final IRoadIdGenerator idGenerator) {
     mGraph = graph;
     mIdGenerator = idGenerator;
     mOsmToNodeId = LongIntMaps.mutable.empty();

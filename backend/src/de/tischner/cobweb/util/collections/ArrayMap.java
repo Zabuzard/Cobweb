@@ -13,7 +13,7 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.ordered.OrderedIterable;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 
 /**
  * Implementation of a {@link Map} which uses arrays internally. Values are

@@ -117,7 +117,6 @@ public final class OsmParser {
     final BufferedInputStream bufferedInput = new BufferedInputStream(Files.newInputStream(osmFile));
     final EFileExtension extension = FileUtil.getFileExtension(osmFile);
     switch (extension) {
-      case NONE: // Fall through
       case OSM:
         return bufferedInput;
       case B_ZIP_TWO:
@@ -126,7 +125,12 @@ public final class OsmParser {
         return new GzipCompressorInputStream(bufferedInput);
       case XZ:
         return new XZCompressorInputStream(bufferedInput);
-      case UNKNOWN: // Fall through
+      case NONE: // Ignore file
+        return null;
+      case UNKNOWN: // Ignore file
+        return null;
+      case ZIP: // Ignore file
+        return null;
       default: // Ignore file
         return null;
     }
@@ -140,7 +144,6 @@ public final class OsmParser {
    * If <tt>true</tt> the parser considers unreduced variants of OSM files only.
    */
   private final boolean mConsiderUnreducedOnly;
-
   /**
    * Directory that contains the OSM files or <tt>null</tt> if {@link #mFiles}
    * is used.

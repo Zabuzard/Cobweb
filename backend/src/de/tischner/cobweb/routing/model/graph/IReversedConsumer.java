@@ -1,4 +1,4 @@
-package de.tischner.cobweb.routing.model.graph.road;
+package de.tischner.cobweb.routing.model.graph;
 
 /**
  * Interface for consumer of {@link IReversedProvider}.

@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IParseConfigProvider;
+import de.tischner.cobweb.parsing.gtfs.GtfsParser;
+import de.tischner.cobweb.parsing.gtfs.IGtfsFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.OsmParser;
 
@@ -31,10 +33,14 @@ public final class DataParser {
    */
   private final IParseConfigProvider mConfig;
   /**
-   * Collection of files that contain the OSM files to parse or <tt>null</tt> if
-   * the directory set in the configuration file should be used.
+   * Collection of files that contain the files to parse or <tt>null</tt> if the
+   * directory set in the configuration file should be used.
    */
-  private final Collection<Path> mOsmFiles;
+  private final Collection<Path> mFiles;
+  /**
+   * Currently registered GTFS handler.
+   */
+  private final Collection<IGtfsFileHandler> mGtfsHandler;
   /**
    * Currently registered OSM handler.
    */
@@ -48,33 +54,44 @@ public final class DataParser {
   /**
    * Creates a new data parser using the given configuration.
    *
-   * @param config   The configuration provider to use
-   * @param osmFiles Collection of files that contain the OSM files to parse or
-   *                 <tt>null</tt> if the directory set in the configuration
-   *                 file should be used.
+   * @param config The configuration provider to use
+   * @param files  Collection of files that contain the files to parse or
+   *               <tt>null</tt> if the directory set in the configuration file
+   *               should be used.
    */
-  public DataParser(final IParseConfigProvider config, final Collection<Path> osmFiles) {
-    this(config, osmFiles, false);
+  public DataParser(final IParseConfigProvider config, final Collection<Path> files) {
+    this(config, files, false);
   }
 
   /**
    * Creates a new data parser using the given configuration.
    *
    * @param config                  The configuration provider to use
-   * @param osmFiles                Collection of files that contain the OSM
-   *                                files to parse or <tt>null</tt> if the
-   *                                directory set in the configuration file
-   *                                should be used.
+   * @param files                   Collection of files that contain the files
+   *                                to parse or <tt>null</tt> if the directory
+   *                                set in the configuration file should be
+   *                                used.
    * @param useReducerConfiguration <tt>True</tt> if the parser is used for the
    *                                reducer command, will use a different
    *                                configuration then
    */
-  public DataParser(final IParseConfigProvider config, final Collection<Path> osmFiles,
+  public DataParser(final IParseConfigProvider config, final Collection<Path> files,
       final boolean useReducerConfiguration) {
     mConfig = config;
-    mOsmFiles = osmFiles;
+    mFiles = files;
     mUseReducerConfiguration = useReducerConfiguration;
     mOsmHandler = new ArrayList<>();
+    mGtfsHandler = new ArrayList<>();
+  }
+
+  /**
+   * Registers the given GTFS handler. The handler will be notified when parsing
+   * GTFS data using the {@link #parseData()} method.
+   *
+   * @param handler The handler to register
+   */
+  public void addGtfsHandler(final IGtfsFileHandler handler) {
+    mGtfsHandler.add(handler);
   }
 
   /**
@@ -92,6 +109,7 @@ public final class DataParser {
    */
   public void clearHandler() {
     mOsmHandler.clear();
+    mGtfsHandler.clear();
   }
 
   /**
@@ -115,9 +133,9 @@ public final class DataParser {
       // collection of files instead
       final Path directoryToUse;
       final Collection<Path> filesToUse;
-      if (mOsmFiles != null) {
+      if (mFiles != null) {
         directoryToUse = null;
-        filesToUse = mOsmFiles;
+        filesToUse = mFiles;
       } else {
         directoryToUse = mConfig.getOsmDirectory();
         filesToUse = null;
@@ -134,6 +152,41 @@ public final class DataParser {
     } else if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Skipping parsing OSM data since no handler are registered");
     }
+
+    // Parse GTFS data
+    if (!mGtfsHandler.isEmpty()) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Parsing GTFS data for {} handler", mGtfsHandler.size());
+      }
+
+      // Decide whether to use the directory set in the configuration or a given
+      // collection of files instead
+      final Path directoryToUse;
+      final Collection<Path> filesToUse;
+      if (mFiles != null) {
+        directoryToUse = null;
+        filesToUse = mFiles;
+      } else {
+        directoryToUse = mConfig.getGtfsDirectory();
+        filesToUse = null;
+      }
+      // Choose the right configuration
+      final GtfsParser gtfsParser = new GtfsParser(directoryToUse, filesToUse, mGtfsHandler);
+
+      gtfsParser.parseGtfsFiles();
+    } else if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Skipping parsing GTFS data since no handler are registered");
+    }
+  }
+
+  /**
+   * Unregisters the given GTFS handler. The handler will not be notified
+   * anymore when parsing GTFS data using the {@link #parseData()} method.
+   *
+   * @param handler The handler to unregister
+   */
+  public void removeGtfsHandler(final IGtfsFileHandler handler) {
+    mGtfsHandler.remove(handler);
   }
 
   /**

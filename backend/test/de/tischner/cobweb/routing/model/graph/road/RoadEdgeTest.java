@@ -126,7 +126,7 @@ public final class RoadEdgeTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#setReversedProvider(de.tischner.cobweb.routing.model.graph.road.IReversedProvider)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#setReversedProvider(de.tischner.cobweb.routing.model.graph.IReversedProvider)}.
    */
   @Test
   public void testSetReversedProvider() {

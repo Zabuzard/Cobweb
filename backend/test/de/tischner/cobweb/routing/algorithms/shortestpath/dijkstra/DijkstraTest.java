@@ -16,8 +16,8 @@ import org.junit.Test;
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.IPath;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
 
 /**
  * Test for the class {@link Dijkstra}.

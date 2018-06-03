@@ -3,11 +3,11 @@ package de.tischner.cobweb.routing.model.graph.road;
 import java.util.NoSuchElementException;
 
 /**
- * Interface for classes that can generate unique IDs.
+ * Interface for classes that can generate unique IDs for road nodes and ways.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public interface IUniqueIdGenerator {
+public interface IRoadIdGenerator {
   /**
    * Generates and returns an unique ID for nodes.
    *

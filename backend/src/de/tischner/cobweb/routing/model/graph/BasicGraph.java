@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
-import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
-
 /**
  * Basic implementation of a graph which operates on {@link BasicNode}s and
  * {@link BasicEdge}s.

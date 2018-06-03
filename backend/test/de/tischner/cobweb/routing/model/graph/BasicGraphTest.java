@@ -7,8 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
-
 /**
  * Test for the class {@link BasicGraph}.
  *

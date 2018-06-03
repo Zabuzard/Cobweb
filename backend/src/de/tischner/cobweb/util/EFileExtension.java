@@ -32,7 +32,11 @@ public enum EFileExtension {
   /**
    * XZ file, known under the extension <tt>xz</tt>.
    */
-  XZ("xz");
+  XZ("xz"),
+  /**
+   * Zip file, known under the extension <tt>zip</tt>.
+   */
+  ZIP("zip");
 
   /**
    * Gets the file extension that corresponds to the extension name.

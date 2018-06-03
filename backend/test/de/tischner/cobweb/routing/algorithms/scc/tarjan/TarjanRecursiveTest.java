@@ -13,7 +13,7 @@ import de.tischner.cobweb.routing.algorithms.scc.StronglyConnectedComponent;
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;

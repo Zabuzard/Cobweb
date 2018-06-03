@@ -10,6 +10,7 @@ import org.junit.Test;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 
 /**
  * Test for the class {@link RoadGraph}.

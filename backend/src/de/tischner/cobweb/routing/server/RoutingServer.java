@@ -15,11 +15,11 @@ import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.road.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
-import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
 import de.tischner.cobweb.routing.server.model.RoutingResponse;
 

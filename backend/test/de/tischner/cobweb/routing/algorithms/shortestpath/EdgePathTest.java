@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
+import de.tischner.cobweb.routing.model.graph.IHasId;
 
 /**
  * Test for the class {@link EdgePath}.

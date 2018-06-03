@@ -1,7 +1,7 @@
 package de.tischner.cobweb.util;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
-import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.routing.model.graph.ISpatial;
 
 /**
  * Utility class which offers methods related to routing.

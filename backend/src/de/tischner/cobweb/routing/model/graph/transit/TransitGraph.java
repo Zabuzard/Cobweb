@@ -1,4 +1,4 @@
-package de.tischner.cobweb.routing.model.graph.road;
+package de.tischner.cobweb.routing.model.graph.transit;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -25,20 +25,21 @@ import de.tischner.cobweb.util.collections.ArrayMap;
 import de.tischner.cobweb.util.collections.HybridArrayHashSet;
 
 /**
- * Implementation of a {@link IGraph} model which consists of road nodes and
+ * Implementation of a {@link IGraph} model which consists of transit nodes and
  * edges.<br>
  * <br>
- * It offers access to the nodes by their unique ID and is capable of implicitly
- * reversing nodes in constant time. The class is fully serializable.
+ * It offers access to the nodes by their unique station ID together with a time
+ * and is capable of implicitly reversing nodes in constant time. The class is
+ * fully serializable.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the nodes which must have an ID and be spatial
  * @param <E> Type of the edges which must have an ID and be able to consume a
  *        {@link IReversedProvider}
  */
-public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
-    E extends IEdge<N> & IHasId & IReversedConsumer & Serializable> extends AGraph<N, E>
-    implements IGetNodeById<N>, IReversedProvider, IRoadIdGenerator {
+public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializable,
+    E extends IEdge<N> & IReversedConsumer & Serializable> extends AGraph<N, E>
+    implements IGetNodeById<N>, IReversedProvider, ITransitIdGenerator {
   /**
    * The serial version UID.
    */
@@ -63,26 +64,23 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
    * A map that connects nodes to their outgoing edges.
    */
   private final Map<N, Set<E>> mNodeToOutgoingEdges;
-  /**
-   * The unique ID generator used for ways.
-   */
-  private final UniqueIdGenerator mWayIdGenerator;
 
   /**
-   * Creates a new initially empty road graph.
+   * Creates a new initially empty transit graph.
    */
-  public RoadGraph() {
+  public TransitGraph() {
     // TODO The map could be exchanged by an array. However, from a design-view
     // it is problematic that IDs could have gaps and thus methods like
     // getNodes() which return a Collection and not only a Stream get
     // problematic due to possible null values encoding gaps.
     mIdToNode = IntObjectMaps.mutable.empty();
     mNodeIdGenerator = new UniqueIdGenerator();
-    mWayIdGenerator = new UniqueIdGenerator();
 
     // Assume node IDs are close to each other and have no, or only few, gaps.
     mNodeToIncomingEdges = new ArrayMap<>();
     mNodeToOutgoingEdges = new ArrayMap<>();
+    // TODO Add station logic, nodes must be accessible through station with
+    // timestamp
   }
 
   @Override
@@ -109,11 +107,6 @@ public final class RoadGraph<N extends INode & IHasId & ISpatial & Serializable,
   @Override
   public int generateUniqueNodeId() throws NoSuchElementException {
     return mNodeIdGenerator.generateUniqueId();
-  }
-
-  @Override
-  public int generateUniqueWayId() throws NoSuchElementException {
-    return mWayIdGenerator.generateUniqueId();
   }
 
   @Override

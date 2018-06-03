@@ -1,10 +1,10 @@
 package de.tischner.cobweb.routing.algorithms.metrics;
 
-import de.tischner.cobweb.routing.model.graph.road.ISpatial;
+import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.util.RoutingUtil;
 
 /**
- * Implements the <i>as-the-crows-flies</i> metric for {@link ISpatial}
+ * Implements the <i>as-the-crow-flies</i> metric for {@link ISpatial}
  * objects.<br>
  * <br>
  * Given two objects it computes the direct, straight-line, distance of both

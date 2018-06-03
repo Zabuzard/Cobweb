@@ -1,8 +1,6 @@
-package de.tischner.cobweb.routing.model.graph.road;
+package de.tischner.cobweb.routing.model.graph;
 
 import java.util.Optional;
-
-import de.tischner.cobweb.routing.model.graph.INode;
 
 /**
  * Interface for classes that provide access to nodes by their unique ID.

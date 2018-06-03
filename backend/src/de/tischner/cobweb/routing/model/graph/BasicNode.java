@@ -2,8 +2,6 @@ package de.tischner.cobweb.routing.model.graph;
 
 import java.io.Serializable;
 
-import de.tischner.cobweb.routing.model.graph.road.IHasId;
-
 /**
  * Basic implementation of a {@link INode} with an unique ID.
  *

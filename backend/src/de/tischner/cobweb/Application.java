@@ -24,6 +24,7 @@ import de.tischner.cobweb.db.MemoryDatabase;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
+import de.tischner.cobweb.parsing.gtfs.IGtfsFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
 import de.tischner.cobweb.parsing.osm.OsmReducer;
@@ -36,6 +37,10 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.AStar;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
+import de.tischner.cobweb.routing.model.graph.transit.TransitEdge;
+import de.tischner.cobweb.routing.model.graph.transit.TransitGraph;
+import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
+import de.tischner.cobweb.routing.parsing.gtfs.GtfsRealisticTimeExpandedHandler;
 import de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
@@ -89,10 +94,6 @@ public final class Application {
    */
   private ADatabase mDatabase;
   /**
-   * Graph to route on.
-   */
-  private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
-  /**
    * Logger to use for logging.
    */
   private Logger mLogger;
@@ -101,9 +102,17 @@ public final class Application {
    */
   private NameSearchServer mNameSearchServer;
   /**
+   * Road graph to route on.
+   */
+  private RoadGraph<RoadNode, RoadEdge<RoadNode>> mRoadGraph;
+  /**
    * Server to use for responding to routing requests. Offers a REST API.
    */
   private RoutingServer<RoadNode, RoadEdge<RoadNode>, RoadGraph<RoadNode, RoadEdge<RoadNode>>> mRoutingServer;
+  /**
+   * Transit graph to route on.
+   */
+  private TransitGraph<TransitNode, TransitEdge<TransitNode>> mTransitGraph;
 
   /**
    * Creates a new application using the given arguments. After creation use
@@ -213,6 +222,25 @@ public final class Application {
   }
 
   /**
+   * Creates file handler that handle GTFS files for routing. If they are
+   * notified when parsing GTFS data, they will adjust models used for routing
+   * like the graph accordingly.
+   *
+   * @return An iterable consisting of all routing file handlers that adjust
+   *         routing models
+   * @throws ParseException If an exception occurred while parsing data like
+   *                        configuration files
+   */
+  private Iterable<IGtfsFileHandler> createGtfsRoutingHandler() throws ParseException {
+    try {
+      final IGtfsFileHandler transitHandler = new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, mConfig);
+      return Collections.singletonList(transitHandler);
+    } catch (final IOException e) {
+      throw new ParseException(e);
+    }
+  }
+
+  /**
    * Creates file handler that handle OSM files for the database. If they are
    * notified when parsing OSM data, they will adjust the database accordingly.
    *
@@ -239,10 +267,10 @@ public final class Application {
    *                        configuration files
    */
   private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
-    final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mGraph, mGraph);
+    final IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> roadBuilder = new OsmRoadBuilder<>(mRoadGraph, mRoadGraph);
     final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
     try {
-      final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mGraph, roadFilter, roadBuilder, mDatabase, mConfig);
+      final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mRoadGraph, roadFilter, roadBuilder, mDatabase, mConfig);
       return Collections.singletonList(roadHandler);
     } catch (final IOException e) {
       throw new ParseException(e);
@@ -263,7 +291,7 @@ public final class Application {
     initializeDatabase();
     initializeGraph();
 
-    final int graphSizeBefore = mGraph.size();
+    final int graphSizeBefore = mRoadGraph.size();
 
     // Prepare data parsing
     final Collection<Path> paths = mCommandData.getPaths();
@@ -279,6 +307,8 @@ public final class Application {
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
     createOsmRoutingHandler().forEach(dataParser::addOsmHandler);
+    // Add GTFS handler
+    createGtfsRoutingHandler().forEach(dataParser::addGtfsHandler);
 
     // Parse all data
     final Instant parseStartTime = Instant.now();
@@ -289,7 +319,7 @@ public final class Application {
 
     serializeGraphIfDesired(graphSizeBefore);
 
-    mLogger.info("Graph size: {}", mGraph.getSizeInformation());
+    mLogger.info("Graph size: {}, {}", mRoadGraph.getSizeInformation(), mTransitGraph.getSizeInformation());
 
     initializeRouting();
     initializeNameSearch();
@@ -331,10 +361,13 @@ public final class Application {
    */
   private void initializeGraph() throws ParseException {
     mLogger.info("Initializing graph");
+    // TODO Should be contained in the cached graph
+    mTransitGraph = new TransitGraph<>();
 
     final Path graphCache = mConfig.getGraphCache();
     if (!mConfig.useGraphCache() || !Files.isRegularFile(graphCache)) {
-      mGraph = new RoadGraph<>();
+      // TODO The cached graph should be a graph containing multiple models
+      mRoadGraph = new RoadGraph<>();
       return;
     }
 
@@ -342,7 +375,7 @@ public final class Application {
     mLogger.info("Deserializing graph from: {}", graphCache);
     final SerializationUtil<RoadGraph<RoadNode, RoadEdge<RoadNode>>> serializationUtil = new SerializationUtil<>();
     try {
-      mGraph = serializationUtil.deserialize(graphCache);
+      mRoadGraph = serializationUtil.deserialize(graphCache);
     } catch (ClassNotFoundException | ClassCastException | IOException e) {
       throw new ParseException(e);
     }
@@ -380,13 +413,13 @@ public final class Application {
 
     final Instant preCompTimeStart = Instant.now();
     // Create the shortest path algorithm
-    final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mGraph);
-    final IMetric<RoadNode> metric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mGraph, landmarkProvider);
-    mComputation = new AStar<>(mGraph, metric);
+    final ILandmarkProvider<RoadNode> landmarkProvider = new RandomLandmarks<>(mRoadGraph);
+    final IMetric<RoadNode> metric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mRoadGraph, landmarkProvider);
+    mComputation = new AStar<>(mRoadGraph, metric);
     final Instant preCompTimeEnd = Instant.now();
     mLogger.info("Precomputation took: {}", Duration.between(preCompTimeStart, preCompTimeEnd));
 
-    mRoutingServer = new RoutingServer<>(mConfig, mGraph, mComputation, mDatabase);
+    mRoutingServer = new RoutingServer<>(mConfig, mRoadGraph, mComputation, mDatabase);
     mRoutingServer.initialize();
   }
 
@@ -403,15 +436,16 @@ public final class Application {
    *                        serialization occurred
    */
   private void serializeGraphIfDesired(final int graphSizeBefore) throws ParseException {
-    if (!mConfig.useGraphCache() || mGraph.size() == graphSizeBefore) {
+    if (!mConfig.useGraphCache() || mRoadGraph.size() == graphSizeBefore) {
       return;
     }
 
     final Path graphCache = mConfig.getGraphCache();
     mLogger.info("Serializing graph to: {}", graphCache);
+    // TODO The graph should contain multiple models
     final SerializationUtil<RoadGraph<RoadNode, RoadEdge<RoadNode>>> serializationUtil = new SerializationUtil<>();
     try {
-      serializationUtil.serialize(mGraph, graphCache);
+      serializationUtil.serialize(mRoadGraph, graphCache);
     } catch (final IOException e) {
       throw new ParseException(e);
     }
