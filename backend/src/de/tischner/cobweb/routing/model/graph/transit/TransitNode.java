@@ -101,7 +101,7 @@ public final class TransitNode implements INode, IHasId, ISpatial, Serializable 
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("RoadNode [id=");
+    builder.append("TransitNode [id=");
     builder.append(mId);
     builder.append(", latitude=");
     builder.append(mLatitude);

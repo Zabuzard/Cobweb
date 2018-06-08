@@ -40,7 +40,9 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 import de.tischner.cobweb.routing.model.graph.transit.TransitEdge;
 import de.tischner.cobweb.routing.model.graph.transit.TransitGraph;
 import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
+import de.tischner.cobweb.routing.parsing.gtfs.GtfsConnectionBuilder;
 import de.tischner.cobweb.routing.parsing.gtfs.GtfsRealisticTimeExpandedHandler;
+import de.tischner.cobweb.routing.parsing.gtfs.IGtfsConnectionBuilder;
 import de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
@@ -233,7 +235,10 @@ public final class Application {
    */
   private Iterable<IGtfsFileHandler> createGtfsRoutingHandler() throws ParseException {
     try {
-      final IGtfsFileHandler transitHandler = new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, mConfig);
+      final IGtfsConnectionBuilder<TransitNode, TransitEdge<TransitNode>> connectionBuilder =
+          new GtfsConnectionBuilder<>(mTransitGraph, mTransitGraph);
+      final IGtfsFileHandler transitHandler =
+          new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, connectionBuilder, mConfig);
       return Collections.singletonList(transitHandler);
     } catch (final IOException e) {
       throw new ParseException(e);

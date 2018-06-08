@@ -9,6 +9,15 @@ import java.util.NoSuchElementException;
  */
 public interface ITransitIdGenerator {
   /**
+   * Generates and returns an unique ID for transit edges.
+   *
+   * @return The generated unique ID
+   * @throws NoSuchElementException If the generator is out of unique IDs to
+   *                                generate
+   */
+  int generateUniqueEdgeId() throws NoSuchElementException;
+
+  /**
    * Generates and returns an unique ID for transit nodes.
    *
    * @return The generated unique ID

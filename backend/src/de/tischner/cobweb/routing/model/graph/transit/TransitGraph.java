@@ -45,6 +45,10 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
    */
   private static final long serialVersionUID = 1L;
   /**
+   * The unique ID generated used for edges.
+   */
+  private final UniqueIdGenerator mEdgeIdGenerator;
+  /**
    * A map connecting node IDs to their corresponding nodes.
    */
   private final MutableIntObjectMap<N> mIdToNode;
@@ -75,6 +79,7 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
     // problematic due to possible null values encoding gaps.
     mIdToNode = IntObjectMaps.mutable.empty();
     mNodeIdGenerator = new UniqueIdGenerator();
+    mEdgeIdGenerator = new UniqueIdGenerator();
 
     // Assume node IDs are close to each other and have no, or only few, gaps.
     mNodeToIncomingEdges = new ArrayMap<>();
@@ -102,6 +107,11 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
   @Override
   public boolean containsNodeWithId(final int id) {
     return mIdToNode.containsKey(id);
+  }
+
+  @Override
+  public int generateUniqueEdgeId() throws NoSuchElementException {
+    return mEdgeIdGenerator.generateUniqueId();
   }
 
   @Override

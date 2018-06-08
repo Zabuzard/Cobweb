@@ -277,7 +277,7 @@ public final class ArrayMap<K extends IHasId, V> implements Map<K, V>, Serializa
    * @param capacity The desired capacity
    */
   private void increaseCapacity(final int capacity) {
-    for (int i = mValues.size(); i <= capacity; i++) {
+    for (int i = mValues.size(); i < capacity; i++) {
       mValues.add(null);
     }
   }

@@ -19,7 +19,7 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
  * @param <N> The type of the node which must have an ID and be spatial
  */
 public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializable>
-    implements IEdge<N>, IReversedConsumer, Serializable {
+    implements IEdge<N>, IHasId, IReversedConsumer, Serializable {
   /**
    * THe serial version UID.
    */
@@ -32,6 +32,10 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
    * The destination of this edge.
    */
   private final N mDestination;
+  /**
+   * The ID of this edge which is unique.
+   */
+  private final int mId;
   /**
    * An object that provides a reversed flag or <tt>null</tt> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
@@ -46,12 +50,14 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
   /**
    * Creates a new transit edge which connects the given source and destination.
    *
+   * @param id          The ID of the edge which is unique
    * @param source      The source node of the edge
    * @param destination The destination node of the edge
    * @param cost        The cost of this edge, measured in seconds. Interpreted
    *                    as travel time.
    */
-  public TransitEdge(final N source, final N destination, final double cost) {
+  public TransitEdge(final int id, final N source, final N destination, final double cost) {
+    mId = id;
     mSource = source;
     mDestination = destination;
     mCost = cost;
@@ -73,18 +79,7 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
       return false;
     }
     final TransitEdge<?> other = (TransitEdge<?>) obj;
-    if (this.mDestination == null) {
-      if (other.mDestination != null) {
-        return false;
-      }
-    } else if (!this.mDestination.equals(other.mDestination)) {
-      return false;
-    }
-    if (this.mSource == null) {
-      if (other.mSource != null) {
-        return false;
-      }
-    } else if (!this.mSource.equals(other.mSource)) {
+    if (this.mId != other.mId) {
       return false;
     }
     return true;
@@ -111,6 +106,11 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
     return mDestination;
   }
 
+  @Override
+  public int getId() {
+    return mId;
+  }
+
   /*
    * (non-Javadoc)
    * @see de.tischner.cobweb.model.graph.IEdge#getSource()
@@ -131,8 +131,7 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((this.mDestination == null) ? 0 : this.mDestination.hashCode());
-    result = prime * result + ((this.mSource == null) ? 0 : this.mSource.hashCode());
+    result = prime * result + this.mId;
     return result;
   }
 
@@ -154,7 +153,7 @@ public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializabl
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("RoadEdge [");
+    builder.append("TransitEdge [");
     builder.append(getSource().getId());
     builder.append(" -(");
     builder.append(mCost);
