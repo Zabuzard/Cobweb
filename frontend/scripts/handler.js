@@ -134,12 +134,12 @@ function handleRouteServerError(status, error) {
 
 /**
  * Handles a routing response from the server.
- * @param {{from:number, to:number, journeys:{depTime:number, arrTime:number,
+ * @param {{time:number, compTime:number, from:number, to:number, journeys:{depTime:number, arrTime:number,
  * route:{time:number, type:number, mode:number, name:string, geom:number[][]}[]}[]}} response - The response from the
  * server as JSON according to the REST API specification
  */
 function handleRouteServerResponse(response) {
-	setMiscInfo(response.time);
+	setMiscInfo(response.time, response.compTime);
 
 	// If no path could be computed
 	if (response.journeys.length == 0) {

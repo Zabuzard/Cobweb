@@ -1,12 +1,11 @@
 package de.tischner.cobweb.util.collections;
 
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-public final class DoubletonCollection<E> implements Collection<E>, Serializable {
+public final class DoubletonCollection<E> implements Collection<E> {
 
   private final Collection<E> mFirst;
   private final Collection<E> mSecond;

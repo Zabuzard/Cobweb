@@ -125,9 +125,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final N source = sourceOptional.get();
     final N destination = destinationOptional.get();
 
+    final long startCompTime = System.nanoTime();
     final Optional<IPath<N, E>> pathOptional = mComputation.computeShortestPath(source, destination);
+    final long endCompTime = System.nanoTime();
     if (!pathOptional.isPresent()) {
-      sendEmptyResponse(request, startTime);
+      sendNotReachableResponse(request, startTime, startCompTime);
       return;
     }
 
@@ -135,13 +137,12 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final IPath<N, E> path = pathOptional.get();
     final Journey journey = buildJourney(request, path);
 
-    // TODO Should construction of the result be included in the time
-    // measurement or not? In particular the database lookups take some time.
     final long endTime = System.nanoTime();
 
     // Build and send response
     final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
-        request.getFrom(), request.getTo(), Collections.singletonList(journey));
+        RoutingUtil.nanoToMilliseconds(endCompTime - startCompTime), request.getFrom(), request.getTo(),
+        Collections.singletonList(journey));
     sendResponse(response);
   }
 
@@ -229,8 +230,29 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private void sendEmptyResponse(final RoutingRequest request, final long startTime) throws IOException {
     final long endTime = System.nanoTime();
-    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), 0L,
         request.getFrom(), request.getTo(), Collections.emptyList());
+    sendResponse(response);
+  }
+
+  /**
+   * Sends a not reachable response. This is usually used if no shortest path
+   * could be found.
+   *
+   * @param request       The request to respond to
+   * @param startTime     The time the computation started, in nanoseconds. Must
+   *                      be compatible with {@link System#nanoTime()}.
+   * @param startCompTime The time the computation of the shortest path started,
+   *                      in nanoseconds. Must be compatible with
+   *                      {@link System#nanoTime()}.
+   * @throws IOException If an I/O exception occurred while sending the response
+   */
+  private void sendNotReachableResponse(final RoutingRequest request, final long startTime, final long startCompTime)
+      throws IOException {
+    final long endTime = System.nanoTime();
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
+        RoutingUtil.nanoToMilliseconds(endTime - startCompTime), request.getFrom(), request.getTo(),
+        Collections.emptyList());
     sendResponse(response);
   }
 

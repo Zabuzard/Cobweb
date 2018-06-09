@@ -27,6 +27,11 @@ import de.tischner.cobweb.util.collections.DoubletonCollection;
 public final class LinkGraph
     implements IGetNodeById<ICoreNode>, IReversedProvider, IGraph<ICoreNode, ICoreEdge<ICoreNode>> {
   /**
+   * The serial version UID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Removes the given link edge from the given map by using the given key.<br>
    * <br>
    * If the link set is empty after removal, the key is removed from the map

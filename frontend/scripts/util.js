@@ -109,12 +109,14 @@ function clearMessages() {
 }
 
 /**
- * Displays the given time in the miscellaneous info message box on the site.
+ * Displays the given time information in the miscellaneous info message box on the site.
  * @param {number} time - The time to display, in milliseconds
+ * @param {number} compTime - The computation time to display, in milliseconds
  */
-function setMiscInfo(time) {
+function setMiscInfo(time, compTime) {
 	var seconds = time / 1000;
-	$('#miscInfoPanel').text("computed in " + seconds + "s");
+	var compSeconds = compTime / 1000;
+	$('#miscInfoPanel').text("computed in " + seconds + "s (" + compSeconds + "s)");
 }
 
 /**

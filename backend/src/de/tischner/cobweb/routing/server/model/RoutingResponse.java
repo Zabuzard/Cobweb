@@ -6,8 +6,8 @@ import java.util.List;
  * POJO that models a routing response.<br>
  * <br>
  * A response consists of departure and arrival time, together with possible
- * routes. It also includes the time it needed to answer the query in
- * milliseconds.<br>
+ * routes. It also includes the time it needed to answer the query and to
+ * compute the answer in milliseconds.<br>
  * <br>
  * It has the exact structure that is expected as response format for the REST
  * API. It is primarily used to be constructed and then encoded to JSON to be
@@ -16,6 +16,10 @@ import java.util.List;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 public final class RoutingResponse {
+  /**
+   * The duration computation of the answer to the query took, in milliseconds.
+   */
+  private long mCompTime;
   /**
    * The unique ID of the node to start the journeys from.
    */
@@ -37,12 +41,16 @@ public final class RoutingResponse {
    * Creates a new routing response.
    *
    * @param time     The duration answering the query took, in milliseconds
+   * @param compTime The duration computation of the answer to the query took,
+   *                 in milliseconds
    * @param from     The unique ID of the node to start the journeys from
    * @param to       The unique ID of the node to end the journeys at
    * @param journeys A list of all computed appropriate journeys
    */
-  public RoutingResponse(final long time, final long from, final long to, final List<Journey> journeys) {
+  public RoutingResponse(final long time, final long compTime, final long from, final long to,
+      final List<Journey> journeys) {
     mTime = time;
+    mCompTime = compTime;
     mFrom = from;
     mTo = to;
     mJourneys = journeys;
@@ -55,6 +63,16 @@ public final class RoutingResponse {
   @SuppressWarnings("unused")
   private RoutingResponse() {
     // Empty constructor for construction through reflection
+  }
+
+  /**
+   * Gets the duration computation of the answer to the query took, in
+   * milliseconds.
+   *
+   * @return The duration to get
+   */
+  public long getCompTime() {
+    return mCompTime;
   }
 
   /**
