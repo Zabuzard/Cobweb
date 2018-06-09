@@ -1,12 +1,10 @@
-package de.tischner.cobweb.routing.parsing.gtfs;
+package de.tischner.cobweb.routing.model.graph.transit;
 
-import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 
-public final class NodeTime<N extends INode & IHasId & ISpatial> implements Comparable<NodeTime<N>> {
+public final class NodeTime<N extends INode> implements Comparable<NodeTime<N>> {
   private final N mNode;
-  private final int mTime;
+  private int mTime;
 
   public NodeTime(final N node, final int time) {
     mNode = node;
@@ -24,5 +22,9 @@ public final class NodeTime<N extends INode & IHasId & ISpatial> implements Comp
 
   public int getTime() {
     return mTime;
+  }
+
+  public void setTime(final int time) {
+    mTime = time;
   }
 }

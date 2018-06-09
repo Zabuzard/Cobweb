@@ -2,7 +2,6 @@ package de.tischner.cobweb.routing.model.graph;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -112,12 +111,12 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * cobweb.routing.model.graph.INode)
    */
   @Override
-  public Set<E> getIncomingEdges(final N destination) {
+  public Stream<E> getIncomingEdges(final N destination) {
     final Set<E> edges = getNodeToIncomingEdges().get(destination);
     if (edges == null) {
-      return Collections.emptySet();
+      return Stream.empty();
     }
-    return edges;
+    return edges.stream();
   }
 
   /*
@@ -127,12 +126,12 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * cobweb.routing.model.graph.INode)
    */
   @Override
-  public Set<E> getOutgoingEdges(final N source) {
+  public Stream<E> getOutgoingEdges(final N source) {
     final Set<E> edges = getNodeToOutgoingEdges().get(source);
     if (edges == null) {
-      return Collections.emptySet();
+      return Stream.empty();
     }
-    return edges;
+    return edges.stream();
   }
 
   /**

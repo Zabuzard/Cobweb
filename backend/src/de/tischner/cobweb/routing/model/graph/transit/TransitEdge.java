@@ -1,13 +1,10 @@
 package de.tischner.cobweb.routing.model.graph.transit;
 
-import java.io.Serializable;
-
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IEdge;
-import de.tischner.cobweb.routing.model.graph.IHasId;
-import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IReversedConsumer;
 import de.tischner.cobweb.routing.model.graph.IReversedProvider;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 
 /**
  * Implementation of a {@link IEdge} which connects transit nodes.<br>
@@ -18,10 +15,9 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> The type of the node which must have an ID and be spatial
  */
-public final class TransitEdge<N extends INode & IHasId & ISpatial & Serializable>
-    implements IEdge<N>, IHasId, IReversedConsumer, Serializable {
+public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
   /**
-   * THe serial version UID.
+   * The serial version UID.
    */
   private static final long serialVersionUID = 1L;
   /**

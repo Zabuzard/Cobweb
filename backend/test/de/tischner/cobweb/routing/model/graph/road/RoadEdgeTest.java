@@ -108,7 +108,7 @@ public final class RoadEdgeTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#RoadEdge(int, de.tischner.cobweb.routing.model.graph.INode, de.tischner.cobweb.routing.model.graph.INode, de.tischner.cobweb.parsing.osm.EHighwayType, int)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#RoadEdge(int, de.tischner.cobweb.routing.model.graph.ICoreNode, de.tischner.cobweb.routing.model.graph.ICoreNode, EHighwayType, int)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test

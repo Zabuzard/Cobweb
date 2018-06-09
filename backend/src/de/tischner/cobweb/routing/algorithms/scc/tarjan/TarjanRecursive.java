@@ -54,10 +54,10 @@ public final class TarjanRecursive<N extends INode, E extends IEdge<N>, G extend
     pushToDeque(node);
 
     // Start a depth-first-search over all successors
-    for (final E edge : getOutgoingEdges(node)) {
+    getOutgoingEdges(node).forEach(edge -> {
       final N successor = edge.getDestination();
       processSuccessor(node, successor);
-    }
+    });
 
     // All reachable nodes where visited.
     // If this nodes low link value is equals to its index, then it is the root

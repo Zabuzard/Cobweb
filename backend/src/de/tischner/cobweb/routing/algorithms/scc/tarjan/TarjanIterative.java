@@ -38,7 +38,7 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
    * @param node The node to process successors of
    */
   private void doGetSuccessorsTask(final N node) {
-    for (final E edge : getOutgoingEdges(node)) {
+    getOutgoingEdges(node).forEach(edge -> {
       final N successor = edge.getDestination();
       if (containsIndexNode(successor)) {
         // Update the low link value if not visited the first time
@@ -49,7 +49,7 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
         // Register successor if visited the first time
         mTaskDeque.push(new TarjanTaskElement<>(successor, node));
       }
-    }
+    });
   }
 
   /**

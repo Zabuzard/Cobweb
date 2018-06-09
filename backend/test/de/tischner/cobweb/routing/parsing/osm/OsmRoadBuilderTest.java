@@ -9,6 +9,8 @@ import org.junit.Test;
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
@@ -26,7 +28,7 @@ public final class OsmRoadBuilderTest {
   /**
    * The road builder used for testing.
    */
-  private OsmRoadBuilder<RoadGraph<RoadNode, RoadEdge<RoadNode>>> mBuilder;
+  private OsmRoadBuilder<RoadGraph<ICoreNode, ICoreEdge<ICoreNode>>> mBuilder;
   /**
    * Counter used for generating unique edge IDs.
    */
@@ -34,7 +36,7 @@ public final class OsmRoadBuilderTest {
   /**
    * The graph used for testing.
    */
-  private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
+  private RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mGraph;
 
   /**
    * Setups a road builder instance for testing.
@@ -80,7 +82,7 @@ public final class OsmRoadBuilderTest {
     nodes.add(3L);
     final OsmWay way = new Way(20L, nodes, Arrays.asList(new Tag("highway", "motorway"), new Tag("maxspeed", "100")));
 
-    final RoadEdge<RoadNode> edge = mBuilder.buildEdge(way, 1L, 6L);
+    final ICoreEdge<ICoreNode> edge = mBuilder.buildEdge(way, 1L, 6L);
     Assert.assertEquals(0, edge.getSource().getId());
     Assert.assertEquals(5, edge.getDestination().getId());
     Assert.assertEquals(0, edge.getId());
@@ -111,11 +113,11 @@ public final class OsmRoadBuilderTest {
     nodes.add(3L);
     final OsmWay way = new Way(20L, nodes, Arrays.asList(new Tag("highway", "motorway"), new Tag("maxspeed", "100")));
 
-    final RoadEdge<RoadNode> edge = mBuilder.buildEdge(way, 1L, 6L);
+    final ICoreEdge<ICoreNode> edge = mBuilder.buildEdge(way, 1L, 6L);
     mGraph.addEdge(edge);
     final double costBefore = edge.getCost();
 
-    final RoadNode node = mGraph.getNodeById(5).get();
+    final ICoreNode node = mGraph.getNodeById(5).get();
     node.setLatitude(100.0F);
     node.setLongitude(100.0F);
 
@@ -125,12 +127,12 @@ public final class OsmRoadBuilderTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder#OsmRoadBuilder(de.tischner.cobweb.routing.model.graph.IGraph, de.tischner.cobweb.routing.model.graph.road.IUniqueIdGenerator)}.
+   * {@link de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder#OsmRoadBuilder(de.tischner.cobweb.routing.model.graph.IGraph, de.tischner.cobweb.routing.model.graph.road.IRoadIdGenerator)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testOsmRoadBuilder() {
-    final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph = new RoadGraph<>();
+    final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> graph = new RoadGraph<>();
     try {
       new OsmRoadBuilder<>(graph, graph);
     } catch (final Exception e) {
@@ -146,7 +148,7 @@ public final class OsmRoadBuilderTest {
    * @param first  The first node
    * @param second The second node
    */
-  private void addEdgeInBothDirections(final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph, final RoadNode first,
+  private void addEdgeInBothDirections(final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final RoadNode first,
       final RoadNode second) {
     addEdgeInOneDirection(graph, first, second);
     addEdgeInOneDirection(graph, second, first);
@@ -160,7 +162,7 @@ public final class OsmRoadBuilderTest {
    * @param first  The first node
    * @param second The second node
    */
-  private void addEdgeInOneDirection(final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph, final RoadNode first,
+  private void addEdgeInOneDirection(final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final RoadNode first,
       final RoadNode second) {
     graph.addEdge(new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100));
     mEdgeIdCounter++;

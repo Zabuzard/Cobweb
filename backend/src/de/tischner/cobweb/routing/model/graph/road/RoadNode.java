@@ -1,10 +1,7 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
-import java.io.Serializable;
-
-import de.tischner.cobweb.routing.model.graph.IHasId;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 
 /**
  * Implementation of an {@link INode} which represents a node on a road. As such
@@ -12,7 +9,7 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class RoadNode implements INode, IHasId, ISpatial, Serializable {
+public final class RoadNode implements ICoreNode {
   /**
    * The serial version UID.
    */

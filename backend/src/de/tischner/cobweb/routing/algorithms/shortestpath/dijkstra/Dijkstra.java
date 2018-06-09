@@ -200,10 +200,10 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
       }
 
       // Relax all outgoing edges
-      for (final E edge : mGraph.getOutgoingEdges(node)) {
+      mGraph.getOutgoingEdges(node).forEach(edge -> {
         // Skip the edge if it should not be considered
         if (!considerEdgeForRelaxation(edge, pathDestination)) {
-          continue;
+          return;
         }
 
         final N destination = edge.getDestination();
@@ -220,19 +220,19 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
           activeNodes.add(destinationDistance);
 
           // Relaxation has finished
-          continue;
+          return;
         }
 
         // Destination is not visited for the first time
         // Don't relax if the node was already settled
         if (nodeToSettledDistance.containsKey(destination)) {
-          continue;
+          return;
         }
 
         // Don't relax if the edge does not improve the distance to this
         // destination
         if (tentativeEdgeDistance >= destinationDistance.getTentativeDistance()) {
-          continue;
+          return;
         }
 
         // Improve the distance by replacing the old container with a new one
@@ -241,7 +241,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
         // Replace the old distance by the new one and set as active
         nodeToDistance.put(destination, destinationDistance);
         activeNodes.add(destinationDistance);
-      }
+      });
     }
 
     return nodeToSettledDistance;

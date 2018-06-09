@@ -39,6 +39,7 @@ import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
+import de.tischner.cobweb.routing.model.graph.transit.NodeTime;
 
 /**
  * Implementation of an {@link IGtfsFileHandler} which constructs a realistic
@@ -121,7 +122,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    */
   public GtfsRealisticTimeExpandedHandler(final G graph, final IGtfsConnectionBuilder<N, E> builder,
       final IRoutingConfigProvider config) throws IOException {
-    // TODO A lot, currently only a super early draft
+    // TODO A lot, currently only an early draft
     mGraph = graph;
     mBuilder = builder;
     mTripToSequence = Maps.mutable.empty();
@@ -191,6 +192,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
     // Process the departure nodes and connect them to their previous transfer
     // node
+    final NodeTime<N> nodeTimeNeedle = new NodeTime<>(null, 0);
     mStopToDepNodes.forEachKeyValue((stopId, depNodes) -> {
       final List<NodeTime<N>> transferNodes = mStopToTransferNodes.get(stopId);
       depNodes.forEach(depNode -> {
@@ -198,7 +200,8 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
         // Note that this requires that the transfer nodes were sorted
         // before
         final int depTime = depNode.getTime();
-        final int indexOfPrevious = -1 * Collections.binarySearch(transferNodes, new NodeTime<>(null, depTime)) - 2;
+        nodeTimeNeedle.setTime(depTime);
+        final int indexOfPrevious = -1 * Collections.binarySearch(transferNodes, nodeTimeNeedle) - 2;
         // Check if there is a previous transfer node
         if (indexOfPrevious < 0) {
           return;

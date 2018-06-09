@@ -163,7 +163,7 @@ public final class BasicGraphTest {
    */
   @Test
   public void testGetIncomingEdges() {
-    final Set<Integer> sourceIds = mGraph.getIncomingEdges(mGraph.getNodeById(1).get()).stream().map(IEdge::getSource)
+    final Set<Integer> sourceIds = mGraph.getIncomingEdges(mGraph.getNodeById(1).get()).map(IEdge::getSource)
         .map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertEquals(4, sourceIds.size());
     Assert.assertTrue(sourceIds.contains(2));
@@ -211,8 +211,8 @@ public final class BasicGraphTest {
    */
   @Test
   public void testGetOutgoingEdges() {
-    final Set<Integer> destinationIds = mGraph.getOutgoingEdges(mGraph.getNodeById(1).get()).stream()
-        .map(IEdge::getDestination).map(IHasId::getId).collect(Collectors.toSet());
+    final Set<Integer> destinationIds = mGraph.getOutgoingEdges(mGraph.getNodeById(1).get()).map(IEdge::getDestination)
+        .map(IHasId::getId).collect(Collectors.toSet());
     Assert.assertEquals(4, destinationIds.size());
     Assert.assertTrue(destinationIds.contains(2));
     Assert.assertTrue(destinationIds.contains(3));

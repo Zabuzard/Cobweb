@@ -8,6 +8,8 @@ import org.eclipse.collections.impl.factory.primitive.LongIntMaps;
 import de.tischner.cobweb.parsing.ParseException;
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.parsing.osm.OsmParseUtil;
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.road.IRoadIdGenerator;
@@ -27,8 +29,8 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <G> The type of the graph which must be able to get nodes by their IDs
  */
-public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>> & IGetNodeById<RoadNode>>
-    implements IOsmRoadBuilder<RoadNode, RoadEdge<RoadNode>> {
+public final class OsmRoadBuilder<G extends IGraph<ICoreNode, ICoreEdge<ICoreNode>> & IGetNodeById<ICoreNode>>
+    implements IOsmRoadBuilder<ICoreNode, ICoreEdge<ICoreNode>> {
   /**
    * The graph to operate on.
    */
@@ -68,7 +70,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
    * {@link #complete()} is called.
    */
   @Override
-  public RoadEdge<RoadNode> buildEdge(final OsmWay way, final long sourceIdOsm, final long destinationIdOsm)
+  public ICoreEdge<ICoreNode> buildEdge(final OsmWay way, final long sourceIdOsm, final long destinationIdOsm)
       throws ParseException {
     final int sourceId = mOsmToNodeId.getIfAbsentPut(sourceIdOsm, () -> {
       throw new ParseException();
@@ -76,8 +78,8 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
     final int destinationId = mOsmToNodeId.getIfAbsentPut(destinationIdOsm, () -> {
       throw new ParseException();
     });
-    final RoadNode source = mGraph.getNodeById(sourceId).orElseThrow(() -> new ParseException());
-    final RoadNode destination = mGraph.getNodeById(destinationId).orElseThrow(() -> new ParseException());
+    final ICoreNode source = mGraph.getNodeById(sourceId).orElseThrow(() -> new ParseException());
+    final ICoreNode destination = mGraph.getNodeById(destinationId).orElseThrow(() -> new ParseException());
 
     // Get information about the highway type
     final Map<String, String> tagToValue = OsmModelUtil.getTagsAsMap(way);
@@ -109,7 +111,7 @@ public final class OsmRoadBuilder<G extends IGraph<RoadNode, RoadEdge<RoadNode>>
   @Override
   public void complete() {
     // Spatial data of nodes are now known, update all edge costs
-    mGraph.getEdges().forEach(RoadEdge::updateCost);
+    mGraph.getEdges().filter(RoadEdge.class::isInstance).map(RoadEdge.class::cast).forEach(RoadEdge::updateCost);
   }
 
 }

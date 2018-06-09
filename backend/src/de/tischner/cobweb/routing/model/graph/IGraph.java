@@ -1,7 +1,6 @@
 package de.tischner.cobweb.routing.model.graph;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -57,14 +56,12 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
   Stream<E> getEdges();
 
   /**
-   * Gets a set of all edges that have the given node as destination.<br>
-   * <br>
-   * There are no guarantees made on if the set is backed by the graph or not.
+   * Gets a stream of all edges that have the given node as destination.
    *
    * @param destination The destination to get incoming edges for
-   * @return A set of all incoming edges
+   * @return A stream of all incoming edges
    */
-  Set<E> getIncomingEdges(N destination);
+  Stream<E> getIncomingEdges(N destination);
 
   /**
    * Gets a collection of all nodes that the graph contains.<br>
@@ -77,14 +74,12 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
   Collection<N> getNodes();
 
   /**
-   * Gets a set of all edges that have the given node as source.<br>
-   * <br>
-   * There are no guarantees made on if the set is backed by the graph or not.
+   * Gets a stream of all edges that have the given node as source.
    *
    * @param source The source to get outgoing edges for
-   * @return A set of all outgoing edges
+   * @return A stream of all outgoing edges
    */
-  Set<E> getOutgoingEdges(N source);
+  Stream<E> getOutgoingEdges(N source);
 
   /**
    * Removes the given edge if it is contained in the graph.

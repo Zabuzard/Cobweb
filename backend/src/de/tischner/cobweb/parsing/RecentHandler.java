@@ -65,7 +65,6 @@ public final class RecentHandler implements IFileHandler {
    */
   public RecentHandler(final Path info) throws IOException {
     mInfo = info;
-    mPathToLastModified = new HashMap<>();
     initialize();
   }
 
@@ -114,8 +113,12 @@ public final class RecentHandler implements IFileHandler {
       LOGGER.debug("Updating info to: {}", mInfo);
     }
 
+    // Read current state
+    final Map<Path, Long> currentInfo = readCurrentInfo();
+    // Update
+    currentInfo.putAll(mPathToLastModified);
     // Write the updated info back
-    final List<String> lines = mPathToLastModified.entrySet().stream()
+    final List<String> lines = currentInfo.entrySet().stream()
         .map(entry -> entry.getKey() + DELIMITER + entry.getValue()).collect(Collectors.toList());
     Files.write(mInfo, lines);
   }
@@ -126,15 +129,21 @@ public final class RecentHandler implements IFileHandler {
    * @throws IOException If an I/O exception occurred when reading the info file
    */
   private void initialize() throws IOException {
+    mPathToLastModified = readCurrentInfo();
+  }
+
+  private Map<Path, Long> readCurrentInfo() throws IOException {
     if (!Files.isRegularFile(mInfo)) {
-      return;
+      return new HashMap<>();
     }
 
     // Read in the file and parse all info
+    Map<Path, Long> pathToLastModified = new HashMap<>();
     try (Stream<String> lines = Files.lines(mInfo)) {
       final Pattern delimiterPatt = Pattern.compile(DELIMITER);
-      mPathToLastModified = lines.map(delimiterPatt::split)
+      pathToLastModified = lines.map(delimiterPatt::split)
           .collect(Collectors.toMap(data -> Paths.get(data[0]), data -> Long.valueOf(data[1])));
     }
+    return pathToLastModified;
   }
 }

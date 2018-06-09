@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
@@ -190,12 +191,12 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
   }
 
   /**
-   * Gets a set of all outgoing edges of the given node.
+   * Gets a stream of all outgoing edges of the given node.
    *
    * @param node The node to get edges from
-   * @return A set of all outgoing edges of the given node
+   * @return A stream of all outgoing edges of the given node
    */
-  protected Set<E> getOutgoingEdges(final N node) {
+  protected Stream<E> getOutgoingEdges(final N node) {
     return mGraph.getOutgoingEdges(node);
   }
 
