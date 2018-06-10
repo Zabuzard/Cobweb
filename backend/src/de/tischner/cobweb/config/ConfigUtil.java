@@ -52,6 +52,10 @@ final class ConfigUtil {
    */
   static final String KEY_NAME_SEARCH_SERVER_PORT = "nameSearchServerPort";
   /**
+   * Name of the key that stores the port the nearest search server should use.
+   */
+  static final String KEY_NEAREST_SEARCH_SERVER_PORT = "nearestSearchServerPort";
+  /**
    * Name of the key that stores the path to the directory where all OSM input
    * data are stored.
    */
@@ -112,6 +116,10 @@ final class ConfigUtil {
    * Default port to use by the name search server.
    */
   static final int VALUE_NAME_SEARCH_SERVER_PORT = 846;
+  /**
+   * Default port to use by the nearest search server.
+   */
+  static final int VALUE_NEAREST_SEARCH_SERVER_PORT = 847;
   /**
    * Default path to the directory that contains all OSM data.
    */

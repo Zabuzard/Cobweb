@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.model;
+package de.tischner.cobweb.searching.name.model;
 
 import de.zabuza.lexisearch.indexing.IKeyProvider;
 import de.zabuza.lexisearch.indexing.IKeyRecord;

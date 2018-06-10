@@ -1,31 +1,26 @@
-package de.tischner.cobweb.searching.server;
+package de.tischner.cobweb.searching.nearest.server;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tischner.cobweb.config.INameSearchConfigProvider;
-import de.tischner.cobweb.db.INameSearchDatabase;
-import de.tischner.cobweb.searching.model.NodeNameSet;
-import de.tischner.cobweb.searching.server.model.NameSearchRequest;
-import de.tischner.cobweb.searching.server.model.NameSearchResponse;
-import de.zabuza.lexisearch.indexing.IKeyRecord;
-import de.zabuza.lexisearch.indexing.qgram.QGramProvider;
-import de.zabuza.lexisearch.queries.FuzzyPrefixQuery;
-import de.zabuza.lexisearch.ranking.PostingBeforeRecordRanking;
+import de.tischner.cobweb.config.INearestSearchConfigProvider;
+import de.tischner.cobweb.db.INearestSearchDatabase;
+import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
+import de.tischner.cobweb.searching.nearest.server.model.NearestSearchRequest;
+import de.tischner.cobweb.searching.nearest.server.model.NearestSearchResponse;
 
 /**
- * A server which offers a REST API that is able to answer name search
- * requests.<br>
+ * A server which offers a REST API that is able to answer nearest neighboring
+ * node search requests.<br>
  * <br>
  * After construction the {@link #initialize()} method should be called.
  * Afterwards it can be started by using {@link #start()}. Request the server to
@@ -33,34 +28,28 @@ import de.zabuza.lexisearch.ranking.PostingBeforeRecordRanking;
  * {@link #isRunning()}. Once a server was shutdown it should not be used
  * anymore, instead create a new one.<br>
  * <br>
- * A request consists of a name, which can be a prefix and fuzzy, and a maximal
- * amount of matches interested in. A response consists of a list of matches,
- * sorted by relevance (most relevant first). It also includes the time it
- * needed to answer the query in milliseconds. The response will not contain
- * more matches than specified by the request. A match consists of the full name
- * and the corresponding OSM node ID.<br>
+ * A request consists of a latitude and longitude. A response consists of the
+ * nearest OSM node, including its unique OSM ID and its exact latitude and
+ * longitude coordinates. It also includes the time it needed to answer the
+ * query in milliseconds.<br>
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
- * Requests are parsed into {@link NameSearchRequest} and responses into
- * {@link NameSearchResponse}. Accepted HTTP methods are <tt>POST</tt> and
+ * Requests are parsed into {@link NearestSearchRequest} and responses into
+ * {@link NearestSearchResponse}. Accepted HTTP methods are <tt>POST</tt> and
  * <tt>OPTIONS</tt>. The server will send <tt>BAD REQUEST</tt> to invalid
  * requests.<br>
  * <br>
  * The server itself handles clients in parallel using a cached thread pool. For
- * construction it wants a configuration and a database for retrieving the name
- * data-set.
+ * construction it wants a configuration and a nearest neighbor computation
+ * object for retrieving the nodes.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class NameSearchServer implements Runnable {
+public final class NearestSearchServer implements Runnable {
   /**
    * Logger used for logging.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(NameSearchServer.class);
-  /**
-   * The value to use for the <tt>q-grams</tt>, i.e. the <tt>q</tt>.
-   */
-  private static final int Q_GRAM_VALUE = 3;
+  private static final Logger LOGGER = LoggerFactory.getLogger(NearestSearchServer.class);
   /**
    * The timeout used when waiting for a client to connect, in milliseconds. The
    * server status is checked after each timeout.
@@ -70,23 +59,15 @@ public final class NameSearchServer implements Runnable {
    * Configuration provider which provides the port that should be used by the
    * server.
    */
-  private final INameSearchConfigProvider mConfig;
+  private final INearestSearchConfigProvider mConfig;
   /**
-   * Database used for retrieving the name data-set.
+   * The database to use for retrieving node data.
    */
-  private final INameSearchDatabase mDatabase;
+  private final INearestSearchDatabase mDatabase;
   /**
-   * The query object to use for answering fuzzy prefix queries.
+   * The nearest neighbor computation algorithm to use.
    */
-  private FuzzyPrefixQuery<IKeyRecord<String>> mFuzzyQuery;
-  /**
-   * The maximal amount of matches to send in a response.
-   */
-  private int mMatchLimit;
-  /**
-   * The data-set of node names to query on.
-   */
-  private NodeNameSet mNodeNames;
+  private final INearestNeighborComputation<ICoreNode> mNearestNeighborComputation;
   /**
    * The server socket to use for communication.
    */
@@ -101,8 +82,8 @@ public final class NameSearchServer implements Runnable {
   private volatile boolean mShouldRun;
 
   /**
-   * Creates a new name search server with the given configuration that works
-   * with the given tools.<br>
+   * Creates a new nearest search server with the given configuration that works
+   * with the given algorithm.<br>
    * <br>
    * After construction the {@link #initialize()} method should be called.
    * Afterwards it can be started by using {@link #start()}. Request the server
@@ -110,12 +91,17 @@ public final class NameSearchServer implements Runnable {
    * with {@link #isRunning()}. Once a server was shutdown it should not be used
    * anymore, instead create a new one.
    *
-   * @param config   Configuration provider which provides the port that should
-   *                 be used by the server
-   * @param database Database used for retrieving the name data-set
+   * @param config                     Configuration provider which provides the
+   *                                   port that should be used by the server
+   * @param nearestNeighborComputation Nearest neighbor computation algorithm to
+   *                                   use
+   * @param database                   The database to use for retrieving node
+   *                                   data
    */
-  public NameSearchServer(final INameSearchConfigProvider config, final INameSearchDatabase database) {
+  public NearestSearchServer(final INearestSearchConfigProvider config,
+      final INearestNeighborComputation<ICoreNode> nearestNeighborComputation, final INearestSearchDatabase database) {
     mConfig = config;
+    mNearestNeighborComputation = nearestNeighborComputation;
     mDatabase = database;
   }
 
@@ -127,11 +113,9 @@ public final class NameSearchServer implements Runnable {
    *                              the server socket.
    */
   public void initialize() throws UncheckedIOException {
-    initializeFuzzyPrefixQuery();
-    mMatchLimit = mConfig.getMatchLimit();
     mServerThread = new Thread(this);
     try {
-      mServerSocket = new ServerSocket(mConfig.getNameSearchServerPort());
+      mServerSocket = new ServerSocket(mConfig.getNearestSearchServerPort());
       mServerSocket.setSoTimeout(SOCKET_TIMEOUT);
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
@@ -167,19 +151,19 @@ public final class NameSearchServer implements Runnable {
 
         // Handle the client
         requestId++;
-        final ClientHandler handler = new ClientHandler(requestId, client, mFuzzyQuery, mNodeNames, mMatchLimit);
+        final ClientHandler handler = new ClientHandler(requestId, client, mNearestNeighborComputation, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
         // Ignore the exception. The timeout is used to repeatedly check if the
         // server should continue running.
       } catch (final Exception e) {
         // TODO Implement some limit of repeated exceptions
-        // Log every exception and try to keep alive
-        LOGGER.error("Unknown exception in name search server routine", e);
+        // Log every exception and try to stay alive
+        LOGGER.error("Unknown exception in nearest search server routine", e);
       }
     }
 
-    LOGGER.info("Name search server is shutting down");
+    LOGGER.info("Nearest search server is shutting down");
   }
 
   /**
@@ -190,7 +174,7 @@ public final class NameSearchServer implements Runnable {
    */
   public void shutdown() {
     mShouldRun = false;
-    LOGGER.info("Set shutdown request to name search server");
+    LOGGER.info("Set shutdown request to nearest search server");
   }
 
   /**
@@ -205,27 +189,9 @@ public final class NameSearchServer implements Runnable {
     if (isRunning()) {
       return;
     }
-    LOGGER.info("Starting name search server");
+    LOGGER.info("Starting nearest search server");
     mShouldRun = true;
     mServerThread.start();
-  }
-
-  /**
-   * Initializes the query object which is used for answering fuzzy prefix
-   * queries.
-   */
-  private void initializeFuzzyPrefixQuery() {
-    LOGGER.info("Setting up fuzzy prefix query");
-    final Instant fuzzyTimeStart = Instant.now();
-
-    final QGramProvider qGramProvider = new QGramProvider(Q_GRAM_VALUE);
-    final PostingBeforeRecordRanking<String> ranking = new PostingBeforeRecordRanking<>();
-    mNodeNames = NodeNameSet.buildFromNodeNameData(mDatabase.getAllNodeNameData(), qGramProvider);
-    mFuzzyQuery = new FuzzyPrefixQuery<>(mNodeNames, qGramProvider, ranking);
-    LOGGER.info("Inverted index size: {}", mNodeNames.size());
-
-    final Instant fuzzyTimeEnd = Instant.now();
-    LOGGER.info("Setup took: {}", Duration.between(fuzzyTimeStart, fuzzyTimeEnd));
   }
 
 }

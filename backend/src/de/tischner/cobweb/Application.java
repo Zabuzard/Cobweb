@@ -28,10 +28,13 @@ import de.tischner.cobweb.parsing.gtfs.IGtfsFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
 import de.tischner.cobweb.parsing.osm.OsmReducer;
+import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
+import de.tischner.cobweb.routing.algorithms.nearestneighbor.CoverTree;
+import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.AStar;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
@@ -47,7 +50,8 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
-import de.tischner.cobweb.searching.server.NameSearchServer;
+import de.tischner.cobweb.searching.name.server.NameSearchServer;
+import de.tischner.cobweb.searching.nearest.server.NearestSearchServer;
 import de.tischner.cobweb.util.CleanUtil;
 import de.tischner.cobweb.util.SerializationUtil;
 
@@ -59,8 +63,8 @@ import de.tischner.cobweb.util.SerializationUtil;
  * operated using {@link #start()} and {@link #shutdown()}.<br>
  * <br>
  * The application consists of a routing server which offers a REST API, a
- * database that stores meta information and a search server used as utility
- * which offers a REST API too.
+ * database that stores meta information and two search servers used as utility
+ * which offer a REST API too.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
@@ -106,6 +110,14 @@ public final class Application {
    * Server to use for responding to name search requests. Offers a REST API.
    */
   private NameSearchServer mNameSearchServer;
+  /**
+   * Algorithm used to compute nearest neighbors.
+   */
+  private INearestNeighborComputation<ICoreNode> mNearestNeighborComputation;
+  /**
+   * Server to use for responding to nearest search requests. Offers a REST API.
+   */
+  private NearestSearchServer mNearestSearchServer;
   /**
    * Road graph to route on.
    */
@@ -210,6 +222,7 @@ public final class Application {
         case START:
           mRoutingServer.start();
           mNameSearchServer.start();
+          mNearestSearchServer.start();
           break;
         case CLEAN:
           CleanUtil.clean(mConfig, mConfig);
@@ -303,6 +316,24 @@ public final class Application {
   }
 
   /**
+   * Initializes the nearest neighbor computation algorithm. Depending on the
+   * size of the graph this method may take a while.
+   */
+  private void initalizeNearestNeighborComputation() {
+    mLogger.info("Initializing nearest neighbor computation");
+    final Instant nearestNeighborsStartTime = Instant.now();
+
+    final CoverTree<ICoreNode> nearestNeighborComputation = new CoverTree<>(new AsTheCrowFliesMetric<>());
+    for (final ICoreNode node : mRoadGraph.getNodes()) {
+      nearestNeighborComputation.insert(node);
+    }
+    mNearestNeighborComputation = nearestNeighborComputation;
+
+    final Instant nearestNeighborsEndTime = Instant.now();
+    mLogger.info("Nearest neighbors took: {}", Duration.between(nearestNeighborsStartTime, nearestNeighborsEndTime));
+  }
+
+  /**
    * Initializes the API of the application. This consists of the routing
    * server, the database, the search server and all corresponding utilities and
    * models.
@@ -342,6 +373,8 @@ public final class Application {
     mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
     dataParser.clearHandler();
 
+    initalizeNearestNeighborComputation();
+
     completeGraphInitialization(graphSizeBefore);
     serializeGraphIfDesired(graphSizeBefore);
 
@@ -349,6 +382,7 @@ public final class Application {
 
     initializeRouting();
     initializeNameSearch();
+    initializeNearestSearch();
 
     final Instant initEndTime = Instant.now();
     mLogger.info("Initialization of API took: {}", Duration.between(initStartTime, initEndTime));
@@ -404,6 +438,8 @@ public final class Application {
     } catch (ClassNotFoundException | ClassCastException | IOException e) {
       throw new ParseException(e);
     }
+    mRoadGraph = mLinkGraph.getRoadGraph();
+    mTransitGraph = mLinkGraph.getTransitGraph();
   }
 
   /**
@@ -426,6 +462,17 @@ public final class Application {
     mLogger.info("Initializing name search");
     mNameSearchServer = new NameSearchServer(mConfig, mDatabase);
     mNameSearchServer.initialize();
+  }
+
+  /**
+   * Initializes the nearest search server and algorithms used to answer nearest
+   * search requests. Depending on the used algorithms this method may take a
+   * while for all precomputations to finish.
+   */
+  private void initializeNearestSearch() {
+    mLogger.info("Initializing nearest search");
+    mNearestSearchServer = new NearestSearchServer(mConfig, mNearestNeighborComputation, mDatabase);
+    mNearestSearchServer.initialize();
   }
 
   /**

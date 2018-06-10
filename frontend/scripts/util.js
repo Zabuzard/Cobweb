@@ -231,5 +231,5 @@ function placeEdge(edge) {
  * A node in the JSON format for route elements of a journey as specified in the REST API
  */
 function zoomIntoNode(node) {
-	map.fitBounds([node.geom], {'maxZoom' : 14});
+	map.fitBounds([node.geom], {'maxZoom' : 12});
 }

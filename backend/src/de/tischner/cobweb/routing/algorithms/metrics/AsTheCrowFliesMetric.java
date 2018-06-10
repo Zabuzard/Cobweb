@@ -8,8 +8,8 @@ import de.tischner.cobweb.util.RoutingUtil;
  * objects.<br>
  * <br>
  * Given two objects it computes the direct, straight-line, distance of both
- * objects based on their coordinates. The distance is measured in
- * <tt>metres</tt>.
+ * objects based on their coordinates. The distance is measured as travel time
+ * in <tt>seconds</tt>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> The type of objects the metric operates on, must implement
@@ -18,7 +18,8 @@ import de.tischner.cobweb.util.RoutingUtil;
 public final class AsTheCrowFliesMetric<N extends ISpatial> implements IMetric<N> {
 
   /**
-   * The distance between both given objects, measured in <tt>metres</tt>.
+   * The distance between both given objects, measured as travel time in
+   * <tt>seconds</tt>.
    */
   @Override
   public double distance(final N first, final N second) {

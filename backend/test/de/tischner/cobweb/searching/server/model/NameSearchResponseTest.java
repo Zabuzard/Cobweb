@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.tischner.cobweb.searching.name.server.model.Match;
+import de.tischner.cobweb.searching.name.server.model.NameSearchResponse;
+
 /**
  * Test for the class {@link NameSearchResponse}.
  *
@@ -17,7 +20,7 @@ public final class NameSearchResponseTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchResponse#getMatches()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchResponse#getMatches()}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -32,7 +35,7 @@ public final class NameSearchResponseTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchResponse#getTime()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchResponse#getTime()}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -44,7 +47,7 @@ public final class NameSearchResponseTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchResponse#NameSearchResponse(long, java.util.List)}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchResponse#NameSearchResponse(long, java.util.List)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test

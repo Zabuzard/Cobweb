@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.model;
+package de.tischner.cobweb.searching.name.model;
 
 import java.util.Collection;
 import java.util.Iterator;

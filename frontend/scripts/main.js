@@ -10,6 +10,8 @@
 var routeRequestServer = 'http://localhost:845/route';
  /** The URL of the name search server which offers a REST API. */
 var nameSearchRequestServer = 'http://localhost:846/namesearch';
+ /** The URL of the nearest search server which offers a REST API. */
+var nearestSearchRequestServer = 'http://localhost:847/nearestsearch';
 /**The access-token of the Mapbox API to use. */
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
 /** The URL of the Mapbox server. */
@@ -136,7 +138,19 @@ function initNameSearchHandler(inputId) {
  * Initializes the map.
  */
 function initMap() {
-	map = L.map('mapContainer').setView([mapDefaultLat, mapDefaultLong], mapDefaultZoom);
+	map = L.map('mapContainer', {
+		contextmenu: true,
+		contextmenuWidth: 140,
+		contextmenuItems: [
+			{
+				text: 'From here',
+				callback: fromHereHandler
+			}, {
+				text: 'To here',
+				callback: toHereHandler
+			}
+		]
+	}).setView([mapDefaultLat, mapDefaultLong], mapDefaultZoom);
 
 	mapStreetLayer = L.tileLayer(mapboxUrl, {
 		attribution: mapboxAttribution,
@@ -198,6 +212,30 @@ function sendNameSearchRequestToServer(request, inputId) {
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 			handleNameSearchServerError(textStatus, errorThrown);
+		}
+	});
+}
+
+/**
+ * Sends the given request to the nearest search server.
+ * @param {{latitude:number, longitude:number}} request - The request
+ * to send in the JSON format specified by the REST API
+ * @param {number} inputId - The ID of the input field corresponding
+ * to this request. Will be passed to the handler for setting to the matched node.
+ */
+function sendNearestSearchRequestToServer(request, inputId) {
+	$.ajax({
+		url: nearestSearchRequestServer,
+		method: 'POST',
+		timeout: 5 * 1000,
+		contentType: 'application/json; charset=utf-8',
+		dataType: 'json',
+		data: JSON.stringify(request),
+		success: function(response) {
+			handleNearestSearchServerResponse(response, inputId);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			handleNearestSearchServerError(textStatus, errorThrown);
 		}
 	});
 }

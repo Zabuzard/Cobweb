@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.server;
+package de.tischner.cobweb.searching.nearest.server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,20 +11,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import de.tischner.cobweb.searching.model.NodeNameSet;
-import de.tischner.cobweb.searching.server.model.NameSearchRequest;
+import de.tischner.cobweb.db.INearestSearchDatabase;
+import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
+import de.tischner.cobweb.searching.nearest.server.model.NearestSearchRequest;
 import de.tischner.cobweb.util.MemberFieldNamingStrategy;
 import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.EHttpStatus;
 import de.tischner.cobweb.util.http.HttpRequest;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;
 import de.tischner.cobweb.util.http.HttpUtil;
-import de.zabuza.lexisearch.indexing.IKeyRecord;
-import de.zabuza.lexisearch.queries.FuzzyPrefixQuery;
 
 /**
- * Class that handles a name search client. It is designed to communicate with a
- * client via HTTP and serve name search requests.<br>
+ * Class that handles a nearest search client. It is designed to communicate
+ * with a client via HTTP and serve nearest search requests.<br>
  * <br>
  * To handle the client call {@link #run()}. The method should only be called
  * once, the object should not be used anymore after the method has
@@ -37,10 +37,10 @@ import de.zabuza.lexisearch.queries.FuzzyPrefixQuery;
  */
 public final class ClientHandler implements Runnable {
   /**
-   * Resource that is to be requested from a client if he submits a name search
-   * query.
+   * Resource that is to be requested from a client if he submits a nearest
+   * search query.
    */
-  private static final String API_RESOURCE = "/namesearch";
+  private static final String API_RESOURCE = "/nearestsearch";
   /**
    * Logger used for logging.
    */
@@ -50,43 +50,38 @@ public final class ClientHandler implements Runnable {
    */
   private final Socket mClient;
   /**
-   * The query object to use for answering fuzzy prefix queries.
+   * The database to use for retrieving node data.
    */
-  private final FuzzyPrefixQuery<IKeyRecord<String>> mFuzzyQuery;
+  private final INearestSearchDatabase mDatabase;
   /**
    * The unique ID of this client request.
    */
   private final int mId;
   /**
-   * The maximal amount of matches to send in a response.
+   * The nearest neighbor computation algorithm to use.
    */
-  private final int mMatchLimit;
-  /**
-   * The data-set of node names to query on.
-   */
-  private final NodeNameSet mNodeNames;
+  private final INearestNeighborComputation<ICoreNode> mNearestNeighborComputation;
 
   /**
    * Creates a new handler which handles the given client using the given
-   * tools.<br>
+   * algorithm.<br>
    * <br>
    * To handle the client call {@link #run()}. The method should only be called
    * once, the object should not be used anymore after the method has finished.
    *
-   * @param id         The unique ID of this client request
-   * @param client     The client to handle
-   * @param fuzzyQuery The query object to use for answering fuzzy prefix
-   *                   queries
-   * @param nodeNames  The data-set of node names to query on
-   * @param matchLimit The maximal amount of matches to send in a response
+   * @param id                         The unique ID of this client request
+   * @param client                     The client to handle
+   * @param nearestNeighborComputation Nearest neighbor computation algorithm to
+   *                                   use
+   * @param database                   The database to use for retrieving node
+   *                                   data
    */
-  public ClientHandler(final int id, final Socket client, final FuzzyPrefixQuery<IKeyRecord<String>> fuzzyQuery,
-      final NodeNameSet nodeNames, final int matchLimit) {
+  public ClientHandler(final int id, final Socket client,
+      final INearestNeighborComputation<ICoreNode> nearestNeighborComputation, final INearestSearchDatabase database) {
     mId = id;
     mClient = client;
-    mFuzzyQuery = fuzzyQuery;
-    mNodeNames = nodeNames;
-    mMatchLimit = matchLimit;
+    mNearestNeighborComputation = nearestNeighborComputation;
+    mDatabase = database;
   }
 
   /**
@@ -128,7 +123,7 @@ public final class ClientHandler implements Runnable {
    */
   private void handleRequest(final HttpRequest request) throws IOException {
     // TODO Maybe don't log always
-    LOGGER.info("Handling search name HTTP request with id: {}", mId);
+    LOGGER.info("Handling nearest search HTTP request with id: {}", mId);
 
     // Method not allowed
     final String type = request.getType().toUpperCase();
@@ -183,9 +178,9 @@ public final class ClientHandler implements Runnable {
     // Parse the JSON request and handle it
     final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
     try {
-      final NameSearchRequest nameSearchRequest = gson.fromJson(request.getContent(), NameSearchRequest.class);
-      final RequestHandler handler = new RequestHandler(mClient, gson, mFuzzyQuery, mNodeNames, mMatchLimit);
-      handler.handleRequest(nameSearchRequest);
+      final NearestSearchRequest nearestSearchRequest = gson.fromJson(request.getContent(), NearestSearchRequest.class);
+      final RequestHandler handler = new RequestHandler(mClient, gson, mNearestNeighborComputation, mDatabase);
+      handler.handleRequest(nearestSearchRequest);
     } catch (final JsonSyntaxException e) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);
       return;

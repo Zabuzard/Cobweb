@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 public final class ConfigStore implements IConfigProvider, IParseConfigProvider, IRoutingConfigProvider,
-    INameSearchConfigProvider, IDatabaseConfigProvider {
+    INameSearchConfigProvider, IDatabaseConfigProvider, INearestSearchConfigProvider {
   /**
    * The logger to use for logging.
    */
@@ -42,130 +42,76 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mSettings = new HashMap<>(mDefaultSettings);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IConfigProvider#getAllSettings()
-   */
   @Override
   public Map<String, String> getAllSettings() {
     return mSettings;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getCleanDbScript()
-   */
   @Override
   public Path getCleanDbScript() {
     return Paths.get(getSetting(ConfigUtil.KEY_CLEAN_DB_SCRIPT));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getDbInfo()
-   */
   @Override
   public Path getDbInfo() {
     return Paths.get(getSetting(ConfigUtil.KEY_DB_INFO));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCache()
-   */
   @Override
   public Path getGraphCache() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getGraphCacheInfo()
-   */
   @Override
   public Path getGraphCacheInfo() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE_INFO));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IParseConfigProvider#getGtfsDirectory()
-   */
   @Override
   public Path getGtfsDirectory() {
     return Paths.get(getSetting(ConfigUtil.KEY_GTFS_DIRECTORY));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getInitDbScript()
-   */
   @Override
   public Path getInitDbScript() {
     return Paths.get(getSetting(ConfigUtil.KEY_INIT_DB_SCRIPT));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#getJDBCUrl()
-   */
   @Override
   public String getJdbcUrl() {
     return getSetting(ConfigUtil.KEY_JDBC_URL);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.INameSearchConfigProvider#getMatchLimit()
-   */
   @Override
   public int getMatchLimit() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_NAME_SEARCH_SERVER_MATCH_LIMIT));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.tischner.cobweb.config.INameSearchConfigProvider#getNameSearchServerPort
-   * ()
-   */
   @Override
   public int getNameSearchServerPort() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IParseConfigProvider#getOsmDirectory()
-   */
+  @Override
+  public int getNearestSearchServerPort() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_NEAREST_SEARCH_SERVER_PORT));
+  }
+
   @Override
   public Path getOsmDirectory() {
     return Paths.get(getSetting(ConfigUtil.KEY_OSM_DIRECTORY));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IRoutingConfigProvider#getOsmRoadFilter()
-   */
   @Override
   public Path getOsmRoadFilter() {
     return Paths.get(getSetting(ConfigUtil.KEY_OSM_ROAD_FILTER));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * de.tischner.cobweb.config.IRoutingConfigProvider#getRoutingServerPort()
-   */
   @Override
   public int getRoutingServerPort() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_ROUTING_SERVER_PORT));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IConfigProvider#getSetting(java.lang.String)
-   */
   @Override
   public String getSetting(final String key) {
     final String value = mSettings.get(key);
@@ -183,29 +129,16 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mSettings.putAll(mDefaultSettings);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IConfigProvider#setSetting(java.lang.String,
-   * java.lang.String)
-   */
   @Override
   public void setSetting(final String key, final String value) {
     mSettings.put(key, value);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IDatabaseConfigProvider#useExternalDb()
-   */
   @Override
   public boolean useExternalDb() {
     return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_EXTERNAL_DB));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see de.tischner.cobweb.config.IRoutingConfigProvider#useGraphCache()
-   */
   @Override
   public boolean useGraphCache() {
     return Boolean.valueOf(getSetting(ConfigUtil.KEY_USE_GRAPH_CACHE));
@@ -252,6 +185,10 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
         String.valueOf(ConfigUtil.VALUE_NAME_SEARCH_SERVER_PORT));
     mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_MATCH_LIMIT,
         String.valueOf(ConfigUtil.VALUE_NAME_SEARCH_SERVER_MATCH_LIMIT));
+
+    // Nearest search settings
+    mDefaultSettings.put(ConfigUtil.KEY_NEAREST_SEARCH_SERVER_PORT,
+        String.valueOf(ConfigUtil.VALUE_NEAREST_SEARCH_SERVER_PORT));
   }
 
 }

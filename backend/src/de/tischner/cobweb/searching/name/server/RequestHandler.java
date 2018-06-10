@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.server;
+package de.tischner.cobweb.searching.name.server;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
-import de.tischner.cobweb.searching.model.NodeName;
-import de.tischner.cobweb.searching.model.NodeNameSet;
-import de.tischner.cobweb.searching.server.model.Match;
-import de.tischner.cobweb.searching.server.model.NameSearchRequest;
-import de.tischner.cobweb.searching.server.model.NameSearchResponse;
+import de.tischner.cobweb.searching.name.model.NodeName;
+import de.tischner.cobweb.searching.name.model.NodeNameSet;
+import de.tischner.cobweb.searching.name.server.model.Match;
+import de.tischner.cobweb.searching.name.server.model.NameSearchRequest;
+import de.tischner.cobweb.searching.name.server.model.NameSearchResponse;
 import de.tischner.cobweb.util.RoutingUtil;
 import de.tischner.cobweb.util.http.EHttpContentType;
 import de.tischner.cobweb.util.http.HttpResponseBuilder;

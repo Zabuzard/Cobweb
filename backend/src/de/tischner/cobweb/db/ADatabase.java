@@ -13,7 +13,7 @@ import de.topobyte.osm4j.core.model.iface.OsmEntity;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public abstract class ADatabase implements IRoutingDatabase, INameSearchDatabase {
+public abstract class ADatabase implements IRoutingDatabase, INameSearchDatabase, INearestSearchDatabase {
   /*
    * (non-Javadoc)
    * @see

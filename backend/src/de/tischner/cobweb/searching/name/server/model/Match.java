@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.server.model;
+package de.tischner.cobweb.searching.name.server.model;
 
 /**
  * POJO that models a match to a name search.<br>

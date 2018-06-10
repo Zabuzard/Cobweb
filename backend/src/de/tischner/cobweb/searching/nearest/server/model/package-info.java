@@ -3,4 +3,4 @@
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-package de.tischner.cobweb.searching.server.model;
+package de.tischner.cobweb.searching.nearest.server.model;

@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.tischner.cobweb.db.NodeNameData;
+import de.tischner.cobweb.searching.name.model.NodeName;
+import de.tischner.cobweb.searching.name.model.NodeNameSet;
 import de.zabuza.lexisearch.indexing.IInvertedIndex;
 import de.zabuza.lexisearch.indexing.IInvertedList;
 import de.zabuza.lexisearch.indexing.IKeyProvider;
@@ -52,7 +54,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#add(de.zabuza.lexisearch.indexing.IKeyRecord)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#add(de.zabuza.lexisearch.indexing.IKeyRecord)}.
    */
   @Test
   public void testAdd() {
@@ -66,7 +68,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#addAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#addAll(java.util.Collection)}.
    */
   @Test
   public void testAddAll() {
@@ -92,7 +94,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#buildFromNodeNameData(java.lang.Iterable, de.zabuza.lexisearch.indexing.IKeyProvider)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#buildFromNodeNameData(java.lang.Iterable, de.zabuza.lexisearch.indexing.IKeyProvider)}.
    */
   @Test
   public void testBuildFromNodeNameData() {
@@ -118,7 +120,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#clear()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#clear()}.
    */
   @Test
   public void testClear() {
@@ -130,7 +132,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#contains(java.lang.Object)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#contains(java.lang.Object)}.
    */
   @Test
   public void testContains() {
@@ -143,7 +145,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#containsAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#containsAll(java.util.Collection)}.
    */
   @Test
   public void testContainsAll() {
@@ -163,7 +165,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#createdInvertedIndex()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#createdInvertedIndex()}.
    */
   @Test
   public void testCreatedInvertedIndex() {
@@ -182,7 +184,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#getKeyRecordById(int)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#getKeyRecordById(int)}.
    */
   @Test
   public void testGetKeyRecordById() {
@@ -194,7 +196,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#isEmpty()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#isEmpty()}.
    */
   @Test
   public void testIsEmpty() {
@@ -204,7 +206,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#iterator()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#iterator()}.
    */
   @Test
   public void testIterator() {
@@ -224,7 +226,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#NodeNameSet()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#NodeNameSet()}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -238,7 +240,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#remove(java.lang.Object)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#remove(java.lang.Object)}.
    */
   @Test
   public void testRemove() {
@@ -259,7 +261,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#removeAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#removeAll(java.util.Collection)}.
    */
   @Test
   public void testRemoveAll() {
@@ -289,7 +291,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#retainAll(java.util.Collection)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#retainAll(java.util.Collection)}.
    */
   @Test
   public void testRetainAll() {
@@ -305,7 +307,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#size()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#size()}.
    */
   @Test
   public void testSize() {
@@ -321,7 +323,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#toArray()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#toArray()}.
    */
   @Test
   public void testToArray() {
@@ -338,7 +340,7 @@ public final class NodeNameSetTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeNameSet#toArray(Object[])}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeNameSet#toArray(Object[])}.
    */
   @Test
   public void testToArrayTArray() {

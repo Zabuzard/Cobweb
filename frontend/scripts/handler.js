@@ -97,6 +97,37 @@ function nameSearchHandler() {
 }
 
 /**
+ * Searches for the nearest node to the given position and sets it to the user interface.
+ * @param {Object} e - The corresponding map event, must contain a <tt>latlng</tt> field.
+ */
+function fromHereHandler(e) {
+	nearestSearchHandler(e, 'from');
+}
+
+/**
+ * Searches for the nearest node to the given position and sets it to the user interface.
+ * @param {Object} e - The corresponding map event, must contain a <tt>latlng</tt> field.
+ */
+function toHereHandler(e) {
+	nearestSearchHandler(e, 'to');
+}
+
+/**
+ * Searches for the nearest node to the given position and sets it to the user interface.
+ * @param {Object} e - The corresponding map event, must contain a <tt>latlng</tt> field.
+ * @param {number} id - The ID of the input field corresponding
+ * to this request. Will be passed to the handler for setting to the matched node.
+ */
+function nearestSearchHandler(e, id) {
+	// Build request
+	var request = {}
+	request.latitude = e.latlng.lat;
+	request.longitude = e.latlng.lng;
+
+	sendNearestSearchRequestToServer(request, id);
+}
+
+/**
  * Handles an invalid routing request.
  * @param {Object} request - The invalid routing request
  */
@@ -126,9 +157,9 @@ function handleValidRequest(request, fromName, toName) {
  * @param {Object} error - The error itself
  */
 function handleRouteServerError(status, error) {
-	var text = "Error while communicating with the route server.\n";
-	text += "Status: " + status + "\n";
-	text += "Message: " + error;
+	var text = 'Error while communicating with the route server.\n';
+	text += 'Status: ' + status + '\n';
+	text += 'Message: ' + error;
 	setErrorMessage(text);
 }
 
@@ -143,7 +174,7 @@ function handleRouteServerResponse(response) {
 
 	// If no path could be computed
 	if (response.journeys.length == 0) {
-		var text = "Not reachable";
+		var text = 'Not reachable';
 		setInfoMessage(text);
 		return;
 	}
@@ -215,8 +246,57 @@ function handleNameSearchServerResponse(response, inputId) {
  * @param {Object} error - The error itself
  */
 function handleNameSearchServerError(status, error) {
-	var text = "Error while communicating with the name search server.\n";
-	text += "Status: " + status + "\n";
-	text += "Message: " + error;
+	var text = 'Error while communicating with the name search server.\n';
+	text += 'Status: ' + status + '\n';
+	text += 'Message: ' + error;
+	setErrorMessage(text);
+}
+
+/**
+ * Handles a nearest search response from the server.
+ * @param {{time:number, id:number, latitude:number, longitude:number} response - The response
+ * from the server as JSON according to the REST API specification
+ * @param {number} inputId - The ID of the input field corresponding to this response.
+ */
+function handleNearestSearchServerResponse(response, inputId) {
+	// If no node could be computed
+	if (response.id == -1) {
+		var text = 'No nearest node';
+		setInfoMessage(text);
+		return;
+	}
+	
+	var name = '-';
+
+	// Iterate all matches and build the data-source
+	var dataSource = [];
+	dataSource[0] = {
+		value: response.id,
+		label: name
+	}
+	currentMatches[inputId] = dataSource;
+	
+	// Display the match on the user interface
+	$('#' + inputId).val(name);
+	$('#' + inputId + 'Val').val(response.id);
+	
+	// Display the match on the map
+	var node = {};
+	node.type = -1;
+	node.mode = -1;
+	node.name = name;
+	node.geom = [[response.latitude, response.longitude]];
+	placeNode(node);
+}
+
+/**
+ * Handles an error that appeared while communicating with the nearest search server.
+ * @param {Object} status - The status of the error
+ * @param {Object} error - The error itself
+ */
+function handleNearestSearchServerError(status, error) {
+	var text = 'Error while communicating with the nearest search server.\n';
+	text += 'Status: ' + status + '\n';
+	text += 'Message: ' + error;
 	setErrorMessage(text);
 }

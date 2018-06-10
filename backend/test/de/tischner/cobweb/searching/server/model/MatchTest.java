@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tischner.cobweb.searching.name.server.model.Match;
+
 /**
  * Test for the class {@link Match}.
  *
@@ -25,7 +27,7 @@ public final class MatchTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.Match#getId()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.Match#getId()}.
    */
   @Test
   public void testGetId() {
@@ -34,7 +36,7 @@ public final class MatchTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.Match#getName()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.Match#getName()}.
    */
   @Test
   public void testGetName() {
@@ -43,7 +45,7 @@ public final class MatchTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.Match#Match(long, java.lang.String)}.
+   * {@link de.tischner.cobweb.searching.name.server.model.Match#Match(long, java.lang.String)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test

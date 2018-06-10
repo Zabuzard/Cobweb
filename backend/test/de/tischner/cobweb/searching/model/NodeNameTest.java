@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tischner.cobweb.searching.name.model.NodeName;
 import de.zabuza.lexisearch.indexing.IKeyProvider;
 import de.zabuza.lexisearch.indexing.qgram.QGramProvider;
 
@@ -33,7 +34,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getKeys()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getKeys()}.
    */
   @Test
   public void testGetKeys() {
@@ -42,7 +43,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getName()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getName()}.
    */
   @Test
   public void testGetName() {
@@ -51,7 +52,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getNodeId()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getNodeId()}.
    */
   @Test
   public void testGetNodeId() {
@@ -60,7 +61,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getRecordId()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getRecordId()}.
    */
   @Test
   public void testGetRecordId() {
@@ -69,7 +70,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getScore()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getScore()}.
    */
   @Test
   public void testGetScore() {
@@ -78,7 +79,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#getSize()}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#getSize()}.
    */
   @Test
   public void testGetSize() {
@@ -87,7 +88,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#NodeName(int, long, java.lang.String, de.zabuza.lexisearch.indexing.IKeyProvider)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#NodeName(int, long, java.lang.String, de.zabuza.lexisearch.indexing.IKeyProvider)}.
    */
   @SuppressWarnings("unused")
   @Test
@@ -103,7 +104,7 @@ public final class NodeNameTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.model.NodeName#NodeName(int, long, java.lang.String, de.zabuza.lexisearch.indexing.IKeyProvider, int)}.
+   * {@link de.tischner.cobweb.searching.name.model.NodeName#NodeName(int, long, java.lang.String, de.zabuza.lexisearch.indexing.IKeyProvider, int)}.
    */
   @SuppressWarnings("unused")
   @Test

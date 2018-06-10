@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.server.model;
+package de.tischner.cobweb.searching.name.server.model;
 
 import java.util.List;
 

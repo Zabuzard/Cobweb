@@ -3,6 +3,8 @@ package de.tischner.cobweb.searching.server.model;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.tischner.cobweb.searching.name.server.model.NameSearchRequest;
+
 /**
  * Test for the class {@link NameSearchRequest}.
  *
@@ -12,7 +14,7 @@ public final class NameSearchRequestTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchRequest#getAmount()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchRequest#getAmount()}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -25,7 +27,7 @@ public final class NameSearchRequestTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchRequest#getName()}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchRequest#getName()}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -38,7 +40,7 @@ public final class NameSearchRequestTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.searching.server.model.NameSearchRequest#NameSearchRequest(String, int)}.
+   * {@link de.tischner.cobweb.searching.name.server.model.NameSearchRequest#NameSearchRequest(String, int)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
