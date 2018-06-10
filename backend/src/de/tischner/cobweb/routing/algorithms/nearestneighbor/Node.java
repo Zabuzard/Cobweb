@@ -1,7 +1,8 @@
 package de.tischner.cobweb.routing.algorithms.nearestneighbor;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 /**
  * @author Nils Loehndorf
@@ -16,7 +17,7 @@ public final class Node<E> implements Comparable<Node<E>> {
 
   public Node(final Node<E> parent, final E element) {
     mParent = parent;
-    mChildren = new LinkedList<>();
+    mChildren = FastList.newList();
     mElement = element;
   }
 

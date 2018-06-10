@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import de.tischner.cobweb.routing.model.graph.AGraph;
@@ -39,7 +41,7 @@ import de.tischner.cobweb.util.collections.HybridArrayHashSet;
  */
 public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializable,
     E extends IEdge<N> & IReversedConsumer & Serializable> extends AGraph<N, E>
-    implements IGetNodeById<N>, IReversedProvider, ITransitIdGenerator {
+    implements IGetNodeById<N>, IReversedProvider, ITransitIdGenerator, IHasTransitStops<N> {
   /**
    * The serial version UID.
    */
@@ -68,6 +70,10 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
    * A map that connects nodes to their outgoing edges.
    */
   private final Map<N, Set<E>> mNodeToOutgoingEdges;
+  /**
+   * A list of all stops of this graph.
+   */
+  private final MutableSet<TransitStop<N>> mStops;
 
   /**
    * Creates a new initially empty transit graph.
@@ -84,8 +90,7 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
     // Assume node IDs are close to each other and have no, or only few, gaps.
     mNodeToIncomingEdges = new ArrayMap<>();
     mNodeToOutgoingEdges = new ArrayMap<>();
-    // TODO Add station logic, nodes must be accessible through station with
-    // timestamp
+    mStops = Sets.mutable.empty();
   }
 
   @Override
@@ -102,6 +107,11 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
     }
     mIdToNode.put(id, node);
     return true;
+  }
+
+  @Override
+  public boolean addStop(final TransitStop<N> stop) {
+    return mStops.add(stop);
   }
 
   @Override
@@ -148,6 +158,11 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
   }
 
   @Override
+  public Collection<TransitStop<N>> getStops() {
+    return mStops;
+  }
+
+  @Override
   public boolean isReversed() {
     return mIsReversed;
   }
@@ -165,6 +180,11 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
 
     mIdToNode.remove(id);
     return true;
+  }
+
+  @Override
+  public boolean removeStop(final TransitStop<N> stop) {
+    return mStops.remove(stop);
   }
 
   /**

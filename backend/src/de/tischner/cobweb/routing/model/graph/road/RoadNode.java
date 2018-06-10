@@ -9,7 +9,7 @@ import de.tischner.cobweb.routing.model.graph.INode;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class RoadNode implements ICoreNode {
+public final class RoadNode implements ICoreNode, IRoadNode {
   /**
    * The serial version UID.
    */

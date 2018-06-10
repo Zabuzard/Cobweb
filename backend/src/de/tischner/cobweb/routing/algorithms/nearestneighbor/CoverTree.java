@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.collections.impl.list.mutable.FastList;
+
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 
@@ -12,6 +14,11 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private static final double DEFAULT_BASE = 1.2;
   private static final int DEFAULT_MAX_NUM_LEVELS = 500;
   private static final int DEFAULT_MIN_NUM_LEVELS = -500;
+
+  private static <T> List<T> createList() {
+    return FastList.newList();
+  }
+
   private final double mBase;
   private boolean mHasBounds;
   private float mMaxLat;
@@ -25,6 +32,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private float mMinLong;
   private int mMinNumLevels = DEFAULT_MIN_NUM_LEVELS;
   private final int[] mNumLevels;
+
   private Node<E> mRootNode;
 
   /**
@@ -61,18 +69,18 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * @return
    */
   public List<E> getCover(final int level) {
-    List<Node<E>> coverset = new LinkedList<>();
+    List<Node<E>> coverset = CoverTree.createList();
     coverset.add(mRootNode);
 
     for (int currentLevel = mMaxLevel; currentLevel > level; currentLevel--) {
-      final List<Node<E>> nextCoverset = new LinkedList<>();
+      final List<Node<E>> nextCoverset = CoverTree.createList();
       for (final Node<E> n : coverset) {
         nextCoverset.addAll(n.getChildren());
       }
       coverset = nextCoverset;
     }
 
-    final List<E> cover = new LinkedList<>();
+    final List<E> cover = CoverTree.createList();
     for (final Node<E> node : coverset) {
       cover.add(node.getElement());
     }
@@ -93,7 +101,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   public List<E> getKCenters(final int numCenters) {
     final List<Node<E>> coverset = removeNodes(numCenters);
     // create cover
-    final List<E> cover = new LinkedList<>();
+    final List<E> cover = CoverTree.createList();
     for (final Node<E> n : coverset) {
       cover.add(n.getElement());
     }
@@ -103,12 +111,12 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
 
   @Override
   public Optional<E> getNearestNeighbor(final E point) {
-    final List<Node<E>> candidates = new LinkedList<>();
+    final List<Node<E>> candidates = CoverTree.createList();
     candidates.add(mRootNode);
     double minDist = distance(mRootNode, point);
     mRootNode.setDistance(minDist);
     for (int level = mMaxLevel; level > mMinLevel; level--) {
-      final List<Node<E>> nextCandidates = new LinkedList<>();
+      final List<Node<E>> nextCandidates = CoverTree.createList();
       for (final Node<E> candidate : candidates) {
         for (final Node<E> child : candidate.getChildren()) {
           // do not compute distances twice
@@ -180,7 +188,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     }
 
     // usually insertion begins here
-    List<Node<E>> coverset = new LinkedList<>();
+    List<Node<E>> coverset = CoverTree.createList();
     // the initial coverset contains only the root node
     coverset.add(mRootNode);
     int level = mMaxLevel;
@@ -188,7 +196,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     int parentLevel = mMaxLevel;
     while (true) {
       boolean parentFound = true;
-      final List<Node<E>> candidates = new LinkedList<>();
+      final List<Node<E>> candidates = CoverTree.createList();
       for (final Node<E> node : coverset) {
         for (final Node<E> child : node.getChildren()) {
           if (!areAtSameLocation(node, child)) {
@@ -402,10 +410,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * Removes the the cover at the lowest level of the tree.
    */
   private void removeLowestCover() {
-    List<Node<E>> coverset = new LinkedList<>();
+    List<Node<E>> coverset = CoverTree.createList();
     coverset.add(mRootNode);
     for (int level = mMaxLevel; level > mMinLevel + 1; level--) {
-      final List<Node<E>> nextCoverset = new LinkedList<>();
+      final List<Node<E>> nextCoverset = CoverTree.createList();
       for (final Node<E> node : coverset) {
         nextCoverset.addAll(node.getChildren());
       }
@@ -422,10 +430,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * Removes all but k points.
    */
   private List<Node<E>> removeNodes(final int numCenters) {
-    List<Node<E>> coverset = new LinkedList<>();
+    List<Node<E>> coverset = CoverTree.createList();
     coverset.add(mRootNode);
     for (int level = mMaxLevel; level > mMinLevel + 1; level--) {
-      final List<Node<E>> nextCoverset = new LinkedList<>();
+      final List<Node<E>> nextCoverset = CoverTree.createList();
       for (final Node<E> node : coverset) {
         nextCoverset.addAll(node.getChildren());
       }

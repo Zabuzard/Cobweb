@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,9 @@ import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.link.LinkGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
+import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 import de.tischner.cobweb.routing.model.graph.transit.TransitGraph;
+import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
 import de.tischner.cobweb.routing.parsing.gtfs.GtfsConnectionBuilder;
 import de.tischner.cobweb.routing.parsing.gtfs.GtfsRealisticTimeExpandedHandler;
 import de.tischner.cobweb.routing.parsing.gtfs.IGtfsConnectionBuilder;
@@ -250,10 +254,22 @@ public final class Application {
     if (mConfig.useGraphCache() && mLinkGraph.size() == graphSizeBefore) {
       return;
     }
-
-    // TODO Implement
     mLogger.debug("Initializing hub connections");
-    mLinkGraph.initializeHubConnections(Collections.emptyMap());
+    final Instant hubStartTime = Instant.now();
+
+    final Map<ICoreNode, TransitStop<ICoreNode>> hubConnections = new HashMap<>();
+    // For each transit stop retrieve the nearest road node
+    final RoadNode stopLocationWrapper = new RoadNode(-1, 0, 0);
+    for (final TransitStop<ICoreNode> stop : mTransitGraph.getStops()) {
+      stopLocationWrapper.setLatitude(stop.getLatitude());
+      stopLocationWrapper.setLongitude(stop.getLongitude());
+      final ICoreNode hubNode = mNearestNeighborComputation.getNearestNeighbor(stopLocationWrapper).get();
+      hubConnections.put(hubNode, stop);
+    }
+    mLinkGraph.initializeHubConnections(hubConnections);
+
+    final Instant hubEndTime = Instant.now();
+    mLogger.info("Hub connections took: {}", Duration.between(hubStartTime, hubEndTime));
   }
 
   /**
@@ -432,6 +448,8 @@ public final class Application {
 
     // Deserialize graph
     mLogger.info("Deserializing graph from: {}", graphCache);
+    final Instant deserializeStartTime = Instant.now();
+
     final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
     try {
       mLinkGraph = serializationUtil.deserialize(graphCache);
@@ -440,6 +458,9 @@ public final class Application {
     }
     mRoadGraph = mLinkGraph.getRoadGraph();
     mTransitGraph = mLinkGraph.getTransitGraph();
+
+    final Instant deserializeEndTime = Instant.now();
+    mLogger.info("Deserialization took: {}", Duration.between(deserializeStartTime, deserializeEndTime));
   }
 
   /**
@@ -514,12 +535,17 @@ public final class Application {
 
     final Path graphCache = mConfig.getGraphCache();
     mLogger.info("Serializing graph to: {}", graphCache);
+    final Instant serializeStartTime = Instant.now();
+
     final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
     try {
       serializationUtil.serialize(mLinkGraph, graphCache);
     } catch (final IOException e) {
       throw new ParseException(e);
     }
+
+    final Instant serializeEndTime = Instant.now();
+    mLogger.info("Serialization took: {}", Duration.between(serializeStartTime, serializeEndTime));
   }
 
   /**

@@ -39,7 +39,9 @@ import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
+import de.tischner.cobweb.routing.model.graph.transit.IHasTransitStops;
 import de.tischner.cobweb.routing.model.graph.transit.NodeTime;
+import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
 
 /**
  * Implementation of an {@link IGtfsFileHandler} which constructs a realistic
@@ -56,7 +58,8 @@ import de.tischner.cobweb.routing.model.graph.transit.NodeTime;
  * @param <G> Type of the graph
  */
 public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N>,
-    G extends IGraph<N, E> & IGetNodeById<N>> extends GtfsEntityForwarder implements IGtfsFileHandler {
+    G extends IGraph<N, E> & IGetNodeById<N> & IHasTransitStops<N>> extends GtfsEntityForwarder
+    implements IGtfsFileHandler {
   /**
    * Logger used for logging.
    */
@@ -95,6 +98,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    * the configuration has set the use of a graph cache.
    */
   private final RecentHandler mRecentHandler;
+  private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToArrNodes;
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToDepNodes;
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToTransferNodes;
   private final MutableMap<AgencyAndId, List<TripStopNodes<N>>> mTripToSequence;
@@ -128,6 +132,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     mTripToSequence = Maps.mutable.empty();
     mStopToTransferNodes = Maps.mutable.empty();
     mStopToDepNodes = Maps.mutable.empty();
+    mStopToArrNodes = Maps.mutable.empty();
 
     mUseGraphCache = config.useGraphCache();
     if (mUseGraphCache) {
@@ -213,6 +218,14 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
             mBuilder.buildEdge(transferNode.getNode(), depNode.getNode(), depTime - transferNode.getTime());
         mGraph.addEdge(transferToDepEdge);
       });
+    });
+
+    // Process the arrival nodes and pass them to the graph
+    mStopToArrNodes.forEachValue(arrivalNodes -> {
+      Collections.sort(arrivalNodes);
+      final N anyNode = arrivalNodes.stream().findAny().get().getNode();
+      final TransitStop<N> stop = new TransitStop<>(arrivalNodes, anyNode.getLatitude(), anyNode.getLongitude());
+      mGraph.addStop(stop);
     });
 
     if (mUseGraphCache) {
@@ -322,6 +335,11 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     // transfer node
     final List<NodeTime<N>> departureNodes = mStopToDepNodes.getIfAbsentPut(stopId, FastList::new);
     departureNodes.add(new NodeTime<>(depNode, depTime));
+
+    // Remember arrival nodes per stop to pass them later to the graph for
+    // retrieval of the correct node corresponding to a query time
+    final List<NodeTime<N>> arrivalNodes = mStopToArrNodes.getIfAbsentPut(stopId, FastList::new);
+    arrivalNodes.add(new NodeTime<>(arrNode, arrTime));
 
     // TODO Implement
   }

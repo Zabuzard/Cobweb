@@ -58,6 +58,8 @@ var currentMatches = {
 	'from': [],
 	'to': []
 }
+/** The maximal time to wait for a server response until canceling it for a timeout, in milliseconds. */
+var serverTimeout = 10 * 1000;
 
 // Starts the init function when the document is loaded.
 $(document).ready(init);
@@ -179,7 +181,7 @@ function sendRouteRequestToServer(request) {
 	$.ajax({
 		url: routeRequestServer,
 		method: 'POST',
-		timeout: 5 * 1000,
+		timeout: serverTimeout,
 		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		data: JSON.stringify(request),
@@ -203,7 +205,7 @@ function sendNameSearchRequestToServer(request, inputId) {
 	$.ajax({
 		url: nameSearchRequestServer,
 		method: 'POST',
-		timeout: 5 * 1000,
+		timeout: serverTimeout,
 		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		data: JSON.stringify(request),
@@ -227,7 +229,7 @@ function sendNearestSearchRequestToServer(request, inputId) {
 	$.ajax({
 		url: nearestSearchRequestServer,
 		method: 'POST',
-		timeout: 5 * 1000,
+		timeout: serverTimeout,
 		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		data: JSON.stringify(request),

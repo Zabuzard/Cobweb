@@ -22,6 +22,7 @@ import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
+import de.tischner.cobweb.routing.model.graph.road.IRoadNode;
 import de.tischner.cobweb.routing.server.model.ERouteElementType;
 import de.tischner.cobweb.routing.server.model.ETransportationMode;
 import de.tischner.cobweb.routing.server.model.Journey;
@@ -201,19 +202,14 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     // Add the source
     final N source = path.getSource();
     geom.add(new float[] { source.getLatitude(), source.getLongitude() });
-    mDatabase.getOsmNodeByInternal(source.getId()).flatMap(mDatabase::getNodeName).ifPresent(nameJoiner::add);
+    if (source instanceof IRoadNode) {
+      mDatabase.getOsmNodeByInternal(source.getId()).flatMap(mDatabase::getNodeName).ifPresent(nameJoiner::add);
+    }
 
     // Add all edge destinations
-    int lastWayId = -1;
     for (final E edge : path) {
       final N edgeDestination = edge.getDestination();
       geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
-
-      final int wayId = edge.getId();
-      if (wayId != lastWayId) {
-        mDatabase.getOsmWayByInternal(wayId).flatMap(mDatabase::getWayName).ifPresent(nameJoiner::add);
-      }
-      lastWayId = wayId;
     }
 
     return new RouteElement(ERouteElementType.PATH, ETransportationMode.CAR, nameJoiner.toString(), geom);

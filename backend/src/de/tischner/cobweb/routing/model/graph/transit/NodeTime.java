@@ -1,8 +1,14 @@
 package de.tischner.cobweb.routing.model.graph.transit;
 
+import java.io.Serializable;
+
 import de.tischner.cobweb.routing.model.graph.INode;
 
-public final class NodeTime<N extends INode> implements Comparable<NodeTime<N>> {
+public final class NodeTime<N extends INode> implements Comparable<NodeTime<N>>, Serializable {
+  /**
+   * The serial version UID.
+   */
+  private static final long serialVersionUID = 1L;
   private final N mNode;
   private int mTime;
 

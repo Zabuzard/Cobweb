@@ -9,7 +9,7 @@ import de.tischner.cobweb.routing.model.graph.INode;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class TransitNode implements ICoreNode {
+public final class TransitNode implements ICoreNode, ITransitNode {
   /**
    * The serial version UID.
    */
