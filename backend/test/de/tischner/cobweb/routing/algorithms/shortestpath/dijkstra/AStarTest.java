@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
-import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
+import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStar;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 
 /**
@@ -16,13 +16,13 @@ public final class AStarTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.AStar#AStar(de.tischner.cobweb.routing.model.graph.IGraph, de.tischner.cobweb.routing.algorithms.metrics.IMetric)}.
+   * {@link de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStar#AStar(de.tischner.cobweb.routing.algorithms.metrics.IMetric)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
   public void testAStar() {
     try {
-      new AStar<>(new RoadGraph<>(), new AsTheCrowFliesMetric<RoadNode>());
+      new AStar<>(new AsTheCrowFliesMetric<RoadNode>());
     } catch (final Exception e) {
       Assert.fail();
     }

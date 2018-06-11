@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.db.IRoutingDatabase;
-import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
+import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
@@ -64,9 +64,9 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    */
   private static final int SOCKET_TIMEOUT = 2_000;
   /**
-   * The algorithm to use for shortest path computation.
+   * The factory to use for generating algorithms for shortest path computation.
    */
-  private final IShortestPathComputation<N, E> mComputation;
+  private final ShortestPathComputationFactory<N, E> mComputationFactory;
   /**
    * Configuration provider which provides the port that should be used by the
    * server.
@@ -104,18 +104,19 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    * with {@link #isRunning()}. Once a server was shutdown it should not be used
    * anymore, instead create a new one.
    *
-   * @param config      Configuration provider which provides the port that
-   *                    should be used by the server
-   * @param graph       The graph to route on
-   * @param computation The algorithm to use for shortest path computation
-   * @param database    Database used for retrieving meta-data about graph
-   *                    objects like nodes and edges
+   * @param config             Configuration provider which provides the port
+   *                           that should be used by the server
+   * @param graph              The graph to route on
+   * @param computationFactory The factory to use for generating algorithms for
+   *                           shortest path computation
+   * @param database           Database used for retrieving meta-data about
+   *                           graph objects like nodes and edges
    */
   public RoutingServer(final IRoutingConfigProvider config, final G graph,
-      final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
+      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mConfig = config;
     mGraph = graph;
-    mComputation = computation;
+    mComputationFactory = computationFactory;
     mDatabase = database;
   }
 
@@ -165,7 +166,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
         // Handle the client
         requestId++;
-        final ClientHandler<N, E, G> handler = new ClientHandler<>(requestId, client, mGraph, mComputation, mDatabase);
+        final ClientHandler<N, E, G> handler =
+            new ClientHandler<>(requestId, client, mGraph, mComputationFactory, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
         // Ignore the exception. The timeout is used to repeatedly check if the

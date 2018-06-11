@@ -34,8 +34,8 @@ public final class GtfsConnectionBuilder implements IGtfsConnectionBuilder<ICore
   }
 
   @Override
-  public ICoreNode buildNode(final float latitude, final float longitude) {
-    return new TransitNode(mIdGenerator.generateUniqueNodeId(), latitude, longitude);
+  public ICoreNode buildNode(final float latitude, final float longitude, final int time) {
+    return new TransitNode(mIdGenerator.generateUniqueNodeId(), latitude, longitude, time);
   }
 
 }

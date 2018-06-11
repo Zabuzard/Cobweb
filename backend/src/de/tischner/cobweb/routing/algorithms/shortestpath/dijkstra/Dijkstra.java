@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.stream.Stream;
 
 import de.tischner.cobweb.routing.algorithms.shortestpath.AShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
@@ -29,21 +30,19 @@ import de.tischner.cobweb.routing.model.graph.IPath;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the node
  * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E>>
-    extends AShortestPathComputation<N, E> {
+public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPathComputation<N, E> {
   /**
    * The graph to operate on.
    */
-  private final G mGraph;
+  private final IGraph<N, E> mGraph;
 
   /**
    * Creates a new Dijkstra instance which operates on the given graph.
    *
    * @param graph The graph to operate on
    */
-  public Dijkstra(final G graph) {
+  public Dijkstra(final IGraph<N, E> graph) {
     mGraph = graph;
   }
 
@@ -185,8 +184,8 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
       final double tentativeDistance = distance.getTentativeDistance();
 
       // Skip the element if the node was already settled before. In that case
-      // there
-      // was a better path to this node around and this path was abandoned.
+      // there was a better path to this node around and this path was
+      // abandoned.
       if (nodeToSettledDistance.containsKey(node)) {
         continue;
       }
@@ -200,14 +199,14 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
       }
 
       // Relax all outgoing edges
-      mGraph.getOutgoingEdges(node).forEach(edge -> {
+      provideEdgesToRelax(distance).forEach(edge -> {
         // Skip the edge if it should not be considered
         if (!considerEdgeForRelaxation(edge, pathDestination)) {
           return;
         }
 
         final N destination = edge.getDestination();
-        final double tentativeEdgeDistance = tentativeDistance + edge.getCost();
+        final double tentativeEdgeDistance = tentativeDistance + provideEdgeCost(edge, tentativeDistance);
 
         // Check if the destination is visited for the first time
         TentativeDistance<N, E> destinationDistance = nodeToDistance.get(destination);
@@ -281,6 +280,37 @@ public class Dijkstra<N extends INode, E extends IEdge<N>, G extends IGraph<N, E
     // guess of 0 for every node.
     // This method may be used by extending classes to improve performance.
     return 0.0;
+  }
+
+  /**
+   * Provides the cost of an given edge.<br>
+   * <br>
+   * The base is the result of {@link E#getCost()}. Implementations are allowed
+   * to override this method in order to modify the cost.
+   *
+   * @param edge              The edge whose cost to provide
+   * @param tentativeDistance The current tentative distance when relaxing this
+   *                          edge
+   * @return Stream of edges to process for relaxation
+   */
+  protected double provideEdgeCost(final E edge, @SuppressWarnings("unused") final double tentativeDistance) {
+    return edge.getCost();
+  }
+
+  /**
+   * Generates a stream of edges to process for relaxation.<br>
+   * <br>
+   * The base are all outgoing edges of the given node. Implementations are
+   * allowed to override this method in order to further filter the stream.
+   * Additionally, the method {@link #considerEdgeForRelaxation(IEdge, INode)}
+   * will be called on each element of this stream.
+   *
+   * @param tentativeDistance The tentative distance wrapper of the node to
+   *                          relax edges of
+   * @return Stream of edges to process for relaxation
+   */
+  protected Stream<E> provideEdgesToRelax(final TentativeDistance<N, E> tentativeDistance) {
+    return mGraph.getOutgoingEdges(tentativeDistance.getNode());
   }
 
 }

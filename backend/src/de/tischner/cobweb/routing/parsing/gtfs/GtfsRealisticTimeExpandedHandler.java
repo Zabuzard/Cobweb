@@ -303,9 +303,9 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     final int transferTime = arrTime + TRANSFER_DELAY;
 
     // Build nodes
-    final N arrNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon());
-    final N depNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon());
-    final N transferNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon());
+    final N arrNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon(), arrTime);
+    final N depNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon(), depTime);
+    final N transferNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon(), transferTime);
     mGraph.addNode(arrNode);
     mGraph.addNode(depNode);
     mGraph.addNode(transferNode);

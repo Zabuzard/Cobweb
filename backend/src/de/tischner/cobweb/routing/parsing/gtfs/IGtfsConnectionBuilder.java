@@ -15,5 +15,5 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
 public interface IGtfsConnectionBuilder<N extends INode & IHasId & ISpatial, E extends IEdge<N>> {
   E buildEdge(N source, N destination, double cost);
 
-  N buildNode(float latitude, float longitude);
+  N buildNode(float latitude, float longitude, int time);
 }

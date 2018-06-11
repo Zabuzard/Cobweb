@@ -28,7 +28,7 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.RoutingUtil#distanceEquiRect(de.tischner.cobweb.routing.model.graph.road.ISpatial, de.tischner.cobweb.routing.model.graph.road.ISpatial)}.
+   * {@link de.tischner.cobweb.util.RoutingUtil#distanceEquiRect(de.tischner.cobweb.routing.model.graph.ISpatial, de.tischner.cobweb.routing.model.graph.ISpatial)}.
    */
   @SuppressWarnings("static-method")
   @Test
@@ -84,6 +84,18 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#millisToSeconds(long)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testMillisToSeconds() {
+    Assert.assertEquals(1.0, RoutingUtil.millisToSeconds(1_000L), 0.0001);
+    Assert.assertEquals(1.5, RoutingUtil.millisToSeconds(1_500L), 0.0001);
+    Assert.assertEquals(0.0, RoutingUtil.millisToSeconds(0L), 0.0001);
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.util.RoutingUtil#msToKmh(double)}.
    */
   @SuppressWarnings("static-method")
@@ -96,15 +108,28 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.RoutingUtil#nanoToMilliseconds(long)}.
+   * {@link de.tischner.cobweb.util.RoutingUtil#nanosToMillis(long)}.
    */
   @SuppressWarnings("static-method")
   @Test
-  public void testNanoToMilliseconds() {
-    Assert.assertEquals(10L, RoutingUtil.nanoToMilliseconds(10_000_000L));
-    Assert.assertEquals(1L, RoutingUtil.nanoToMilliseconds(1_500_000L));
-    Assert.assertEquals(1L, RoutingUtil.nanoToMilliseconds(1_000_000L));
-    Assert.assertEquals(0L, RoutingUtil.nanoToMilliseconds(0L));
+  public void testNanosToMillis() {
+    Assert.assertEquals(10L, RoutingUtil.nanosToMillis(10_000_000L));
+    Assert.assertEquals(1L, RoutingUtil.nanosToMillis(1_500_000L));
+    Assert.assertEquals(1L, RoutingUtil.nanosToMillis(1_000_000L));
+    Assert.assertEquals(0L, RoutingUtil.nanosToMillis(0L));
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#nanosToSeconds(long)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testNanosToSeconds() {
+    Assert.assertEquals(10.0, RoutingUtil.nanosToSeconds(10_000_000_000L), 0.0001);
+    Assert.assertEquals(1.5, RoutingUtil.nanosToSeconds(1_500_000_000L), 0.0001);
+    Assert.assertEquals(1.0, RoutingUtil.nanosToSeconds(1_000_000_000L), 0.0001);
+    Assert.assertEquals(0.0, RoutingUtil.nanosToSeconds(0L), 0.0001);
   }
 
   /**
@@ -122,13 +147,24 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.RoutingUtil#secondsToMilliseconds(double)}.
+   * {@link de.tischner.cobweb.util.RoutingUtil#secondsToMillis(double)}.
    */
   @SuppressWarnings("static-method")
   @Test
-  public void testSecondsToMilliseconds() {
-    Assert.assertEquals(1000.0, RoutingUtil.secondsToMilliseconds(1.0), 0.0001);
-    Assert.assertEquals(0.0, RoutingUtil.secondsToMilliseconds(0.0), 0.0001);
+  public void testSecondsToMillis() {
+    Assert.assertEquals(1000.0, RoutingUtil.secondsToMillis(1.0), 0.0001);
+    Assert.assertEquals(0.0, RoutingUtil.secondsToMillis(0.0), 0.0001);
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#secondsToNanos(double)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testSecondsToNanos() {
+    Assert.assertEquals(1_000_000_000, RoutingUtil.secondsToNanos(1.0), 0.0001);
+    Assert.assertEquals(0, RoutingUtil.secondsToNanos(0.0), 0.0001);
   }
 
   /**

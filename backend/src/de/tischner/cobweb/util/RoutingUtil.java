@@ -110,6 +110,16 @@ public final class RoutingUtil {
   }
 
   /**
+   * Converts the given value in <tt>milliseconds</tt> into <tt>seconds</tt>.
+   *
+   * @param millis The value in <tt>milliseconds</tt> to convert
+   * @return The corresponding value in <tt>seconds</tt>
+   */
+  public static double millisToSeconds(final long millis) {
+    return ((double) millis) / SECONDS_TO_MILLIS;
+  }
+
+  /**
    * Converts the given value in <tt>m/s</tt> (metres per second)<tt> into
    * km/h</tt> (kilometres per hour).
    *
@@ -127,8 +137,18 @@ public final class RoutingUtil {
    * @param nanos The value in <tt>nanoseconds</tt> to convert
    * @return The corresponding value in <tt>milliseconds</tt>, rounded down
    */
-  public static long nanoToMilliseconds(final long nanos) {
+  public static long nanosToMillis(final long nanos) {
     return nanos / MILLIS_TO_NANO;
+  }
+
+  /**
+   * Converts the given value in <tt>nanoseconds</tt> to <tt>seconds</tt>.
+   *
+   * @param nanos The value in <tt>nanoseconds</tt> to convert
+   * @return The corresponding value in <tt>seconds</tt>
+   */
+  public static double nanosToSeconds(final long nanos) {
+    return ((double) nanos) / MILLIS_TO_NANO / SECONDS_TO_MILLIS;
   }
 
   /**
@@ -147,8 +167,18 @@ public final class RoutingUtil {
    * @param seconds The value in <tt>seconds</tt> to convert
    * @return The corresponding value in <tt>milliseconds</tt>
    */
-  public static double secondsToMilliseconds(final double seconds) {
+  public static double secondsToMillis(final double seconds) {
     return seconds * SECONDS_TO_MILLIS;
+  }
+
+  /**
+   * Converts the given value in <tt>seconds</tt> to <tt>nanoseconds</tt>.
+   *
+   * @param seconds The value in <tt>seconds</tt> to convert
+   * @return The corresponding value in <tt>nanoseconds</tt>
+   */
+  public static long secondsToNanos(final double seconds) {
+    return (long) (RoutingUtil.secondsToMillis(seconds) * MILLIS_TO_NANO);
   }
 
   /**

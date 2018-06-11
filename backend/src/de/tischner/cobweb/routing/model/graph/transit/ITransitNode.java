@@ -5,6 +5,6 @@ package de.tischner.cobweb.routing.model.graph.transit;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public interface ITransitNode {
+public interface ITransitNode extends IHasTime {
   // Indicator interface, does not provide methods currently
 }

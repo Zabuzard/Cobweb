@@ -102,8 +102,8 @@ public final class RequestHandler {
     final long endTime = System.nanoTime();
 
     // Build and send response
-    final NearestSearchResponse response = new NearestSearchResponse(
-        RoutingUtil.nanoToMilliseconds(endTime - startTime), id, nearestNode.getLatitude(), nearestNode.getLongitude());
+    final NearestSearchResponse response = new NearestSearchResponse(RoutingUtil.nanosToMillis(endTime - startTime), id,
+        nearestNode.getLatitude(), nearestNode.getLongitude());
     sendResponse(response);
   }
 
@@ -118,7 +118,7 @@ public final class RequestHandler {
   private void sendEmptyResponse(final long startTime) throws IOException {
     final long endTime = System.nanoTime();
     final NearestSearchResponse response =
-        new NearestSearchResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), -1L, 0.0f, 0.0f);
+        new NearestSearchResponse(RoutingUtil.nanosToMillis(endTime - startTime), -1L, 0.0f, 0.0f);
     sendResponse(response);
   }
 

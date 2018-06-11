@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
+import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
@@ -56,9 +57,9 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private final Socket mClient;
   /**
-   * The algorithm to use for computing shortest path requests.
+   * The factory to use for generating algorithms for shortest path computation.
    */
-  private final IShortestPathComputation<N, E> mComputation;
+  private final ShortestPathComputationFactory<N, E> mComputationFactory;
   /**
    * The database to use for fetching meta data for nodes and edges.
    */
@@ -78,20 +79,20 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * <br>
    * To handle a request call {@link #handleRequest(RoutingRequest)}.
    *
-   * @param client      The client whose request to handle
-   * @param gson        The GSON object used to format JSON responses
-   * @param graph       The graph used for shortest path computation
-   * @param computation The algorithm to use for computing shortest path
-   *                    requests
-   * @param database    The database to use for fetching meta data for nodes and
-   *                    edges
+   * @param client             The client whose request to handle
+   * @param gson               The GSON object used to format JSON responses
+   * @param graph              The graph used for shortest path computation
+   * @param computationFactory The factory to use for generating algorithms for
+   *                           shortest path computation
+   * @param database           The database to use for fetching meta data for
+   *                           nodes and edges
    */
   public RequestHandler(final Socket client, final Gson gson, final G graph,
-      final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
+      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mClient = client;
     mGson = gson;
     mGraph = graph;
-    mComputation = computation;
+    mComputationFactory = computationFactory;
     mDatabase = database;
   }
 
@@ -126,8 +127,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final N source = sourceOptional.get();
     final N destination = destinationOptional.get();
 
+    final IShortestPathComputation<N, E> computation =
+        mComputationFactory.getAlgorithm(request.getDepTime(), request.getModes());
+
     final long startCompTime = System.nanoTime();
-    final Optional<IPath<N, E>> pathOptional = mComputation.computeShortestPath(source, destination);
+    final Optional<IPath<N, E>> pathOptional = computation.computeShortestPath(source, destination);
     final long endCompTime = System.nanoTime();
     if (!pathOptional.isPresent()) {
       sendNotReachableResponse(request, startTime, startCompTime);
@@ -141,8 +145,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final long endTime = System.nanoTime();
 
     // Build and send response
-    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
-        RoutingUtil.nanoToMilliseconds(endCompTime - startCompTime), request.getFrom(), request.getTo(),
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanosToMillis(endTime - startTime),
+        RoutingUtil.nanosToMillis(endCompTime - startCompTime), request.getFrom(), request.getTo(),
         Collections.singletonList(journey));
     sendResponse(response);
   }
@@ -156,7 +160,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private Journey buildJourney(final RoutingRequest request, final IPath<N, E> path) {
     final long depTime = request.getDepTime();
-    final long duration = (long) Math.ceil(RoutingUtil.secondsToMilliseconds(path.getTotalCost()));
+    final long duration = (long) Math.ceil(RoutingUtil.secondsToMillis(path.getTotalCost()));
     final long arrTime = depTime + duration;
 
     // The route needs place for at least all edges and
@@ -226,7 +230,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private void sendEmptyResponse(final RoutingRequest request, final long startTime) throws IOException {
     final long endTime = System.nanoTime();
-    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), 0L,
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanosToMillis(endTime - startTime), 0L,
         request.getFrom(), request.getTo(), Collections.emptyList());
     sendResponse(response);
   }
@@ -246,8 +250,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   private void sendNotReachableResponse(final RoutingRequest request, final long startTime, final long startCompTime)
       throws IOException {
     final long endTime = System.nanoTime();
-    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime),
-        RoutingUtil.nanoToMilliseconds(endTime - startCompTime), request.getFrom(), request.getTo(),
+    final RoutingResponse response = new RoutingResponse(RoutingUtil.nanosToMillis(endTime - startTime),
+        RoutingUtil.nanosToMillis(endTime - startCompTime), request.getFrom(), request.getTo(),
         Collections.emptyList());
     sendResponse(response);
   }

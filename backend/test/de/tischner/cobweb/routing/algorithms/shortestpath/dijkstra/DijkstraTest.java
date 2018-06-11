@@ -28,7 +28,7 @@ public final class DijkstraTest {
   /**
    * The Dijkstra used for testing.
    */
-  private Dijkstra<BasicNode, BasicEdge<BasicNode>, BasicGraph> mDijkstra;
+  private Dijkstra<BasicNode, BasicEdge<BasicNode>> mDijkstra;
   /**
    * Counter used for generating unique edge IDs.
    */

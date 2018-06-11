@@ -12,7 +12,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import de.tischner.cobweb.db.IRoutingDatabase;
-import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
+import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
@@ -59,9 +59,9 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    */
   private final Socket mClient;
   /**
-   * The algorithm to use for computing shortest path requests.
+   * The factory to use for generating algorithms for shortest path computation.
    */
-  private final IShortestPathComputation<N, E> mComputation;
+  private final ShortestPathComputationFactory<N, E> mComputationFactory;
   /**
    * The database to use for fetching meta data for nodes and edges.
    */
@@ -82,20 +82,20 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    * To handle the client call {@link #run()}. The method should only be called
    * once, the object should not be used anymore after the method has finished.
    *
-   * @param id          The unique ID of this client request
-   * @param client      The client to handle
-   * @param graph       The graph used for shortest path computation
-   * @param computation The algorithm to use for computing shortest path
-   *                    requests
-   * @param database    The database to use for fetching meta data for nodes and
-   *                    edges
+   * @param id                 The unique ID of this client request
+   * @param client             The client to handle
+   * @param graph              The graph used for shortest path computation
+   * @param computationFactory The factory to use for generating algorithms for
+   *                           shortest path computation
+   * @param database           The database to use for fetching meta data for
+   *                           nodes and edges
    */
   public ClientHandler(final int id, final Socket client, final G graph,
-      final IShortestPathComputation<N, E> computation, final IRoutingDatabase database) {
+      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mId = id;
     mClient = client;
     mGraph = graph;
-    mComputation = computation;
+    mComputationFactory = computationFactory;
     mDatabase = database;
   }
 
@@ -194,7 +194,8 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
     try {
       final RoutingRequest routingRequest = gson.fromJson(request.getContent(), RoutingRequest.class);
-      final RequestHandler<N, E, G> handler = new RequestHandler<>(mClient, gson, mGraph, mComputation, mDatabase);
+      final RequestHandler<N, E, G> handler =
+          new RequestHandler<>(mClient, gson, mGraph, mComputationFactory, mDatabase);
       handler.handleRequest(routingRequest);
     } catch (final JsonSyntaxException e) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);

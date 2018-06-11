@@ -26,19 +26,24 @@ public final class TransitNode implements ICoreNode, ITransitNode {
    * The longitude of this node, in degrees.
    */
   private float mLongitude;
+  /**
+   * The timestamp of this node, in seconds since midnight.
+   */
+  private final int mTime;
 
   /**
-   * Creates a new transit node with the given ID and spatial data.
+   * Creates a new transit node with the given ID, spatial data and a timestamp.
    *
    * @param id        The unique ID of this node
    * @param latitude  The latitude of this node, in degrees
    * @param longitude The longitude of this node, in degrees
+   * @param time      The timestamp of this node, in seconds since midnight
    */
-  public TransitNode(final int id, final float latitude, final float longitude) {
+  public TransitNode(final int id, final float latitude, final float longitude, final int time) {
     mId = id;
     mLatitude = latitude;
     mLongitude = longitude;
-    // TODO Add station logic
+    mTime = time;
   }
 
   @Override
@@ -78,6 +83,11 @@ public final class TransitNode implements ICoreNode, ITransitNode {
   }
 
   @Override
+  public int getTime() {
+    return mTime;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -104,6 +114,8 @@ public final class TransitNode implements ICoreNode, ITransitNode {
     builder.append(mLatitude);
     builder.append(", longitude=");
     builder.append(mLongitude);
+    builder.append(", time=");
+    builder.append(mTime);
     builder.append("]");
     return builder.toString();
   }

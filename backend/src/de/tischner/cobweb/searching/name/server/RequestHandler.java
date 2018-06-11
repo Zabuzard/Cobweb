@@ -115,8 +115,7 @@ public final class RequestHandler {
     final long endTime = System.nanoTime();
 
     // Build and send response
-    final NameSearchResponse response =
-        new NameSearchResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), matches);
+    final NameSearchResponse response = new NameSearchResponse(RoutingUtil.nanosToMillis(endTime - startTime), matches);
     sendResponse(response);
   }
 
@@ -156,7 +155,7 @@ public final class RequestHandler {
   private void sendEmptyResponse(final long startTime) throws IOException {
     final long endTime = System.nanoTime();
     final NameSearchResponse response =
-        new NameSearchResponse(RoutingUtil.nanoToMilliseconds(endTime - startTime), Collections.emptyList());
+        new NameSearchResponse(RoutingUtil.nanosToMillis(endTime - startTime), Collections.emptyList());
     sendResponse(response);
   }
 

@@ -31,14 +31,9 @@ import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFilter;
 import de.tischner.cobweb.parsing.osm.OsmReducer;
 import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
-import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
-import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
-import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
-import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.CoverTree;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
-import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.AStar;
+import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.link.LinkGraph;
@@ -74,11 +69,6 @@ import de.tischner.cobweb.util.SerializationUtil;
  */
 public final class Application {
   /**
-   * The amount of landmarks to use for the landmark heuristic used by the
-   * routing algorithm.
-   */
-  private static final int AMOUNT_OF_LANDMARKS = 20;
-  /**
    * Path to the configuration of the logger.
    */
   private static final Path LOGGER_CONFIG = Paths.get("res", "logging", "logConfig.xml");
@@ -87,9 +77,9 @@ public final class Application {
    */
   private final CommandData mCommandData;
   /**
-   * Algorithm to use for shortest path computation.
+   * Factory to use for generating algorithms for shortest path computation.
    */
-  private IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mComputation;
+  private ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> mComputationFactory;
   /**
    * Provides the configuration of the application.
    */
@@ -506,13 +496,12 @@ public final class Application {
 
     final Instant preCompTimeStart = Instant.now();
     // Create the shortest path algorithm
-    final ILandmarkProvider<ICoreNode> landmarkProvider = new RandomLandmarks<>(mLinkGraph);
-    final IMetric<ICoreNode> metric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mLinkGraph, landmarkProvider);
-    mComputation = new AStar<>(mLinkGraph, metric);
+    mComputationFactory = new ShortestPathComputationFactory<>(mLinkGraph);
+    mComputationFactory.initialize();
     final Instant preCompTimeEnd = Instant.now();
     mLogger.info("Precomputation took: {}", Duration.between(preCompTimeStart, preCompTimeEnd));
 
-    mRoutingServer = new RoutingServer<>(mConfig, mLinkGraph, mComputation, mDatabase);
+    mRoutingServer = new RoutingServer<>(mConfig, mLinkGraph, mComputationFactory, mDatabase);
     mRoutingServer.initialize();
   }
 
