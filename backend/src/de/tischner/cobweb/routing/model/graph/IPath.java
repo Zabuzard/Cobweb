@@ -8,7 +8,7 @@ package de.tischner.cobweb.routing.model.graph;
  * @param <N> Type of the node
  * @param <E> Type of the edge
  */
-public interface IPath<N extends INode, E extends IEdge<N>> extends Iterable<E> {
+public interface IPath<N extends INode, E extends IEdge<N>> extends Iterable<EdgeCost<N, E>> {
   /**
    * Gets the destination node of the path.
    *

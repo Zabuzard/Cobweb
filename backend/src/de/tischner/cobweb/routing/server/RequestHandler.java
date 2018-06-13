@@ -20,6 +20,7 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.ETransportationMode;
+import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
@@ -29,7 +30,6 @@ import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.model.graph.SpeedTransportationModeComparator;
-import de.tischner.cobweb.routing.model.graph.road.IRoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.IRoadNode;
 import de.tischner.cobweb.routing.server.model.ERouteElementType;
 import de.tischner.cobweb.routing.server.model.Journey;
@@ -195,7 +195,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     EdgePath<N, E> currentPath = null;
     ETransportationMode currentMode = null;
     // Collect sub paths that use a single transportation mode
-    for (final E edge : path) {
+    for (final EdgeCost<N, E> edgeCost : path) {
+      final E edge = edgeCost.getEdge();
       final ETransportationMode edgeMode = getModeOfEdge(request.getModes(), edge);
 
       // Mode differs
@@ -210,13 +211,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
       }
 
       // Collect edge to current path
-      double edgeCost;
-      if (edge instanceof IRoadEdge) {
-        edgeCost = ((IRoadEdge) edge).getCost(currentMode);
-      } else {
-        edgeCost = edge.getCost();
-      }
-      currentPath.addEdge(edge, edgeCost);
+      currentPath.addEdge(edge, edgeCost.getCost());
     }
     // Append last path
     appendSubPath(currentPath, currentMode, route);
@@ -256,8 +251,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     }
 
     // Add all edge destinations
-    for (final E edge : path) {
-      final N edgeDestination = edge.getDestination();
+    for (final EdgeCost<N, E> edgeCost : path) {
+      final N edgeDestination = edgeCost.getEdge().getDestination();
       geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
     }
 

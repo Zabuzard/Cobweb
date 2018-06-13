@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
+import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 
 /**
@@ -154,13 +155,13 @@ public final class EdgePathTest {
   @Test
   public void testIterator() {
     final List<Integer> expectedIds = Arrays.asList(1, 2, 3);
-    final List<Integer> ids =
-        StreamSupport.stream(mPath.spliterator(), false).map(IHasId::getId).collect(Collectors.toList());
+    final List<Integer> ids = StreamSupport.stream(mPath.spliterator(), false).map(EdgeCost::getEdge).map(IHasId::getId)
+        .collect(Collectors.toList());
     Assert.assertEquals(expectedIds, ids);
 
     final List<Integer> reverseExpectedIds = Arrays.asList(3, 2, 1);
     final List<Integer> reverseIds = StreamSupport.stream(EdgePathTest.buildPath(true).spliterator(), false)
-        .map(IHasId::getId).collect(Collectors.toList());
+        .map(EdgeCost::getEdge).map(IHasId::getId).collect(Collectors.toList());
     Assert.assertEquals(reverseExpectedIds, reverseIds);
   }
 

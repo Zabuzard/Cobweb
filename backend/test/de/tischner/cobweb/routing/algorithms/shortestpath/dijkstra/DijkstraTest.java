@@ -16,6 +16,7 @@ import org.junit.Test;
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
+import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.IPath;
 
@@ -100,10 +101,10 @@ public final class DijkstraTest {
     Assert.assertEquals(4, path.getDestination().getId());
     Assert.assertEquals(3, path.length());
 
-    final Iterator<BasicEdge<BasicNode>> nodeIter = path.iterator();
-    Assert.assertEquals(2, nodeIter.next().getDestination().getId());
-    Assert.assertEquals(3, nodeIter.next().getDestination().getId());
-    Assert.assertEquals(4, nodeIter.next().getDestination().getId());
+    final Iterator<EdgeCost<BasicNode, BasicEdge<BasicNode>>> nodeIter = path.iterator();
+    Assert.assertEquals(2, nodeIter.next().getEdge().getDestination().getId());
+    Assert.assertEquals(3, nodeIter.next().getEdge().getDestination().getId());
+    Assert.assertEquals(4, nodeIter.next().getEdge().getDestination().getId());
 
     Assert.assertFalse(nodeIter.hasNext());
   }

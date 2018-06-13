@@ -3,6 +3,7 @@ package de.tischner.cobweb.routing.algorithms.shortestpath;
 import java.util.Collections;
 import java.util.Iterator;
 
+import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
@@ -62,7 +63,7 @@ public final class EmptyPath<N extends INode, E extends IEdge<N>> implements IPa
    * @see java.lang.Iterable#iterator()
    */
   @Override
-  public Iterator<E> iterator() {
+  public Iterator<EdgeCost<N, E>> iterator() {
     return Collections.emptyListIterator();
   }
 

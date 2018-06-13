@@ -3,6 +3,7 @@ package de.tischner.cobweb.routing.algorithms.shortestpath;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
@@ -27,7 +28,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
   /**
    * The edges this path consists of.
    */
-  private final ArrayList<E> mEdges;
+  private final ArrayList<EdgeCost<N, E>> mEdges;
   /**
    * The total cost of the path, i.e. the sum of all edges cost.
    */
@@ -68,7 +69,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * @param cost The cost of the edge
    */
   public void addEdge(final E edge, final double cost) {
-    mEdges.add(edge);
+    mEdges.add(new EdgeCost<>(edge, cost));
     mTotalCost += cost;
   }
 
@@ -86,7 +87,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
       // Destination is the last entry
       destinationIndex = mEdges.size() - 1;
     }
-    return mEdges.get(destinationIndex).getDestination();
+    return mEdges.get(destinationIndex).getEdge().getDestination();
   }
 
   /*
@@ -103,7 +104,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
       // Source is the first entry
       sourceIndex = 0;
     }
-    return mEdges.get(sourceIndex).getSource();
+    return mEdges.get(sourceIndex).getEdge().getSource();
   }
 
   /*
@@ -129,7 +130,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * @see java.lang.Iterable#iterator()
    */
   @Override
-  public Iterator<E> iterator() {
+  public Iterator<EdgeCost<N, E>> iterator() {
     if (mBuildReversely) {
       return new ReverseIterator<>(mEdges);
     }
