@@ -1,5 +1,9 @@
 package de.tischner.cobweb.routing.model.graph.transit;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IEdge;
@@ -32,6 +36,7 @@ public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
    * The ID of this edge which is unique.
    */
   private final int mId;
+  private final Set<ETransportationMode> mModes;
   /**
    * An object that provides a reversed flag or <tt>null</tt> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
@@ -57,6 +62,7 @@ public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
     mSource = source;
     mDestination = destination;
     mCost = cost;
+    mModes = EnumSet.of(ETransportationMode.TRAM);
   }
 
   /*
@@ -119,6 +125,11 @@ public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
     return mSource;
   }
 
+  @Override
+  public Set<ETransportationMode> getTransportationModes() {
+    return mModes;
+  }
+
   /*
    * (non-Javadoc)
    * @see java.lang.Object#hashCode()
@@ -129,6 +140,11 @@ public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
     int result = 1;
     result = prime * result + this.mId;
     return result;
+  }
+
+  @Override
+  public boolean hasTransportationMode(final ETransportationMode mode) {
+    return mModes.contains(mode);
   }
 
   /*

@@ -1,8 +1,11 @@
 package de.tischner.cobweb.routing.server.model;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 
 /**
  * POJO that models a routing request.<br>
@@ -86,7 +89,7 @@ public final class RoutingRequest {
    * @return A set containing all allowed transportation modes
    */
   public Set<ETransportationMode> getModes() {
-    return Arrays.stream(mModes).mapToObj(ETransportationMode::fromValue).collect(Collectors.toSet());
+    return EnumSet.copyOf(Arrays.stream(mModes).mapToObj(ETransportationMode::fromValue).collect(Collectors.toSet()));
   }
 
   /**

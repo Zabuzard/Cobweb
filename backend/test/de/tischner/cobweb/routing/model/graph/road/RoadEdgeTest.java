@@ -1,10 +1,13 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
+import java.util.EnumSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 
 /**
  * Test for the class {@link RoadEdge}.
@@ -25,7 +28,7 @@ public final class RoadEdgeTest {
   public void setUp() {
     final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
     final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
-    mEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
+    mEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
   }
 
   /**
@@ -36,16 +39,17 @@ public final class RoadEdgeTest {
   public void testEqualsObject() {
     final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
     final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
-    RoadEdge<RoadNode> other = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
+    RoadEdge<RoadNode> other =
+        new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertEquals(mEdge, other);
 
-    other = new RoadEdge<>(1, second, first, EHighwayType.MOTORWAY, 100);
+    other = new RoadEdge<>(1, second, first, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge, other);
 
-    other = new RoadEdge<>(1, first, second, EHighwayType.LIVING_STREET, 100);
+    other = new RoadEdge<>(1, first, second, EHighwayType.LIVING_STREET, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge, other);
 
-    other = new RoadEdge<>(2, first, second, EHighwayType.MOTORWAY, 100);
+    other = new RoadEdge<>(2, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge, other);
   }
 
@@ -93,22 +97,23 @@ public final class RoadEdgeTest {
   public void testHashCode() {
     final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
     final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
-    RoadEdge<RoadNode> other = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
+    RoadEdge<RoadNode> other =
+        new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertEquals(mEdge.hashCode(), other.hashCode());
 
-    other = new RoadEdge<>(1, second, first, EHighwayType.MOTORWAY, 100);
+    other = new RoadEdge<>(1, second, first, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge.hashCode(), other.hashCode());
 
-    other = new RoadEdge<>(1, first, second, EHighwayType.LIVING_STREET, 100);
+    other = new RoadEdge<>(1, first, second, EHighwayType.LIVING_STREET, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge.hashCode(), other.hashCode());
 
-    other = new RoadEdge<>(2, first, second, EHighwayType.MOTORWAY, 100);
+    other = new RoadEdge<>(2, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge.hashCode(), other.hashCode());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#RoadEdge(int, de.tischner.cobweb.routing.model.graph.ICoreNode, de.tischner.cobweb.routing.model.graph.ICoreNode, EHighwayType, int)}.
+   * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#RoadEdge(int, de.tischner.cobweb.routing.model.graph.ICoreNode, de.tischner.cobweb.routing.model.graph.ICoreNode, EHighwayType, int, java.util.Set)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
@@ -116,9 +121,9 @@ public final class RoadEdgeTest {
     final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
     final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
     try {
-      new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
-      new RoadEdge<>(-1, first, second, EHighwayType.ROAD, 100);
-      new RoadEdge<>(0, first, second, EHighwayType.MOTORWAY, -20);
+      new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
+      new RoadEdge<>(-1, first, second, EHighwayType.ROAD, 100, EnumSet.of(ETransportationMode.CAR));
+      new RoadEdge<>(0, first, second, EHighwayType.MOTORWAY, -20, EnumSet.of(ETransportationMode.CAR));
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -143,7 +148,7 @@ public final class RoadEdgeTest {
   public void testUpdateCost() {
     final RoadNode first = new RoadNode(1, 0.0F, 0.0F);
     final RoadNode second = new RoadNode(2, 0.0F, 0.0F);
-    mEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
+    mEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertEquals(0.0, mEdge.getCost(), 0.0001);
 
     first.setLatitude(1.0F);

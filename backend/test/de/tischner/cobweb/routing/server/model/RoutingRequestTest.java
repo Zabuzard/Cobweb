@@ -9,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
+
 /**
  * Test for the class {@link RoutingRequest}.
  *

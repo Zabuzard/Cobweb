@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import org.slf4j.Logger;
@@ -14,18 +16,22 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import de.tischner.cobweb.db.IRoutingDatabase;
+import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
+import de.tischner.cobweb.routing.model.graph.IHasTransportationMode;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
+import de.tischner.cobweb.routing.model.graph.SpeedTransportationModeComparator;
+import de.tischner.cobweb.routing.model.graph.road.IRoadEdge;
 import de.tischner.cobweb.routing.model.graph.road.IRoadNode;
 import de.tischner.cobweb.routing.server.model.ERouteElementType;
-import de.tischner.cobweb.routing.server.model.ETransportationMode;
 import de.tischner.cobweb.routing.server.model.Journey;
 import de.tischner.cobweb.routing.server.model.RouteElement;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
@@ -72,6 +78,10 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * The GSON object used to format JSON responses.
    */
   private final Gson mGson;
+  /**
+   * Comparator that sorts transportation modes ascending in their speed.
+   */
+  private final SpeedTransportationModeComparator mSpeedComparator;
 
   /**
    * Creates a new handler which handles requests of the given client using the
@@ -94,6 +104,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     mGraph = graph;
     mComputationFactory = computationFactory;
     mDatabase = database;
+    mSpeedComparator = new SpeedTransportationModeComparator();
   }
 
   /**
@@ -151,6 +162,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     sendResponse(response);
   }
 
+  private void appendSubPath(final IPath<N, E> subPath, final ETransportationMode mode,
+      final List<RouteElement> route) {
+    route.add(buildNode(subPath.getSource()));
+    route.add(buildPath(subPath, mode));
+    route.add(buildNode(subPath.getDestination()));
+  }
+
   /**
    * Builds a journey object which represents the given path.
    *
@@ -168,14 +186,40 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final List<RouteElement> route = new ArrayList<>(path.length() + 2);
 
     // Build the route
-    route.add(buildNode(path.getSource()));
-
-    // Only add path and destination if the path is not empty
-    if (path.length() != 0) {
-      // TODO Add nodes if transportation mode changes
-      route.add(buildPath(path));
-      route.add(buildNode(path.getDestination()));
+    // If path is empty we use a singleton node only
+    if (path.length() == 0) {
+      route.add(buildNode(path.getSource()));
+      return new Journey(depTime, arrTime, route);
     }
+
+    EdgePath<N, E> currentPath = null;
+    ETransportationMode currentMode = null;
+    // Collect sub paths that use a single transportation mode
+    for (final E edge : path) {
+      final ETransportationMode edgeMode = getModeOfEdge(request.getModes(), edge);
+
+      // Mode differs
+      if (edgeMode != currentMode || currentPath == null) {
+        // Append current path
+        if (currentPath != null) {
+          appendSubPath(currentPath, currentMode, route);
+        }
+        // Prepare next path with new mode
+        currentPath = new EdgePath<>();
+        currentMode = edgeMode;
+      }
+
+      // Collect edge to current path
+      double edgeCost;
+      if (edge instanceof IRoadEdge) {
+        edgeCost = ((IRoadEdge) edge).getCost(currentMode);
+      } else {
+        edgeCost = edge.getCost();
+      }
+      currentPath.addEdge(edge, edgeCost);
+    }
+    // Append last path
+    appendSubPath(currentPath, currentMode, route);
 
     return new Journey(depTime, arrTime, route);
   }
@@ -196,9 +240,10 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * Builds a route element which represents the given path.
    *
    * @param path The path to represent
+   * @param mode The transportation mode to use for this path
    * @return The resulting route element
    */
-  private RouteElement buildPath(final IPath<N, E> path) {
+  private RouteElement buildPath(final IPath<N, E> path, final ETransportationMode mode) {
     // TODO The current way of constructing a name may be inappropriate
     final StringJoiner nameJoiner = new StringJoiner(", ");
     final List<float[]> geom = new ArrayList<>(path.length() + 1);
@@ -216,7 +261,21 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
       geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
     }
 
-    return new RouteElement(ERouteElementType.PATH, ETransportationMode.CAR, nameJoiner.toString(), geom);
+    return new RouteElement(ERouteElementType.PATH, mode, nameJoiner.toString(), geom);
+  }
+
+  private ETransportationMode getModeOfEdge(final Set<ETransportationMode> modeRestrictions, final E edge) {
+    if (!(edge instanceof IHasTransportationMode)) {
+      // Fallback mode
+      return ETransportationMode.CAR;
+    }
+
+    final Set<ETransportationMode> edgeModes = ((IHasTransportationMode) edge).getTransportationModes();
+
+    // Pick the fastest mode that is available after applying the restrictions
+    final Set<ETransportationMode> availableModes = EnumSet.copyOf(edgeModes);
+    availableModes.retainAll(modeRestrictions);
+    return Collections.max(availableModes, mSpeedComparator);
   }
 
   /**

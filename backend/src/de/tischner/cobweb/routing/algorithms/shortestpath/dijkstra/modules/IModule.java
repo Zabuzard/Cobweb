@@ -1,8 +1,7 @@
 package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules;
 
-import java.util.stream.Stream;
+import java.util.OptionalDouble;
 
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.TentativeDistance;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
@@ -31,11 +30,12 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
    *
    * @param node            The node to estimate the distance from
    * @param pathDestination The destination to estimate the distance to
-   * @return An estimate about the shortest path distance
+   * @return An estimate about the shortest path distance or empty if the module
+   *         has no estimate
    */
-  default double getEstimatedDistance(@SuppressWarnings("unused") final N node,
+  default OptionalDouble getEstimatedDistance(@SuppressWarnings("unused") final N node,
       @SuppressWarnings("unused") final N pathDestination) {
-    return 0.0;
+    return OptionalDouble.empty();
   }
 
   /**
@@ -47,27 +47,11 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
    * @param edge              The edge whose cost to provide
    * @param tentativeDistance The current tentative distance when relaxing this
    *                          edge
-   * @return Stream of edges to process for relaxation
+   * @return The cost of the given edge or empty if the module does not provide
+   *         a cost
    */
-  default double provideEdgeCost(final E edge, @SuppressWarnings("unused") final double tentativeDistance) {
-    return edge.getCost();
-  }
-
-  /**
-   * Generates a stream of edges to process for relaxation.<br>
-   * <br>
-   * The base usually are all outgoing edges of the given node. The method is
-   * used in order to further filter the stream. Additionally, the method
-   * {@link #considerEdgeForRelaxation(IEdge, INode)} will be called on each
-   * element of this stream.
-   *
-   * @param base              The base stream of edges
-   * @param tentativeDistance The tentative distance wrapper of the node to
-   *                          relax edges of
-   * @return Stream of edges to process for relaxation
-   */
-  default Stream<E> provideEdgesToRelax(final Stream<E> base,
-      @SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
-    return base;
+  default OptionalDouble provideEdgeCost(@SuppressWarnings("unused") final E edge,
+      @SuppressWarnings("unused") final double tentativeDistance) {
+    return OptionalDouble.empty();
   }
 }

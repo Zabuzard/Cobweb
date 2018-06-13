@@ -1,5 +1,7 @@
 package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules;
 
+import java.util.OptionalDouble;
+
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
@@ -37,8 +39,8 @@ public final class AStar<N extends INode, E extends IEdge<N>> implements IModule
   }
 
   @Override
-  public double getEstimatedDistance(final N node, final N pathDestination) {
-    return mMetric.distance(node, pathDestination);
+  public OptionalDouble getEstimatedDistance(final N node, final N pathDestination) {
+    return OptionalDouble.of(mMetric.distance(node, pathDestination));
   }
 
 }

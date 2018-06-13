@@ -1,4 +1,6 @@
-package de.tischner.cobweb.routing.server.model;
+package de.tischner.cobweb.routing.model.graph;
+
+import de.tischner.cobweb.routing.server.model.RouteElement;
 
 /**
  * Types of transportation modes.<br>

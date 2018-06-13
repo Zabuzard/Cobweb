@@ -35,13 +35,13 @@ public final class EdgePathTest {
     final BasicNode fourthNode = new BasicNode(4);
 
     if (reversely) {
-      path.addEdge(new BasicEdge<>(1, secondNode, firstNode, 1.0));
-      path.addEdge(new BasicEdge<>(2, thirdNode, secondNode, 2.0));
-      path.addEdge(new BasicEdge<>(3, fourthNode, thirdNode, 1.0));
+      path.addEdge(new BasicEdge<>(1, secondNode, firstNode, 1.0), 1.0);
+      path.addEdge(new BasicEdge<>(2, thirdNode, secondNode, 2.0), 2.0);
+      path.addEdge(new BasicEdge<>(3, fourthNode, thirdNode, 1.0), 1.0);
     } else {
-      path.addEdge(new BasicEdge<>(1, firstNode, secondNode, 1.0));
-      path.addEdge(new BasicEdge<>(2, secondNode, thirdNode, 2.0));
-      path.addEdge(new BasicEdge<>(3, thirdNode, fourthNode, 1.0));
+      path.addEdge(new BasicEdge<>(1, firstNode, secondNode, 1.0), 1.0);
+      path.addEdge(new BasicEdge<>(2, secondNode, thirdNode, 2.0), 2.0);
+      path.addEdge(new BasicEdge<>(3, thirdNode, fourthNode, 1.0), 1.0);
     }
 
     return path;
@@ -62,12 +62,12 @@ public final class EdgePathTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath#addEdge(de.tischner.cobweb.routing.model.graph.IEdge)}.
+   * {@link de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath#addEdge(de.tischner.cobweb.routing.model.graph.IEdge, double)}.
    */
   @Test
   public void testAddEdge() {
     Assert.assertEquals(3, mPath.length());
-    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0), 1.0);
     Assert.assertEquals(4, mPath.length());
   }
 
@@ -133,7 +133,7 @@ public final class EdgePathTest {
   public void testGetTotalCost() {
     Assert.assertEquals(4.0, mPath.getTotalCost(), 0.0001);
 
-    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 3.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 3.0), 3.0);
     Assert.assertEquals(7.0, mPath.getTotalCost(), 0.0001);
   }
 
@@ -171,7 +171,7 @@ public final class EdgePathTest {
   @Test
   public void testLength() {
     Assert.assertEquals(3, mPath.length());
-    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0));
+    mPath.addEdge(new BasicEdge<>(4, new BasicNode(10), new BasicNode(11), 1.0), 1.0);
     Assert.assertEquals(4, mPath.length());
   }
 

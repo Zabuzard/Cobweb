@@ -9,6 +9,7 @@ highway=tertiary
 highway=residential
 highway=living_street
 highway=unclassified
+highway=cycleway
 
 #highwaylinks
 highway=motorway_link

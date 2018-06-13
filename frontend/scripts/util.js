@@ -218,7 +218,8 @@ function placeNode(node) {
  * An edge in the JSON format for route elements of a journey as specified in the REST API
  */
 function placeEdge(edge) {
-	var edgeMarker = L.polyline(edge.geom, {'color' : 'red', 'weight' : 8, 'opacity' : 0.5}).addTo(map);
+	var color = transIdToColor[edge.mode];
+	var edgeMarker = L.polyline(edge.geom, {'color' : color, 'weight' : 8, 'opacity' : 0.5}).addTo(map);
 	placedMapRouteMarker(edgeMarker);
 
 	// TODO Remove debug popup

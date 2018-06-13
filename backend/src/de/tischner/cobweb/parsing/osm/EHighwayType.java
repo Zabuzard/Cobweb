@@ -10,6 +10,10 @@ import java.util.Map;
  */
 public enum EHighwayType {
   /**
+   * A way designated for bicycles only.
+   */
+  CYCLEWAY("cycleway", 14),
+  /**
    * A living street.
    */
   LIVING_STREET("living_street", 7),

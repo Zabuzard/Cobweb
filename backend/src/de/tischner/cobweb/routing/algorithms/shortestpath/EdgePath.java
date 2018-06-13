@@ -44,11 +44,12 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * Creates a new initially empty edge path that can be build reversely
    *
    * @param buildReversely Whether or not the path is build reversely. If
-   *                       <tt>true</tt> calls to {@link #addEdge(IEdge)} are
-   *                       interpreted to start from the end of the path. So the
-   *                       destination of the first added edge is the
-   *                       destination of the path and the source of the last
-   *                       added edge is the source of the path.
+   *                       <tt>true</tt> calls to
+   *                       {@link #addEdge(IEdge, double)} are interpreted to
+   *                       start from the end of the path. So the destination of
+   *                       the first added edge is the destination of the path
+   *                       and the source of the last added edge is the source
+   *                       of the path.
    */
   public EdgePath(final boolean buildReversely) {
     mBuildReversely = buildReversely;
@@ -64,10 +65,11 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * of the path.
    *
    * @param edge The edge to add
+   * @param cost The cost of the edge
    */
-  public void addEdge(final E edge) {
+  public void addEdge(final E edge, final double cost) {
     mEdges.add(edge);
-    mTotalCost += edge.getCost();
+    mTotalCost += cost;
   }
 
   /*

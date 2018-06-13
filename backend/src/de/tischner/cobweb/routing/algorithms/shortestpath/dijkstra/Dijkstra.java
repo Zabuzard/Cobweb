@@ -73,22 +73,29 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
       return Optional.empty();
     }
 
-    E parentEdge = destinationDistance.getParentEdge();
+    final E parentEdge = destinationDistance.getParentEdge();
     // Destination is already a source node
     if (parentEdge == null) {
       return Optional.of(new EmptyPath<>(destination));
     }
 
     // Build the path reversely by following the pointers from the destination
-    // to
-    // one of the sources
+    // to one of the sources
     final EdgePath<N, E> path = new EdgePath<>(true);
-    while (parentEdge != null) {
-      // Add the edge and prepare next round
-      path.addEdge(parentEdge);
+    TentativeDistance<N, E> currentDistanceContainer = destinationDistance;
+    E currentEdge = parentEdge;
+    while (currentEdge != null) {
+      // Add the edge
+      final double distance = currentDistanceContainer.getTentativeDistance();
+      final N parent = currentEdge.getSource();
+      final TentativeDistance<N, E> parentDistanceContainer = nodeToDistance.get(parent);
+      final double parentDistance = parentDistanceContainer.getTentativeDistance();
 
-      final N parent = parentEdge.getSource();
-      parentEdge = nodeToDistance.get(parent).getParentEdge();
+      path.addEdge(currentEdge, distance - parentDistance);
+
+      // Prepare next round
+      currentEdge = parentDistanceContainer.getParentEdge();
+      currentDistanceContainer = parentDistanceContainer;
     }
     return Optional.of(path);
   }

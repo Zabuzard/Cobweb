@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 
 /**
@@ -51,13 +52,15 @@ public final class RoutingUtilTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.RoutingUtil#getSpeedOfHighway(de.tischner.cobweb.parsing.osm.EHighwayType, int)}.
+   * {@link de.tischner.cobweb.util.RoutingUtil#getSpeedOfHighway(EHighwayType, int, ETransportationMode)}.
    */
   @SuppressWarnings("static-method")
   @Test
   public void testGetSpeedOfHighway() {
-    Assert.assertEquals(100.0, RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, 100), 0.0001);
-    Assert.assertTrue(RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, -1) > 0);
+    // TODO Check the other modes too
+    Assert.assertEquals(100.0, RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, 100, ETransportationMode.CAR),
+        0.0001);
+    Assert.assertTrue(RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, -1, ETransportationMode.CAR) > 0);
   }
 
   /**

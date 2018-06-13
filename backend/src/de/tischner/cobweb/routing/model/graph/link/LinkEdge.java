@@ -1,5 +1,9 @@
 package de.tischner.cobweb.routing.model.graph.link;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IReversedProvider;
@@ -13,6 +17,7 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
    * The destination of this edge.
    */
   private final N mDestination;
+  private final Set<ETransportationMode> mModes;
   /**
    * An object that provides a reversed flag or <tt>null</tt> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
@@ -33,6 +38,7 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
   public LinkEdge(final N source, final N destination) {
     mSource = source;
     mDestination = destination;
+    mModes = EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT);
   }
 
   @Override
@@ -59,6 +65,16 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
       return mDestination;
     }
     return mSource;
+  }
+
+  @Override
+  public Set<ETransportationMode> getTransportationModes() {
+    return mModes;
+  }
+
+  @Override
+  public boolean hasTransportationMode(final ETransportationMode mode) {
+    return mModes.contains(mode);
   }
 
   @Override

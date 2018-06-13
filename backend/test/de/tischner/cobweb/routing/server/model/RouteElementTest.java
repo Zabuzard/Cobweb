@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
+
 /**
  * Test for the class {@link RouteElement}.
  *
@@ -77,7 +79,7 @@ public final class RouteElementTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.server.model.RouteElement#RouteElement(de.tischner.cobweb.routing.server.model.ERouteElementType, de.tischner.cobweb.routing.server.model.ETransportationMode, java.lang.String, java.util.List)}.
+   * {@link de.tischner.cobweb.routing.server.model.RouteElement#RouteElement(de.tischner.cobweb.routing.server.model.ERouteElementType, de.tischner.cobweb.routing.model.graph.ETransportationMode, java.lang.String, java.util.List)}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test

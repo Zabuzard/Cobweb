@@ -1,6 +1,7 @@
 package de.tischner.cobweb.routing.parsing.osm;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.road.RoadEdge;
@@ -164,7 +166,8 @@ public final class OsmRoadBuilderTest {
    */
   private void addEdgeInOneDirection(final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final RoadNode first,
       final RoadNode second) {
-    graph.addEdge(new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100));
+    graph.addEdge(
+        new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR)));
     mEdgeIdCounter++;
   }
 

@@ -1,8 +1,8 @@
 package de.tischner.cobweb.routing.server.model;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 
 /**
  * POJO that models a route element which can either represent a
@@ -127,8 +127,8 @@ public final class RouteElement {
     builder.append(mMode);
     builder.append(", name=");
     builder.append(mName);
-    builder.append(", geom=");
-    builder.append(mGeom.stream().map(Arrays::toString).collect(Collectors.joining(", ", "[", "]")));
+    builder.append(", geomSize=");
+    builder.append(mGeom.size());
     builder.append("]");
     return builder.toString();
   }

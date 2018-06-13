@@ -1,5 +1,6 @@
 package de.tischner.cobweb.routing.model.graph.road;
 
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import de.tischner.cobweb.parsing.osm.EHighwayType;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 
@@ -64,8 +66,8 @@ public final class RoadGraphTest {
    */
   @Test
   public void testAddEdge() {
-    final RoadEdge<RoadNode> edge =
-        new RoadEdge<>(40, new RoadNode(1, 1.0F, 1.0F), new RoadNode(2, 2.0F, 2.0F), EHighwayType.MOTORWAY, 100);
+    final RoadEdge<RoadNode> edge = new RoadEdge<>(40, new RoadNode(1, 1.0F, 1.0F), new RoadNode(2, 2.0F, 2.0F),
+        EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertFalse(mGraph.containsEdge(edge));
     Assert.assertTrue(mGraph.addEdge(edge));
     Assert.assertTrue(mGraph.containsEdge(edge));
@@ -193,8 +195,10 @@ public final class RoadGraphTest {
     final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
     final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
     final RoadNode third = new RoadNode(3, 3.0F, 3.0F);
-    final RoadEdge<RoadNode> firstEdge = new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100);
-    final RoadEdge<RoadNode> secondEdge = new RoadEdge<>(2, second, third, EHighwayType.MOTORWAY, 100);
+    final RoadEdge<RoadNode> firstEdge =
+        new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
+    final RoadEdge<RoadNode> secondEdge =
+        new RoadEdge<>(2, second, third, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     mGraph = new RoadGraph<>();
     mGraph.addNode(first);
     mGraph.addNode(second);
@@ -251,7 +255,8 @@ public final class RoadGraphTest {
    */
   private void addEdgeInOneDirection(final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph, final RoadNode first,
       final RoadNode second) {
-    graph.addEdge(new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100));
+    graph.addEdge(
+        new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR)));
     mEdgeIdCounter++;
   }
 }

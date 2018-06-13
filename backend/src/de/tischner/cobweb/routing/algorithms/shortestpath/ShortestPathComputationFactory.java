@@ -8,11 +8,12 @@ import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStar;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.ModuleDijkstra;
+import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.MultiModalModule;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.TransitModule;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.server.model.ETransportationMode;
 
 public final class ShortestPathComputationFactory<N extends INode, E extends IEdge<N>> {
   /**
@@ -33,8 +34,7 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
   }
 
   public IShortestPathComputation<N, E> getAlgorithm(final long depTime, final Set<ETransportationMode> modes) {
-    // TODO Implement transportation modes
-    return ModuleDijkstra.of(mGraph, AStar.of(mMetric), TransitModule.of(depTime));
+    return ModuleDijkstra.of(mGraph, AStar.of(mMetric), TransitModule.of(depTime), MultiModalModule.of(modes));
   }
 
   public void initialize() {

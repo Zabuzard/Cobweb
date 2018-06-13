@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.OptionalDouble;
 
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
@@ -44,15 +45,15 @@ public final class TransitModule<N extends INode, E extends IEdge<N>> implements
   }
 
   @Override
-  public double provideEdgeCost(final E edge, final double tentativeDistance) {
+  public OptionalDouble provideEdgeCost(final E edge, final double tentativeDistance) {
     // Only interested in link edges entering the transit graph
     if (!(edge instanceof LinkEdge && edge.getDestination() instanceof ITransitNode)) {
-      return edge.getCost();
+      return OptionalDouble.empty();
     }
 
     final ITransitNode destination = (ITransitNode) edge.getDestination();
     final int connectionTime = destination.getTime();
-    return TransitModule.computeEdgeCost(mDepTime, tentativeDistance, connectionTime);
+    return OptionalDouble.of(TransitModule.computeEdgeCost(mDepTime, tentativeDistance, connectionTime));
   }
 
 }

@@ -1,6 +1,10 @@
 package de.tischner.cobweb.util;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import de.tischner.cobweb.parsing.osm.EHighwayType;
+import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 
 /**
@@ -18,6 +22,14 @@ public final class RoutingUtil {
    */
   private static final int HALF_CIRCLE_DEG = 180;
   /**
+   * Maximal speed of a bike in <tt>km/h</tt>.
+   */
+  private static final int MAX_BIKE_SPEED = 14;
+  /**
+   * Maximal walking speed in <tt>km/h</tt>.
+   */
+  private static final int MAX_FOOT_SPEED = 7;
+  /**
    * The maximal possible speed on a road in <tt>km/h</tt>
    */
   private static final double MAXIMAL_ROAD_SPEED = 200.0;
@@ -26,10 +38,17 @@ public final class RoutingUtil {
    */
   private static final int MILLIS_TO_NANO = 1_000_000;
   /**
+   * Factor to multiply with to convert <tt>mph</tt> (miles per hour) into
+   * <tt>km/h</tt> (kilometres per hour).
+   */
+  private static final double MPH_TO_KMH = 1.60934;
+
+  /**
    * Factor to multiply with to convert <tt>m/s</tt> (metres per second) into
    * <tt>km/h</tt> (kilometres per hour).
    */
   private static final double MS_TO_KMH = 3.6;
+
   /**
    * Factor to multiply with to convert seconds to milliseconds.
    */
@@ -71,21 +90,49 @@ public final class RoutingUtil {
    * @param type     The type of the highway
    * @param maxSpeed The maximal allowed speed on the highway or <tt>-1</tt> if
    *                 not present
+   * @param mode     The transportation mode to use for traveling
    * @return The speed used on the highway in <tt>km/h</tt>
    */
-  public static double getSpeedOfHighway(final EHighwayType type, final int maxSpeed) {
-    // Use the max speed property if present
+  public static double getSpeedOfHighway(final EHighwayType type, final int maxSpeed, final ETransportationMode mode) {
+    final int speedOnRoad;
     if (maxSpeed != -1) {
-      return maxSpeed;
+      // Use the max speed property if present
+      speedOnRoad = maxSpeed;
+    } else if (type != null) {
+      // Use the highway type if present
+      speedOnRoad = type.getAverageSpeed();
+    } else {
+      // Use a default speed value
+      speedOnRoad = EHighwayType.RESIDENTIAL.getAverageSpeed();
     }
 
-    // Use the highway type if present
-    if (type != null) {
-      return type.getAverageSpeed();
+    // Limit the speed by the transportation modes maximal speed
+    if (mode == ETransportationMode.CAR) {
+      // Car is not limited, use the given road speed
+      return speedOnRoad;
+    } else if (mode == ETransportationMode.BIKE) {
+      return Math.min(speedOnRoad, MAX_BIKE_SPEED);
+    } else if (mode == ETransportationMode.FOOT) {
+      return Math.min(speedOnRoad, MAX_FOOT_SPEED);
+    } else {
+      // Assume no limit on the transportation mode
+      return speedOnRoad;
     }
+  }
 
-    // Use a default speed value
-    return EHighwayType.RESIDENTIAL.getAverageSpeed();
+  /**
+   * Gets a set of allowed transportation modes for the given highway type.
+   *
+   * @param type The type of the highway
+   * @return A set of allowed transportation modes
+   */
+  public static Set<ETransportationMode> getTransportationModesOfHighway(final EHighwayType type) {
+    if (type == EHighwayType.MOTORWAY || type == EHighwayType.MOTORWAY_LINK) {
+      return EnumSet.of(ETransportationMode.CAR);
+    } else if (type == EHighwayType.CYCLEWAY) {
+      return EnumSet.of(ETransportationMode.BIKE);
+    }
+    return EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT);
   }
 
   /**
@@ -117,6 +164,17 @@ public final class RoutingUtil {
    */
   public static double millisToSeconds(final long millis) {
     return ((double) millis) / SECONDS_TO_MILLIS;
+  }
+
+  /**
+   * Converts the given value in <tt>mph</tt> (miles per hour)<tt> into
+   * km/h</tt> (kilometres per hour).
+   *
+   * @param mph The value in <tt>mph</tt> to convert
+   * @return The corresponding value in <tt>km/h</tt>
+   */
+  public static double mphToKmh(final double mph) {
+    return mph * MPH_TO_KMH;
   }
 
   /**

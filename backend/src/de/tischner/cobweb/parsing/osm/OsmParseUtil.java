@@ -1,9 +1,12 @@
 package de.tischner.cobweb.parsing.osm;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.tischner.cobweb.util.RoutingUtil;
 
 /**
  * Utility class that offers constants and methods related to parsing OSM
@@ -63,6 +66,18 @@ public final class OsmParseUtil {
     if (maxSpeedText == null) {
       return -1;
     }
+
+    // Most common case
+    if (maxSpeedText.matches("\\d+")) {
+      try {
+        return Integer.parseInt(maxSpeedText);
+      } catch (final NumberFormatException e) {
+        // Use a default value instead
+        LOGGER.error("Can not parse maxspeed value: {}", maxSpeedText);
+        return EHighwayType.RESIDENTIAL.getAverageSpeed();
+      }
+    }
+
     // "none" means there is no speed limit, use a default value
     if (maxSpeedText.equals("none")) {
       return EHighwayType.MOTORWAY.getAverageSpeed();
@@ -76,10 +91,21 @@ public final class OsmParseUtil {
     if (maxSpeedText.equals("signals")) {
       return EHighwayType.MOTORWAY.getAverageSpeed();
     }
-    // TODO Format allows '60' (then its kmh) but also '60 mph' (then we need to
-    // convert)
-    // TODO Current errors: '5 mph', '50;100' and '100, 70'
+
     try {
+      if (maxSpeedText.matches("\\d+ mph")) {
+        final int speedAsMph = Integer.parseInt(maxSpeedText.split(" ", 2)[0]);
+        return (int) RoutingUtil.mphToKmh(speedAsMph);
+      }
+      if (maxSpeedText.matches("\\d+, \\d+")) {
+        final String[] valuesAsText = maxSpeedText.split(", ", 2);
+        return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
+      }
+      if (maxSpeedText.matches("\\d+;\\d+")) {
+        final String[] valuesAsText = maxSpeedText.split(";", 2);
+        return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
+      }
+
       return Integer.parseInt(maxSpeedText);
     } catch (final NumberFormatException e) {
       // Use a default value instead
