@@ -13,7 +13,23 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
  * @param <E> Type of the edge
  */
 public interface IGtfsConnectionBuilder<N extends INode & IHasId & ISpatial, E extends IEdge<N>> {
+  /**
+   * Builds an edge with the given source, destination and cost.
+   *
+   * @param source      The source of the edge
+   * @param destination The destination of the edge
+   * @param cost        The cost of the edge, in travel time as seconds
+   * @return The constructed edge
+   */
   E buildEdge(N source, N destination, double cost);
 
+  /**
+   * Builds a note with the given coordinates and time.
+   *
+   * @param latitude  The latitude of the node
+   * @param longitude The longitude of the node
+   * @param time      The time of the node in seconds since midnight
+   * @return The constructed node
+   */
   N buildNode(float latitude, float longitude, int time);
 }

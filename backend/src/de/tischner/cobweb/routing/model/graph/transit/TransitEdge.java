@@ -36,6 +36,9 @@ public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
    * The ID of this edge which is unique.
    */
   private final int mId;
+  /**
+   * The transportation modes allowed by this edge.
+   */
   private final Set<ETransportationMode> mModes;
   /**
    * An object that provides a reversed flag or <tt>null</tt> if not present.

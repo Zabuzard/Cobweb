@@ -24,6 +24,15 @@ import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
 import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
 import de.tischner.cobweb.util.collections.DoubletonCollection;
 
+/**
+ * Graph implementation which links a given road and transit graph by
+ * {@link LinkEdge}s.<br>
+ * <br>
+ * Use {@link #initializeHubConnections(Map)} after creation to determine how
+ * the graphs are to be connected.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public final class LinkGraph
     implements IGetNodeById<ICoreNode>, IReversedProvider, IGraph<ICoreNode, ICoreEdge<ICoreNode>> {
   /**
@@ -65,12 +74,32 @@ public final class LinkGraph
    * Whether or not the graph is currently reversed.
    */
   private boolean mIsReversed;
-
+  /**
+   * A map connecting nodes to their incoming link edges.
+   */
   private final Map<ICoreNode, Set<LinkEdge<ICoreNode>>> mNodeToIncomingLinks;
+  /**
+   * A map connecting nodes to their outgoing link edges.
+   */
   private final Map<ICoreNode, Set<LinkEdge<ICoreNode>>> mNodeToOutgoingLinks;
+  /**
+   * The road graph linked by this graph.
+   */
   private final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mRoadGraph;
+  /**
+   * The transit graph linked by this graph.
+   */
   private final TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> mTransitGraph;
 
+  /**
+   * Creates a new link graph which links the given road and transit graph.<br>
+   * <br>
+   * Use {@link #initializeHubConnections(Map)} after creation to determine how
+   * the graphs are to be linked.
+   *
+   * @param roadGraph    The road graph to link
+   * @param transitGraph The transit graph to link
+   */
   public LinkGraph(final RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> roadGraph,
       final TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> transitGraph) {
     mRoadGraph = roadGraph;
@@ -182,6 +211,11 @@ public final class LinkGraph
     return Stream.concat(outgoingEdges, putgoingLinkEdges.stream());
   }
 
+  /**
+   * Gets the road graph linked by this graph.
+   *
+   * @return The road graph to get
+   */
   public RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> getRoadGraph() {
     return mRoadGraph;
   }
@@ -196,10 +230,25 @@ public final class LinkGraph
     return toString();
   }
 
+  /**
+   * Gets the transit graph linked by this graph.
+   *
+   * @return The transit graph to get
+   */
   public TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> getTransitGraph() {
     return mTransitGraph;
   }
 
+  /**
+   * Initializes the hub connections of this graph. That is, it links hub nodes
+   * of the road graph to a list of nodes of the transit graph.<br>
+   * <br>
+   * Each hub node will be connected by a link edge to each transit node of the
+   * mapped transit stop, in both directions.
+   *
+   * @param hubConnections A map connecting hub nodes of the road graph to a
+   *                       list of nodes of the transit graph
+   */
   public void initializeHubConnections(final Map<ICoreNode, TransitStop<ICoreNode>> hubConnections) {
     // Create edges for all hub nodes from one to the other graph
     hubConnections.forEach((roadNode, transitNodes) -> {
@@ -278,6 +327,13 @@ public final class LinkGraph
     return sj.toString();
   }
 
+  /**
+   * Gets a map connecting nodes to their incoming link edges.<br>
+   * <br>
+   * The map is backed by the graph, changes to it are reflected to the graph.
+   *
+   * @return A backed map connecting nodes to their incoming link edges
+   */
   private Map<ICoreNode, Set<LinkEdge<ICoreNode>>> getNodeToIncomingLinks() {
     if (mIsReversed) {
       return mNodeToOutgoingLinks;
@@ -285,6 +341,13 @@ public final class LinkGraph
     return mNodeToIncomingLinks;
   }
 
+  /**
+   * Gets a map connecting nodes to their outgoing link edges.<br>
+   * <br>
+   * The map is backed by the graph, changes to it are reflected to the graph.
+   *
+   * @return A backed map connecting nodes to their outgoing link edges
+   */
   private Map<ICoreNode, Set<LinkEdge<ICoreNode>>> getNodeToOutgoingLinks() {
     if (mIsReversed) {
       return mNodeToIncomingLinks;

@@ -98,9 +98,21 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    * the configuration has set the use of a graph cache.
    */
   private final RecentHandler mRecentHandler;
+  /**
+   * Map connecting stop IDs to arrival nodes.
+   */
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToArrNodes;
+  /**
+   * Map connecting stop IDs to departure nodes.
+   */
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToDepNodes;
+  /**
+   * Map connecting stop IDs to transfer nodes.
+   */
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToTransferNodes;
+  /**
+   * Map connecting trip IDs to stop nodes in the sequence of the trip.
+   */
   private final MutableMap<AgencyAndId, List<TripStopNodes<N>>> mTripToSequence;
 
   /**
@@ -126,7 +138,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    */
   public GtfsRealisticTimeExpandedHandler(final G graph, final IGtfsConnectionBuilder<N, E> builder,
       final IRoutingConfigProvider config) throws IOException {
-    // TODO A lot, currently only an early draft
+    // TODO Improve amount of GTFS data actually used for transit graph creation
     mGraph = graph;
     mBuilder = builder;
     mTripToSequence = Maps.mutable.empty();

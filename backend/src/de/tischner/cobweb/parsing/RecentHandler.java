@@ -132,6 +132,12 @@ public final class RecentHandler implements IFileHandler {
     mPathToLastModified = readCurrentInfo();
   }
 
+  /**
+   * Reads the current content of the info file.
+   *
+   * @return The current content of the info file
+   * @throws IOException If an I/O exception occurred when reading the info file
+   */
   private Map<Path, Long> readCurrentInfo() throws IOException {
     if (!Files.isRegularFile(mInfo)) {
       return new HashMap<>();

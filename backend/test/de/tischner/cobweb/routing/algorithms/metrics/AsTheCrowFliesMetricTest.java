@@ -12,7 +12,7 @@ public final class AsTheCrowFliesMetricTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric#distance(de.tischner.cobweb.routing.model.graph.road.ISpatial, de.tischner.cobweb.routing.model.graph.road.ISpatial)}.
+   * {@link de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric#distance(de.tischner.cobweb.routing.model.graph.ISpatial, de.tischner.cobweb.routing.model.graph.ISpatial)}.
    */
   @SuppressWarnings("static-method")
   @Test

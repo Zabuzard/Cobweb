@@ -237,7 +237,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#put(de.tischner.cobweb.routing.model.graph.road.IHasId, java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.ArrayMap#put(de.tischner.cobweb.routing.model.graph.IHasId, Object)}.
    */
   @Test
   public void testPut() {

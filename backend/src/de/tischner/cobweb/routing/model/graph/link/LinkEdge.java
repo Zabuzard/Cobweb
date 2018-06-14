@@ -8,6 +8,15 @@ import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IReversedProvider;
 
+/**
+ * Link edges link nodes of one graph to nodes of a different graph.<br>
+ * <br>
+ * Their cost is <tt>0</tt> and they offer all transportation modes available in
+ * a road network. Their ID is always <tt>-1</tt>.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ * @param <N> The type of nodes
+ */
 public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
   /**
    * The serial version UID.
@@ -17,6 +26,9 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
    * The destination of this edge.
    */
   private final N mDestination;
+  /**
+   * The transportation modes this edge offers.
+   */
   private final Set<ETransportationMode> mModes;
   /**
    * An object that provides a reversed flag or <tt>null</tt> if not present.
@@ -41,6 +53,9 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
     mModes = EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT);
   }
 
+  /**
+   * Gets the cost of this edge which is always <tt>0.0</tt>.
+   */
   @Override
   public double getCost() {
     return 0.0;
@@ -54,6 +69,9 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
     return mDestination;
   }
 
+  /**
+   * Gets the ID of this edge which is always <tt>-1</tt>.
+   */
   @Override
   public int getId() {
     return -1;

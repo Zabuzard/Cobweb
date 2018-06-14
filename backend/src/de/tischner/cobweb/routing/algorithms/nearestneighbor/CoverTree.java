@@ -10,34 +10,121 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 
+/**
+ * Implementation of a Cover-Tree (see
+ * <a href="https://en.wikipedia.org/wiki/Cover_tree">Wikipedia</a>) which
+ * solves nearest neighbor computation queries.<br>
+ * <br>
+ * The implementation is based on the paper:
+ * <ul>
+ * <li><a href="https://dl.acm.org/citation.cfm?id=1143857">Cover Trees for
+ * Nearest Neighbor</a> - Beygelzimer et al. in <tt>ICML '06</tt></li>
+ * </ul>
+ * Modified version from
+ * <a href="https://github.com/loehndorf/covertree">GitHub: Loehndorf -
+ * CoverTree</a>.
+ *
+ * @author Nils Loehndorf
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ * @param <E> Type of the objects contained in the tree which must offer spatial
+ *        data
+ */
 public final class CoverTree<E extends ISpatial> implements INearestNeighborComputation<E> {
+  /**
+   * The default base to use by the tree.
+   */
   private static final double DEFAULT_BASE = 1.2;
+  /**
+   * The default maximal numbers of levels.
+   */
   private static final int DEFAULT_MAX_NUM_LEVELS = 500;
+  /**
+   * The default minimum number of levels.
+   */
   private static final int DEFAULT_MIN_NUM_LEVELS = -500;
 
+  /**
+   * Utility method to create a new list instance. Can be used to exchange the
+   * list type used by the tree.
+   *
+   * @param <T> Type of the elements contained in the list
+   * @return The created list instance
+   */
   private static <T> List<T> createList() {
     return FastList.newList();
   }
 
+  /**
+   * The base of the tree.
+   */
   private final double mBase;
+  /**
+   * If the tree uses bounds. If set to <tt>true</tt> the fields
+   * {@link #mMinLat}, {@link #mMinLong}, {@link #mMaxLat} and {@link #mMaxLong}
+   * are respected.
+   */
   private boolean mHasBounds;
+  /**
+   * The maximal latitude, only effective if {@link #mHasBounds} is set to
+   * <tt>true</tt>.
+   */
   private float mMaxLat;
+  /**
+   * The current maximal level of the tree.
+   */
   private int mMaxLevel;
+  /**
+   * The maximal longitude, only effective if {@link #mHasBounds} is set to
+   * <tt>true</tt>.
+   */
   private float mMaxLong;
+  /**
+   * The maximal minimum level of the tree.
+   */
   private int mMaxMinLevel;
+  /**
+   * The maximal amount of levels of the tree.
+   */
   private int mMaxNumLevels = DEFAULT_MAX_NUM_LEVELS;
+  /**
+   * The metric to use for determining distance between elements.
+   */
   private final IMetric<E> mMetric;
+  /**
+   * The minimal latitude, only effective if {@link #mHasBounds} is set to
+   * <tt>true</tt>.
+   */
   private float mMinLat;
+  /**
+   * The current minimal level of the tree.
+   */
   private int mMinLevel;
+  /**
+   * The minimal longitude, only effective if {@link #mHasBounds} is set to
+   * <tt>true</tt>.
+   */
   private float mMinLong;
+  /**
+   * The minimum number of levels of the tree.
+   */
   private int mMinNumLevels = DEFAULT_MIN_NUM_LEVELS;
+  /**
+   * The current number of levels of the tree.
+   */
   private final int[] mNumLevels;
-
+  /**
+   * The root node.
+   */
   private Node<E> mRootNode;
 
   /**
-   * Create a cover tree which stops increasing the minimumLevel as soon as the
-   * given number of nodes is reached.
+   * Create an initially empty cover tree which stops increasing the minimum
+   * level as soon as the given number of nodes is reached.
+   *
+   * @param base        The base of the tree
+   * @param maxMinLevel The maximal minimum level of the tree
+   * @param metric      The metric to use for determining distance between
+   *                    elements
    */
   public CoverTree(final double base, final int maxMinLevel, final IMetric<E> metric) {
     mMetric = metric;
@@ -51,8 +138,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Create a cover tree at level zero which automatically expands above and
-   * below.
+   * Create an initially empty cover tree at level <tt>0</tt> which
+   * automatically expands above and below.
+   *
+   * @param metric The metric to use for determining distance between elements
    */
   public CoverTree(final IMetric<E> metric) {
     mMetric = metric;
@@ -63,10 +152,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
 
   /**
    * Get the cover of the given level. All points at this level are guaranteed
-   * to be 2^i apart from one another.
+   * to be <tt>2^level</tt> apart from one another.
    *
-   * @param level
-   * @return
+   * @param level The level to get the cover of
+   * @return The cover at the given level
    */
   public List<E> getCover(final int level) {
     List<Node<E>> coverset = CoverTree.createList();
@@ -89,14 +178,17 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Gets at least k centers which are maximally apart from each other. All
-   * remaining centers are removed from the tree. This function only works as
-   * designed when the function insert(point,k) has been used before to add
-   * points to the tree. Otherwise, it will return the cover one level above the
-   * bottom most level of the tree.
+   * Gets at least <tt>numCenters</tt> centers which are maximally apart from
+   * each other. All remaining centers are removed from the tree.<br>
+   * <br>
+   * This function only works as designed when the function
+   * {@link #insert(ISpatial, int)} has been used before to add elements to the
+   * tree. Otherwise, it will return the cover one level above the bottom most
+   * level of the tree.
    *
-   * @param number of centers
-   * @return
+   * @param numCenters The number of centers to get
+   * @return At least <tt>numCenters</tt> centers which are maximally apart from
+   *         each other
    */
   public List<E> getKCenters(final int numCenters) {
     final List<Node<E>> coverset = removeNodes(numCenters);
@@ -119,10 +211,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       final List<Node<E>> nextCandidates = CoverTree.createList();
       for (final Node<E> candidate : candidates) {
         for (final Node<E> child : candidate.getChildren()) {
-          // do not compute distances twice
+          // Do not compute distances twice
           if (!areAtSameLocation(candidate, child)) {
             child.setDistance(distance(child, point));
-            // minimum distance can be recorded here
+            // The minimum distance can be recorded here
             if (child.getDistance() < minDist) {
               minDist = child.getDistance();
             }
@@ -135,7 +227,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
 
       candidates.clear();
 
-      // create a set of candidate nearest neighbors
+      // Create a set of nearest neighbor candidates
       for (final Node<E> nextCandidate : nextCandidates) {
         if (nextCandidate.getDistance() < minDist + Math.pow(mBase, level)) {
           candidates.add(nextCandidate);
@@ -153,13 +245,14 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Insert a point into the tree.
+   * Insert the given element into the tree.
    *
-   * @param point
+   * @param element The element to insert
+   * @return If the element was inserted
    */
   public boolean insert(final E element) {
     if (mHasBounds) {
-      // points outside of the bounding box will not be added to the tree
+      // Elements outside of the bounding box will not be added to the tree
       final float latitude = element.getLatitude();
       final float longitude = element.getLongitude();
       if (latitude > mMaxLat || latitude < mMinLat || longitude > mMaxLong || longitude < mMinLong) {
@@ -167,32 +260,33 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       }
     }
 
-    // if this is the first node make it the root node
+    // If this is the first node make it the root node
     if (mRootNode == null) {
       mRootNode = new Node<>(null, element);
       incNodes(mMaxLevel);
       return true;
     }
 
-    // do not add if the new node is identical to the root node
+    // Do not add if the new node is identical to the root node
     mRootNode.setDistance(distance(mRootNode, element));
     if (mRootNode.getDistance() == 0.0) {
       return false;
     }
 
-    // if the node lies outside the cover of the root node and its descendants
+    // If the node lies outside the cover of the root node and its descendants
     // then insert the node above the root node
     if (mRootNode.getDistance() > Math.pow(mBase, mMaxLevel + 1)) {
       insertAtRoot(element);
       return true;
     }
 
-    // usually insertion begins here
+    // Usually insertion begins here
     List<Node<E>> coverset = CoverTree.createList();
-    // the initial coverset contains only the root node
+    // The initial cover-set contains only the root node
     coverset.add(mRootNode);
     int level = mMaxLevel;
-    Node<E> parent = null; // the root node does not have a parent
+    // The root node does not have a parent
+    Node<E> parent = null;
     int parentLevel = mMaxLevel;
     while (true) {
       boolean parentFound = true;
@@ -200,9 +294,9 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       for (final Node<E> node : coverset) {
         for (final Node<E> child : node.getChildren()) {
           if (!areAtSameLocation(node, child)) {
-            // do not compute distance twice
+            // Do not compute distance twice
             child.setDistance(distance(child, element));
-            // do not add if node is already contained in the tree
+            // Do not add if node is already contained in the tree
             if (child.getDistance() == 0.0) {
               return false;
             }
@@ -217,13 +311,13 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
         }
       }
 
-      // if the children of the coverset are further away the 2^level then an
-      // element of the coverset is the parent of the new node
+      // If the children of the cover-set are further away the 2^level then an
+      // element of the cover-set is the parent of the new node
       if (parentFound) {
         break;
       }
 
-      // select one node of the coverset as the parent of the node
+      // Select one node of the cover-set as the parent of the node
       for (final Node<E> node : coverset) {
         if (node.getDistance() < Math.pow(mBase, level)) {
           parent = node;
@@ -231,12 +325,12 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
           break;
         }
       }
-      // set all nodes as the new coverset
+      // Set all nodes as the new cover-set
       level--;
       coverset = candidates;
     }
 
-    // if the point is a sibling of the root node, then the cover of the root
+    // If the point is a sibling of the root node, then the cover of the root
     // node is increased
     if (parent == null) {
       insertAtRoot(element);
@@ -244,7 +338,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     }
 
     if (parentLevel - 1 < mMinLevel) {
-      // if the maximum size is reached and this would only increase the depth
+      // If the maximum size is reached and this would only increase the depth
       // of the tree then stop
       if (parentLevel - 1 < mMaxMinLevel) {
         return false;
@@ -252,20 +346,24 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       mMinLevel = parentLevel - 1;
     }
 
-    // otherwise add child to the tree
+    // Otherwise add child to the tree
     final Node<E> newNode = new Node<>(parent, element);
     parent.addChild(newNode);
-    // record distance to parent node and add to the sorted set of nodes where
+    // Record distance to parent node and add to the sorted set of nodes where
     // distance is used for sorting (needed for removal)
     incNodes(parentLevel - 1);
     return true;
   }
 
   /**
-   * Insert a point into the tree. If the tree size is greater than k the lowest
-   * cover will be removed as long as it does not decrease tree size below k.
+   * Insert the given element into the tree.<br>
+   * <br>
+   * If the tree size is greater than <tt>level</tt> the lowest cover will be
+   * removed as long as it does not decrease tree size below <tt>level</tt>.
    *
-   * @param point
+   * @param element The element to insert
+   * @param level   The level
+   * @return If the element was added
    */
   public boolean insert(final E element, final int level) {
     final boolean inserted = insert(element);
@@ -289,7 +387,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   /**
    * Returns the maximum level of this tree.
    *
-   * @return
+   * @return The maximum level
    */
   public int maxLevel() {
     return mMaxLevel;
@@ -298,18 +396,22 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   /**
    * Returns the minimum level of this tree.
    *
-   * @return
+   * @return The minimum level
    */
   public int minLevel() {
     return mMinLevel;
   }
 
   /**
-   * Points outside of the bounding box, will not be included. This allows for
+   * Sets bounds for the tree.<br>
+   * <br>
+   * Elements outside of the bounding box, will not be included. This allows for
    * easy truncation.
    *
-   * @param min
-   * @param max
+   * @param minLat  The minimum latitude
+   * @param minLong The minimum longitude
+   * @param maxLat  The maximal latitude
+   * @param maxLong The maximal longitude
    */
   public void setBounds(final float minLat, final float minLong, final float maxLat, final float maxLong) {
     mHasBounds = true;
@@ -322,6 +424,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   /**
    * Set the minimum levels of the cover tree by defining the maximum exponent
    * of the base.
+   *
+   * @param max The maximum exponent to set
    */
   public void setMaxNumLevels(final int max) {
     mMaxNumLevels = max;
@@ -330,25 +434,27 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   /**
    * Set the minimum levels of the cover tree by defining the minimum exponent
    * of the base.
+   *
+   * @param min The minimum exponent to set
    */
   public void setMinNumLevels(final int min) {
     mMinNumLevels = min;
   }
 
   /**
-   * Returns the size of the cover tree
+   * Returns the size of the cover tree, i.e. the amount of elements contained.
    *
-   * @return
+   * @return The size of the tree
    */
   public int size() {
     return size(mMinLevel);
   }
 
   /**
-   * Returns the size of the cover tree up to the given level (inclusive)
+   * Returns the size of the cover tree up to the given level (inclusive).
    *
-   * @param level
-   * @return
+   * @param level The level to get the size to
+   * @return The size of the tree up to the given level (inclusive)
    */
   public int size(final int level) {
     int sum = 0;
@@ -358,38 +464,92 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     return sum;
   }
 
+  /**
+   * Returns whether two elements are at the same location.
+   *
+   * @param first  The first element
+   * @param second The second element
+   * @return <tt>True/<tt> if both elements are at the same location, <tt>false</tt>
+   *         otherwise
+   */
   private boolean areAtSameLocation(final E first, final E second) {
     return first.getLatitude() == second.getLatitude() && first.getLongitude() == second.getLongitude();
   }
 
+  /**
+   * Returns whether the elements contained in the two given nodes are at the
+   * same location.
+   *
+   * @param first  The node containing the first element
+   * @param second The node containing the first element
+   * @return <tt>True/<tt> if both elements are at the same location, <tt>false</tt>
+   *         otherwise
+   */
   private boolean areAtSameLocation(final Node<E> first, final Node<E> second) {
     return areAtSameLocation(first.getElement(), second.getElement());
   }
 
+  /**
+   * Decreases the number of nodes at the given level.
+   *
+   * @param level The level to decrease nodes at
+   */
   private void decNodes(final int level) {
     mNumLevels[level - mMinNumLevels]--;
   }
 
+  /**
+   * Computes the distance between the given elements using the set metric.
+   *
+   * @param first  The first element
+   * @param second The second element
+   * @return The distance between the given elements according to the set metric
+   */
   private double distance(final E first, final E second) {
     return mMetric.distance(first, second);
   }
 
+  /**
+   * Computes the distance between the given elements using the set metric.
+   *
+   * @param first  The node containing the first element
+   * @param second The second element
+   * @return The distance between the given elements according to the set metric
+   */
   private double distance(final Node<E> first, final E second) {
     return distance(first.getElement(), second);
   }
 
+  /**
+   * Computes the distance between the elements contained in the given nodes
+   * using the set metric.
+   *
+   * @param first  The node containing the first element
+   * @param second The node copntaining the second element
+   * @return The distance between the given elements according to the set metric
+   */
   private double distance(final Node<E> first, final Node<E> second) {
     return distance(first.getElement(), second.getElement());
   }
 
+  /**
+   * Increases the number of nodes at the given level.
+   *
+   * @param level The level to increase nodes at
+   */
   private void incNodes(final int level) {
     mNumLevels[level - mMinNumLevels]++;
   }
 
+  /**
+   * Inserts the given element at the root node.
+   *
+   * @param element The element to insert
+   */
   private void insertAtRoot(final E element) {
-    // inserts the point above the root by successively increasing the cover of
-    // the root node until it
-    // contains the new point, the old root is added as child of the new root
+    // Inserts the point above the root by successively increasing the cover of
+    // the root node until it contains the new point, the old root is added as
+    // child of the new root
     final Node<E> oldRoot = mRootNode;
     final double dist = distance(oldRoot, element);
     while (dist > Math.pow(mBase, mMaxLevel)) {
@@ -427,7 +587,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Removes all but k points.
+   * Removes all but <tt>numCenters</tt> elements.
+   *
+   * @param numCenters The amount of elements to keep
+   * @return The cover-set
    */
   private List<Node<E>> removeNodes(final int numCenters) {
     List<Node<E>> coverset = CoverTree.createList();
@@ -445,8 +608,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       throw new AssertionError("Negative missing=" + missing + " in coverset");
     }
 
-    // Successively pick the node with the largest distance to the coverset and
-    // add it to the coverset
+    // Successively pick the node with the largest distance to the cover-set and
+    // add it to the cover-set
     final LinkedList<Node<E>> candidates = new LinkedList<>();
     for (final Node<E> node : coverset) {
       for (final Node<E> child : node.getChildren()) {
@@ -456,10 +619,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       }
     }
 
-    // only add candidates when the coverset is yet smaller then the number of
+    // Only add candidates when the cover-set is yet smaller then the number of
     // desired centers
     if (coverset.size() < numCenters) {
-      // compute the distance of all candidates to their parents and uncles
+      // Compute the distance of all candidates to their parents and uncles
       for (final Node<E> node : candidates) {
         double minDist = Double.POSITIVE_INFINITY;
         for (final Node<E> uncle : node.getParent().getParent().getChildren()) {
@@ -478,7 +641,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
         Collections.sort(candidates);
         final Node<E> nextNode = candidates.removeLast();
         coverset.add(nextNode);
-        // update the distance of all candidates in the neighborhood of
+        // Update the distance of all candidates in the neighborhood of
         // the new node
         for (final Node<E> uncle : nextNode.getParent().getParent().getChildren()) {
           if (uncle != nextNode) {
@@ -491,7 +654,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
       } while (coverset.size() < numCenters);
     }
 
-    // finally remove all nodes that have not been selected from the tree to
+    // Finally remove all nodes that have not been selected from the tree to
     // avoid confusing the nearest neighbor computation
     for (final Node<E> node : candidates) {
       node.getParent().removeChild(node);

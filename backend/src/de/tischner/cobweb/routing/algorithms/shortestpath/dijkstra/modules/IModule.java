@@ -5,6 +5,15 @@ import java.util.OptionalDouble;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 
+/**
+ * Interface for Dijkstra modules used by {@link ModuleDijkstra}. Defines
+ * various methods that allow to manipulate how the base Dijkstra works, like
+ * providing edge costs different to {@link IEdge#getCost()}.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ * @param <N> Type of the nodes
+ * @param <E> Type of the edges
+ */
 public interface IModule<N extends INode, E extends IEdge<N>> {
   /**
    * Whether or not the given edge should be considered for relaxation. The
@@ -39,7 +48,7 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
   }
 
   /**
-   * Provides the cost of an given edge.<br>
+   * Provides the cost of a given edge.<br>
    * <br>
    * The base is the result of {@link E#getCost()}. Implementations are allowed
    * to override this method in order to modify the cost.

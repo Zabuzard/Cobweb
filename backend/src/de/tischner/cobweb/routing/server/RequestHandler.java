@@ -139,7 +139,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final N destination = destinationOptional.get();
 
     final IShortestPathComputation<N, E> computation =
-        mComputationFactory.getAlgorithm(request.getDepTime(), request.getModes());
+        mComputationFactory.createAlgorithm(request.getDepTime(), request.getModes());
 
     final long startCompTime = System.nanoTime();
     final Optional<IPath<N, E>> pathOptional = computation.computeShortestPath(source, destination);
@@ -162,6 +162,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     sendResponse(response);
   }
 
+  /**
+   * Appends the given sub-path to the route.
+   *
+   * @param subPath The sub-path to add
+   * @param mode    The transportation mode to use for this sub-path
+   * @param route   The route to add the sub-path to
+   */
   private void appendSubPath(final IPath<N, E> subPath, final ETransportationMode mode,
       final List<RouteElement> route) {
     route.add(buildNode(subPath.getSource()));
@@ -259,6 +266,16 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     return new RouteElement(ERouteElementType.PATH, mode, nameJoiner.toString(), geom);
   }
 
+  /**
+   * Decides for the transportation mode to use for the given edge based on the
+   * modes it offers and the given restrictions.<br>
+   * <br>
+   * The method will choose the fastest available transportation mode.
+   *
+   * @param modeRestrictions The transportation modes allowed to use
+   * @param edge             The edge to travel along
+   * @return The transportation mode to use for the given edge
+   */
   private ETransportationMode getModeOfEdge(final Set<ETransportationMode> modeRestrictions, final E edge) {
     if (!(edge instanceof IHasTransportationMode)) {
       // Fallback mode
