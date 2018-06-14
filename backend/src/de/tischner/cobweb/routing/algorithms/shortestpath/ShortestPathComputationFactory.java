@@ -6,7 +6,7 @@ import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStar;
+import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStarModule;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.ModuleDijkstra;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.MultiModalModule;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.TransitModule;
@@ -39,7 +39,7 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
    */
   private final IGraph<N, E> mGraph;
   /**
-   * The metric to use for the {@link AStar} module.
+   * The metric to use for the {@link AStarModule} module.
    */
   private IMetric<N> mMetric;
 
@@ -79,7 +79,7 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
    * @return A shortest path algorithm with the given constraints
    */
   public IShortestPathComputation<N, E> createAlgorithm(final long depTime, final Set<ETransportationMode> modes) {
-    return ModuleDijkstra.of(mGraph, AStar.of(mMetric), TransitModule.of(depTime), MultiModalModule.of(modes));
+    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime), MultiModalModule.of(modes));
   }
 
   /**
@@ -88,6 +88,6 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
   public void initialize() {
     final ILandmarkProvider<N> landmarkProvider = new RandomLandmarks<>(mGraph);
     mMetric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mGraph, landmarkProvider);
-    mBaseComputation = ModuleDijkstra.of(mGraph, AStar.of(mMetric));
+    mBaseComputation = ModuleDijkstra.of(mGraph, AStarModule.of(mMetric));
   }
 }

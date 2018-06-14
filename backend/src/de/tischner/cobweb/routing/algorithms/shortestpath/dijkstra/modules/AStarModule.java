@@ -20,7 +20,7 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * @param <N> Type of node
  * @param <E> Type of edge
  */
-public final class AStar<N extends INode, E extends IEdge<N>> implements IModule<N, E> {
+public final class AStarModule<N extends INode, E extends IEdge<N>> implements IModule<N, E> {
   /**
    * Creates an AStar algorithm instance using the given metric.
    *
@@ -29,8 +29,8 @@ public final class AStar<N extends INode, E extends IEdge<N>> implements IModule
    * @param metric The metric to use
    * @return The created AStar algorithm instance
    */
-  public static <N extends INode, E extends IEdge<N>> AStar<N, E> of(final IMetric<N> metric) {
-    return new AStar<>(metric);
+  public static <N extends INode, E extends IEdge<N>> AStarModule<N, E> of(final IMetric<N> metric) {
+    return new AStarModule<>(metric);
   }
 
   /**
@@ -45,7 +45,7 @@ public final class AStar<N extends INode, E extends IEdge<N>> implements IModule
    * @param metric The heuristic metric which must be <i>monotone</i> and
    *               <i>admissible</i>
    */
-  public AStar(final IMetric<N> metric) {
+  public AStarModule(final IMetric<N> metric) {
     mMetric = metric;
   }
 
