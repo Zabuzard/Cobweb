@@ -1,10 +1,9 @@
-package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra;
+package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStarModule;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 
 /**
@@ -12,7 +11,7 @@ import de.tischner.cobweb.routing.model.graph.road.RoadNode;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class AStarTest {
+public final class AStarModuleTest {
 
   /**
    * Test method for

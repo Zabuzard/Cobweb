@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +43,12 @@ public final class GtfsParser {
   private static Collection<Path> findGtfsFilesToConsider(final Path directory, final Collection<Path> files)
       throws IOException {
     final Collection<Path> allPaths;
-    if (directory != null) {
+    if (directory != null && Files.exists(directory)) {
       allPaths = Files.walk(directory).filter(Files::isRegularFile).collect(Collectors.toList());
-    } else {
+    } else if (files != null) {
       allPaths = files.stream().filter(Files::isRegularFile).collect(Collectors.toList());
+    } else {
+      allPaths = Collections.emptyList();
     }
 
     // Filter out non-GTFS archives

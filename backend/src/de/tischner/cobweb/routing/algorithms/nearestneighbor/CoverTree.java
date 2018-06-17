@@ -203,6 +203,10 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
 
   @Override
   public Optional<E> getNearestNeighbor(final E point) {
+    if (size() == 0) {
+      return Optional.empty();
+    }
+
     final List<Node<E>> candidates = CoverTree.createList();
     candidates.add(mRootNode);
     double minDist = distance(mRootNode, point);
@@ -469,8 +473,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    *
    * @param first  The first element
    * @param second The second element
-   * @return <tt>True/<tt> if both elements are at the same location, <tt>false</tt>
-   *         otherwise
+   * @return <tt>True</tt> if both elements are at the same location,
+   *         <tt>false</tt> otherwise
    */
   private boolean areAtSameLocation(final E first, final E second) {
     return first.getLatitude() == second.getLatitude() && first.getLongitude() == second.getLongitude();
@@ -482,8 +486,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    *
    * @param first  The node containing the first element
    * @param second The node containing the first element
-   * @return <tt>True/<tt> if both elements are at the same location, <tt>false</tt>
-   *         otherwise
+   * @return <tt>True</tt> if both elements are at the same location,
+   *         <tt>false</tt> otherwise
    */
   private boolean areAtSameLocation(final Node<E> first, final Node<E> second) {
     return areAtSameLocation(first.getElement(), second.getElement());

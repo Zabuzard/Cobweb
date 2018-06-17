@@ -125,6 +125,9 @@ public final class MultiModalModule<N extends INode, E extends IEdge<N>> impleme
     // Pick the fastest mode that is available after applying the restrictions
     final Set<ETransportationMode> availableModes = EnumSet.copyOf(edgeModes);
     availableModes.retainAll(mModes);
+    if (availableModes.isEmpty()) {
+      return OptionalDouble.empty();
+    }
     final ETransportationMode fastestMode = Collections.max(availableModes, mSpeedComparator);
 
     // Edge cost is already laid out for car or tram (depending on road or

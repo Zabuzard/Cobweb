@@ -1,4 +1,4 @@
-package de.tischner.cobweb.searching.model;
+package de.tischner.cobweb.searching.name.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.tischner.cobweb.db.NodeNameData;
-import de.tischner.cobweb.searching.name.model.NodeName;
-import de.tischner.cobweb.searching.name.model.NodeNameSet;
 import de.zabuza.lexisearch.indexing.IInvertedIndex;
 import de.zabuza.lexisearch.indexing.IInvertedList;
 import de.zabuza.lexisearch.indexing.IKeyProvider;

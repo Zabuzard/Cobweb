@@ -152,7 +152,6 @@ public final class RoutingUtil {
    * @return The maximal possible speed in <tt>km/h</tt>
    */
   public static double maximalRoadSpeed() {
-    // TODO Maybe this needs adjustment
     return MAXIMAL_ROAD_SPEED;
   }
 

@@ -31,7 +31,7 @@ public final class DoubletonIterator<E> implements Iterator<E> {
 
   @Override
   public boolean hasNext() {
-    return mFirst.hasNext() && mSecond.hasNext();
+    return mFirst.hasNext() || mSecond.hasNext();
   }
 
   @Override

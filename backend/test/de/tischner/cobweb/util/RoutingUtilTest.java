@@ -1,5 +1,7 @@
 package de.tischner.cobweb.util;
 
+import java.util.EnumSet;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,10 +59,30 @@ public final class RoutingUtilTest {
   @SuppressWarnings("static-method")
   @Test
   public void testGetSpeedOfHighway() {
-    // TODO Check the other modes too
     Assert.assertEquals(100.0, RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, 100, ETransportationMode.CAR),
         0.0001);
     Assert.assertTrue(RoutingUtil.getSpeedOfHighway(EHighwayType.MOTORWAY, -1, ETransportationMode.CAR) > 0);
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#getTransportationModesOfHighway(EHighwayType)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testGetTransportationModesOfHighway() {
+    Assert.assertEquals(EnumSet.of(ETransportationMode.CAR),
+        RoutingUtil.getTransportationModesOfHighway(EHighwayType.MOTORWAY));
+    Assert.assertEquals(EnumSet.of(ETransportationMode.CAR),
+        RoutingUtil.getTransportationModesOfHighway(EHighwayType.MOTORWAY_LINK));
+
+    Assert.assertEquals(EnumSet.of(ETransportationMode.BIKE),
+        RoutingUtil.getTransportationModesOfHighway(EHighwayType.CYCLEWAY));
+
+    Assert.assertEquals(EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT),
+        RoutingUtil.getTransportationModesOfHighway(EHighwayType.PRIMARY));
+    Assert.assertEquals(EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT),
+        RoutingUtil.getTransportationModesOfHighway(EHighwayType.RESIDENTIAL));
   }
 
   /**
@@ -95,6 +117,18 @@ public final class RoutingUtilTest {
     Assert.assertEquals(1.0, RoutingUtil.millisToSeconds(1_000L), 0.0001);
     Assert.assertEquals(1.5, RoutingUtil.millisToSeconds(1_500L), 0.0001);
     Assert.assertEquals(0.0, RoutingUtil.millisToSeconds(0L), 0.0001);
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.RoutingUtil#mphToKmh(double)}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testMphToKmh() {
+    Assert.assertEquals(2, RoutingUtil.mphToKmh(1.2428), 0.0001);
+    Assert.assertEquals(-2, RoutingUtil.mphToKmh(-1.2428), 0.0001);
+    Assert.assertEquals(0, RoutingUtil.mphToKmh(0), 0.0001);
   }
 
   /**

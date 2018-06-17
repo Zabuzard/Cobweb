@@ -1,10 +1,9 @@
-package de.tischner.cobweb.searching.model;
+package de.tischner.cobweb.searching.name.model;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tischner.cobweb.searching.name.model.NodeName;
 import de.zabuza.lexisearch.indexing.IKeyProvider;
 import de.zabuza.lexisearch.indexing.qgram.QGramProvider;
 

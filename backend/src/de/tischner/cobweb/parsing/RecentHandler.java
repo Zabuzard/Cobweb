@@ -120,6 +120,8 @@ public final class RecentHandler implements IFileHandler {
     // Write the updated info back
     final List<String> lines = currentInfo.entrySet().stream()
         .map(entry -> entry.getKey() + DELIMITER + entry.getValue()).collect(Collectors.toList());
+    // Ensure the directory structure is there
+    Files.createDirectories(mInfo.getParent());
     Files.write(mInfo, lines);
   }
 

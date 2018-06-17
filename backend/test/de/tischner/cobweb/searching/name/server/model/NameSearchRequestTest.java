@@ -1,9 +1,7 @@
-package de.tischner.cobweb.searching.server.model;
+package de.tischner.cobweb.searching.name.server.model;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import de.tischner.cobweb.searching.name.server.model.NameSearchRequest;
 
 /**
  * Test for the class {@link NameSearchRequest}.

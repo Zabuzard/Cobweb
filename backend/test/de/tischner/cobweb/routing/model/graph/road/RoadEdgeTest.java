@@ -91,6 +91,16 @@ public final class RoadEdgeTest {
 
   /**
    * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitEdge#getTransportationModes()}.
+   */
+  @Test
+  public void testGetTransportationModes() {
+    Assert.assertEquals(1, mEdge.getTransportationModes().size());
+    Assert.assertTrue(mEdge.getTransportationModes().contains(ETransportationMode.CAR));
+  }
+
+  /**
+   * Test method for
    * {@link de.tischner.cobweb.routing.model.graph.road.RoadEdge#hashCode()}.
    */
   @Test
@@ -109,6 +119,19 @@ public final class RoadEdgeTest {
 
     other = new RoadEdge<>(2, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
     Assert.assertNotEquals(mEdge.hashCode(), other.hashCode());
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitEdge#hasTransportationMode(ETransportationMode)}.
+   */
+  @Test
+  public void testHasTransportationMode() {
+    Assert.assertTrue(mEdge.hasTransportationMode(ETransportationMode.CAR));
+
+    Assert.assertFalse(mEdge.hasTransportationMode(ETransportationMode.TRAM));
+    Assert.assertFalse(mEdge.hasTransportationMode(ETransportationMode.BIKE));
+    Assert.assertFalse(mEdge.hasTransportationMode(ETransportationMode.FOOT));
   }
 
   /**

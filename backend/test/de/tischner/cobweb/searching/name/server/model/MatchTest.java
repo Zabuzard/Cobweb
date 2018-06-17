@@ -1,10 +1,8 @@
-package de.tischner.cobweb.searching.server.model;
+package de.tischner.cobweb.searching.name.server.model;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import de.tischner.cobweb.searching.name.server.model.Match;
 
 /**
  * Test for the class {@link Match}.

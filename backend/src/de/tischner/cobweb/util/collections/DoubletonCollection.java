@@ -38,19 +38,19 @@ public final class DoubletonCollection<E> implements Collection<E> {
   }
 
   /**
-   * Adds the given element to the first collection.
+   * Adds the given element to the second collection.
    */
   @Override
   public boolean add(final E e) {
-    return mFirst.add(e);
+    return mSecond.add(e);
   }
 
   /**
-   * Adds the given elements to the first collection.
+   * Adds the given elements to the second collection.
    */
   @Override
   public boolean addAll(final Collection<? extends E> c) {
-    return mFirst.addAll(c);
+    return mSecond.addAll(c);
   }
 
   @Override
@@ -87,7 +87,9 @@ public final class DoubletonCollection<E> implements Collection<E> {
   @Override
   public boolean remove(final Object o) {
     boolean wasModified = mFirst.remove(o);
-    wasModified |= mSecond.remove(o);
+    if (!wasModified) {
+      wasModified |= mSecond.remove(o);
+    }
     return wasModified;
   }
 
@@ -136,7 +138,9 @@ public final class DoubletonCollection<E> implements Collection<E> {
       }
 
       // Required per method documentation
-      a[firstSize + secondSize] = null;
+      if (a.length != 0) {
+        a[firstSize + secondSize] = null;
+      }
       return a;
     }
 

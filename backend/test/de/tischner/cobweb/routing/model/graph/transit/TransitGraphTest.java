@@ -1,6 +1,7 @@
-package de.tischner.cobweb.routing.model.graph.road;
+package de.tischner.cobweb.routing.model.graph.transit;
 
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -8,17 +9,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tischner.cobweb.parsing.osm.EHighwayType;
-import de.tischner.cobweb.routing.model.graph.ETransportationMode;
+import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 
 /**
- * Test for the class {@link RoadGraph}.
+ * Test for the class {@link TransitGraph}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class RoadGraphTest {
+public final class TransitGraphTest {
   /**
    * Counter used for generating unique edge IDs.
    */
@@ -26,20 +26,20 @@ public final class RoadGraphTest {
   /**
    * The graph used for testing.
    */
-  private RoadGraph<RoadNode, RoadEdge<RoadNode>> mGraph;
+  private TransitGraph<TransitNode, TransitEdge<TransitNode>> mGraph;
 
   /**
    * Setups a graph instance for testing.
    */
   @Before
   public void setUp() {
-    mGraph = new RoadGraph<>();
-    final RoadNode firstNode = new RoadNode(1, 1.0F, 1.0F);
-    final RoadNode secondNode = new RoadNode(2, 2.0F, 2.0F);
-    final RoadNode thirdNode = new RoadNode(3, 3.0F, 3.0F);
-    final RoadNode fourthNode = new RoadNode(4, 4.0F, 4.0F);
-    final RoadNode fifthNode = new RoadNode(5, 5.0F, 5.0F);
-    final RoadNode sixthNode = new RoadNode(6, 6.0F, 6.0F);
+    mGraph = new TransitGraph<>();
+    final TransitNode firstNode = new TransitNode(1, 1.0F, 1.0F, 1);
+    final TransitNode secondNode = new TransitNode(2, 2.0F, 2.0F, 2);
+    final TransitNode thirdNode = new TransitNode(3, 3.0F, 3.0F, 3);
+    final TransitNode fourthNode = new TransitNode(4, 4.0F, 4.0F, 4);
+    final TransitNode fifthNode = new TransitNode(5, 5.0F, 5.0F, 5);
+    final TransitNode sixthNode = new TransitNode(6, 6.0F, 6.0F, 6);
 
     mGraph.addNode(firstNode);
     mGraph.addNode(secondNode);
@@ -61,12 +61,12 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#addEdge(de.tischner.cobweb.routing.model.graph.IEdge)}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#addEdge(de.tischner.cobweb.routing.model.graph.IEdge)}.
    */
   @Test
   public void testAddEdge() {
-    final RoadEdge<RoadNode> edge = new RoadEdge<>(40, new RoadNode(1, 1.0F, 1.0F), new RoadNode(2, 2.0F, 2.0F),
-        EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
+    final TransitEdge<TransitNode> edge =
+        new TransitEdge<>(40, new TransitNode(1, 1.0F, 1.0F, 1), new TransitNode(2, 2.0F, 2.0F, 2), 1);
     Assert.assertFalse(mGraph.containsEdge(edge));
     Assert.assertTrue(mGraph.addEdge(edge));
     Assert.assertTrue(mGraph.containsEdge(edge));
@@ -76,18 +76,40 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#addNode(de.tischner.cobweb.routing.model.graph.INode)}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#addNode(de.tischner.cobweb.routing.model.graph.INode)}.
    */
   @Test
   public void testAddNode() {
     Assert.assertEquals(6, mGraph.size());
-    mGraph.addNode(new RoadNode(10, 10.0F, 10.0F));
+    mGraph.addNode(new TransitNode(10, 10.0F, 10.0F, 1));
     Assert.assertEquals(7, mGraph.size());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#containsNodeWithId(int)}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#addStop(TransitStop)}.
+   */
+  @Test
+  public void testAddStop() {
+    Collection<TransitStop<TransitNode>> stops = mGraph.getStops();
+    Assert.assertTrue(stops.isEmpty());
+
+    final TransitStop<TransitNode> firstStop = new TransitStop<>(Collections.emptyList(), 1.0F, 1.0F);
+    mGraph.addStop(firstStop);
+    stops = mGraph.getStops();
+    Assert.assertEquals(1, stops.size());
+    Assert.assertTrue(stops.contains(firstStop));
+
+    final TransitStop<TransitNode> secondStop = new TransitStop<>(Collections.emptyList(), 1.0F, 1.0F);
+    mGraph.addStop(secondStop);
+    stops = mGraph.getStops();
+    Assert.assertEquals(2, stops.size());
+    Assert.assertTrue(stops.contains(secondStop));
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#containsNodeWithId(int)}.
    */
   @Test
   public void testContainsNodeWithId() {
@@ -99,7 +121,19 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#generateUniqueNodeId()}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#generateUniqueEdgeId()}.
+   */
+  @Test
+  public void testGenerateUniqueEdgeId() {
+    Assert.assertEquals(0, mGraph.generateUniqueEdgeId());
+    Assert.assertEquals(1, mGraph.generateUniqueEdgeId());
+    Assert.assertEquals(2, mGraph.generateUniqueEdgeId());
+    // Testing the whole range takes too long (1-2 seconds)
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#generateUniqueNodeId()}.
    */
   @Test
   public void testGenerateUniqueNodeId() {
@@ -111,19 +145,7 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#generateUniqueWayId()}.
-   */
-  @Test
-  public void testGenerateUniqueWayId() {
-    Assert.assertEquals(0, mGraph.generateUniqueWayId());
-    Assert.assertEquals(1, mGraph.generateUniqueWayId());
-    Assert.assertEquals(2, mGraph.generateUniqueWayId());
-    // Testing the whole range takes too long (1-2 seconds)
-  }
-
-  /**
-   * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#getNodeById(int)}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#getNodeById(int)}.
    */
   @Test
   public void testGetNodeById() {
@@ -138,7 +160,7 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#getNodes()}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#getNodes()}.
    */
   @Test
   public void testGetNodes() {
@@ -151,12 +173,34 @@ public final class RoadGraphTest {
     Assert.assertTrue(nodeIds.contains(5));
     Assert.assertTrue(nodeIds.contains(6));
 
-    Assert.assertTrue(new RoadGraph<>().getNodes().isEmpty());
+    Assert.assertTrue(new BasicGraph().getNodes().isEmpty());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#isReversed()}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#getStops()}.
+   */
+  @Test
+  public void testGetStops() {
+    Collection<TransitStop<TransitNode>> stops = mGraph.getStops();
+    Assert.assertTrue(stops.isEmpty());
+
+    final TransitStop<TransitNode> firstStop = new TransitStop<>(Collections.emptyList(), 1.0F, 1.0F);
+    mGraph.addStop(firstStop);
+    stops = mGraph.getStops();
+    Assert.assertEquals(1, stops.size());
+    Assert.assertTrue(stops.contains(firstStop));
+
+    final TransitStop<TransitNode> secondStop = new TransitStop<>(Collections.emptyList(), 1.0F, 1.0F);
+    mGraph.addStop(secondStop);
+    stops = mGraph.getStops();
+    Assert.assertEquals(2, stops.size());
+    Assert.assertTrue(stops.contains(secondStop));
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#isReversed()}.
    */
   @Test
   public void testIsReversed() {
@@ -169,11 +213,11 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#removeNode(de.tischner.cobweb.routing.model.graph.INode)}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#removeNode(de.tischner.cobweb.routing.model.graph.INode)}.
    */
   @Test
   public void testRemoveNode() {
-    final RoadNode node = new RoadNode(10, 10.0F, 10.0F);
+    final TransitNode node = new TransitNode(10, 10.0F, 10.0F, 1);
     Assert.assertEquals(6, mGraph.size());
     Assert.assertFalse(mGraph.removeNode(node));
     Assert.assertEquals(6, mGraph.size());
@@ -187,18 +231,16 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#reverse()}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#reverse()}.
    */
   @Test
   public void testReverse() {
-    final RoadNode first = new RoadNode(1, 1.0F, 1.0F);
-    final RoadNode second = new RoadNode(2, 2.0F, 2.0F);
-    final RoadNode third = new RoadNode(3, 3.0F, 3.0F);
-    final RoadEdge<RoadNode> firstEdge =
-        new RoadEdge<>(1, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
-    final RoadEdge<RoadNode> secondEdge =
-        new RoadEdge<>(2, second, third, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR));
-    mGraph = new RoadGraph<>();
+    final TransitNode first = new TransitNode(1, 1.0F, 1.0F, 1);
+    final TransitNode second = new TransitNode(2, 2.0F, 2.0F, 2);
+    final TransitNode third = new TransitNode(3, 3.0F, 3.0F, 3);
+    final TransitEdge<TransitNode> firstEdge = new TransitEdge<>(1, first, second, 1);
+    final TransitEdge<TransitNode> secondEdge = new TransitEdge<>(2, second, third, 2);
+    mGraph = new TransitGraph<>();
     mGraph.addNode(first);
     mGraph.addNode(second);
     mGraph.addNode(third);
@@ -218,13 +260,13 @@ public final class RoadGraphTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.routing.model.graph.road.RoadGraph#RoadGraph()}.
+   * {@link de.tischner.cobweb.routing.model.graph.transit.TransitGraph#TransitGraph()}.
    */
   @SuppressWarnings({ "unused", "static-method" })
   @Test
-  public void testRoadGraph() {
+  public void testTransitGraph() {
     try {
-      new RoadGraph<>();
+      new TransitGraph<>();
     } catch (final Exception e) {
       Assert.fail();
     }
@@ -238,8 +280,8 @@ public final class RoadGraphTest {
    * @param first  The first node
    * @param second The second node
    */
-  private void addEdgeInBothDirections(final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph, final RoadNode first,
-      final RoadNode second) {
+  private void addEdgeInBothDirections(final TransitGraph<TransitNode, TransitEdge<TransitNode>> graph,
+      final TransitNode first, final TransitNode second) {
     addEdgeInOneDirection(graph, first, second);
     addEdgeInOneDirection(graph, second, first);
   }
@@ -252,10 +294,9 @@ public final class RoadGraphTest {
    * @param first  The first node
    * @param second The second node
    */
-  private void addEdgeInOneDirection(final RoadGraph<RoadNode, RoadEdge<RoadNode>> graph, final RoadNode first,
-      final RoadNode second) {
-    graph.addEdge(
-        new RoadEdge<>(mEdgeIdCounter, first, second, EHighwayType.MOTORWAY, 100, EnumSet.of(ETransportationMode.CAR)));
+  private void addEdgeInOneDirection(final TransitGraph<TransitNode, TransitEdge<TransitNode>> graph,
+      final TransitNode first, final TransitNode second) {
+    graph.addEdge(new TransitEdge<>(mEdgeIdCounter, first, second, 1));
     mEdgeIdCounter++;
   }
 }
