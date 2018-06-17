@@ -72,7 +72,7 @@
 	</jar>
 	<sleep seconds="1"/>
     <jar destfile="${dist-dir}/${jar-name}-${version}-standalone.jar" basedir="${bin-dir}" excludes="**/*Test.class">
-	  <zipfileset src="${dist-dir}/external-libs.jar" excludes="*,/META-INF/*"/>
+	  <zipfileset src="${dist-dir}/external-libs.jar" excludes="*,META-INF/*"/>
       <manifest>
         <attribute name="Main-Class" value="${Main-class}"/>
       </manifest>

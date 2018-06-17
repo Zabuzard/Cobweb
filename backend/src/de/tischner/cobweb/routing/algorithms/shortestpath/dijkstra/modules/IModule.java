@@ -50,8 +50,8 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
   /**
    * Provides the cost of a given edge.<br>
    * <br>
-   * The base is the result of {@link E#getCost()}. Implementations are allowed
-   * to override this method in order to modify the cost.
+   * The base is the result of {@link IEdge#getCost()}. Implementations are
+   * allowed to override this method in order to modify the cost.
    *
    * @param edge              The edge whose cost to provide
    * @param tentativeDistance The current tentative distance when relaxing this
