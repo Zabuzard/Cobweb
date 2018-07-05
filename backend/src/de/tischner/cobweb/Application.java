@@ -196,7 +196,7 @@ public final class Application {
       mRoutingServer.shutdown();
       mDatabase.shutdown();
     } catch (final Throwable e) {
-      mLogger.error("Error while shutting down database", e);
+      mLogger.error("Error while shutting down application", e);
       throw e;
     }
   }

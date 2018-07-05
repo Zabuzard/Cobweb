@@ -12,22 +12,22 @@ import org.junit.Test;
 import de.tischner.cobweb.routing.model.graph.BasicNode;
 
 /**
- * Test for the class {@link ArrayMap}.
+ * Test for the class {@link IdMap}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public class ArrayMapTest {
+public class IdMapTest {
   /**
-   * The array map used for testing.
+   * The ID map used for testing.
    */
-  private ArrayMap<BasicNode, Integer> mMap;
+  private IdMap<BasicNode, Integer> mMap;
 
   /**
-   * Setups an array map instance for testing.
+   * Setups an ID map instance for testing.
    */
   @Before
   public void setUp() {
-    mMap = new ArrayMap<>();
+    mMap = new IdMap<>();
     mMap.put(new BasicNode(0), 1);
     mMap.put(new BasicNode(9), 10);
     mMap.put(new BasicNode(5), 6);
@@ -41,38 +41,7 @@ public class ArrayMapTest {
   }
 
   /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#ArrayMap()}.
-   */
-  @SuppressWarnings({ "unused", "static-method" })
-  @Test
-  public void testArrayMap() {
-    try {
-      new ArrayMap<>();
-    } catch (final Exception e) {
-      Assert.fail();
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#ArrayMap(int)}.
-   */
-  @SuppressWarnings({ "unused", "static-method" })
-  @Test
-  public void testArrayMapInt() {
-    try {
-      new ArrayMap<>(10);
-      new ArrayMap<>(0);
-      new ArrayMap<>(100);
-    } catch (final Exception e) {
-      Assert.fail();
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#clear()}.
+   * Test method for {@link de.tischner.cobweb.util.collections.IdMap#clear()}.
    */
   @Test
   public void testClear() {
@@ -80,14 +49,14 @@ public class ArrayMapTest {
     mMap.clear();
     Assert.assertTrue(mMap.isEmpty());
 
-    final ArrayMap<BasicNode, Integer> other = new ArrayMap<>();
+    final IdMap<BasicNode, Integer> other = new IdMap<>();
     other.clear();
     Assert.assertTrue(other.isEmpty());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#containsKey(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#containsKey(java.lang.Object)}.
    */
   @Test
   public void testContainsKey() {
@@ -111,7 +80,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#containsValue(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#containsValue(java.lang.Object)}.
    */
   @Test
   public void testContainsValue() {
@@ -137,7 +106,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#entrySet()}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#entrySet()}.
    */
   @Test
   public void testEntrySet() {
@@ -152,7 +121,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#forEach(java.util.function.BiConsumer)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#forEach(java.util.function.BiConsumer)}.
    */
   @Test
   public void testForEach() {
@@ -169,7 +138,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#forEachIdValue(org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#forEachIdValue(org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure)}.
    */
   @Test
   public void testForEachIdValue() {
@@ -183,7 +152,7 @@ public class ArrayMapTest {
     Assert.assertEquals(6, entries.get(5).intValue());
     Assert.assertEquals(7, entries.get(6).intValue());
 
-    final ArrayMap<BasicNode, Integer> other = new ArrayMap<>();
+    final IdMap<BasicNode, Integer> other = new IdMap<>();
     entries.clear();
     other.forEachIdValue(entries::put);
     Assert.assertTrue(entries.isEmpty());
@@ -191,7 +160,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#get(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#get(java.lang.Object)}.
    */
   @Test
   public void testGet() {
@@ -205,15 +174,44 @@ public class ArrayMapTest {
   }
 
   /**
+   * Test method for {@link de.tischner.cobweb.util.collections.IdMap#IdMap()}.
+   */
+  @SuppressWarnings({ "unused", "static-method" })
+  @Test
+  public void testIdMap() {
+    try {
+      new IdMap<>();
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#isEmpty()}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#IdMap(int)}.
+   */
+  @SuppressWarnings({ "unused", "static-method" })
+  @Test
+  public void testIdMapInt() {
+    try {
+      new IdMap<>(10);
+      new IdMap<>(0);
+      new IdMap<>(100);
+    } catch (final Exception e) {
+      Assert.fail();
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link de.tischner.cobweb.util.collections.IdMap#isEmpty()}.
    */
   @Test
   public void testIsEmpty() {
     Assert.assertFalse(mMap.isEmpty());
-    Assert.assertTrue(new ArrayMap<>().isEmpty());
+    Assert.assertTrue(new IdMap<>().isEmpty());
 
-    final ArrayMap<BasicNode, Integer> other = new ArrayMap<>();
+    final IdMap<BasicNode, Integer> other = new IdMap<>();
     other.put(new BasicNode(10_000), 1);
     Assert.assertFalse(other.isEmpty());
     other.remove(new BasicNode(10_000));
@@ -221,8 +219,7 @@ public class ArrayMapTest {
   }
 
   /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#keySet()}.
+   * Test method for {@link de.tischner.cobweb.util.collections.IdMap#keySet()}.
    */
   @Test
   public void testKeySet() {
@@ -237,7 +234,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#put(de.tischner.cobweb.routing.model.graph.IHasId, Object)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#put(de.tischner.cobweb.routing.model.graph.IHasId, Object)}.
    */
   @Test
   public void testPut() {
@@ -250,7 +247,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#putAll(java.util.Map)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#putAll(java.util.Map)}.
    */
   @Test
   public void testPutAll() {
@@ -274,7 +271,7 @@ public class ArrayMapTest {
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#remove(java.lang.Object)}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#remove(java.lang.Object)}.
    */
   @Test
   public void testRemove() {
@@ -299,22 +296,21 @@ public class ArrayMapTest {
   }
 
   /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#size()}.
+   * Test method for {@link de.tischner.cobweb.util.collections.IdMap#size()}.
    */
   @Test
   public void testSize() {
     Assert.assertEquals(8, mMap.size());
-    Assert.assertEquals(0, new ArrayMap<>().size());
+    Assert.assertEquals(0, new IdMap<>().size());
 
-    final ArrayMap<BasicNode, Integer> other = new ArrayMap<>();
+    final IdMap<BasicNode, Integer> other = new IdMap<>();
     other.put(new BasicNode(10_000), 1);
     Assert.assertEquals(1, other.size());
   }
 
   /**
    * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#streamValues()}.
+   * {@link de.tischner.cobweb.util.collections.IdMap#streamValues()}.
    */
   @Test
   public void testStreamValues() {
@@ -327,14 +323,13 @@ public class ArrayMapTest {
     Assert.assertTrue(values.contains(6));
     Assert.assertTrue(values.contains(7));
 
-    final ArrayMap<BasicNode, Integer> other = new ArrayMap<>();
+    final IdMap<BasicNode, Integer> other = new IdMap<>();
     values = other.streamValues().collect(Collectors.toSet());
     Assert.assertTrue(values.isEmpty());
   }
 
   /**
-   * Test method for
-   * {@link de.tischner.cobweb.util.collections.ArrayMap#values()}.
+   * Test method for {@link de.tischner.cobweb.util.collections.IdMap#values()}.
    */
   @Test
   public void testValues() {

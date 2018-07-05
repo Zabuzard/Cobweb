@@ -56,8 +56,7 @@ public final class HttpUtil {
     while (true) {
       final String line = HttpUtil.readHttpLine(input);
       // According to the specification empty lines that appear before any
-      // content
-      // need to be rejected
+      // content need to be rejected
       if (line.isEmpty()) {
         continue;
       }

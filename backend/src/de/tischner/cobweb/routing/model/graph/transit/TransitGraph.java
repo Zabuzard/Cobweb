@@ -23,8 +23,8 @@ import de.tischner.cobweb.routing.model.graph.IReversedConsumer;
 import de.tischner.cobweb.routing.model.graph.IReversedProvider;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.model.graph.UniqueIdGenerator;
-import de.tischner.cobweb.util.collections.ArrayMap;
 import de.tischner.cobweb.util.collections.HybridArrayHashSet;
+import de.tischner.cobweb.util.collections.IdMap;
 
 /**
  * Implementation of a {@link IGraph} model which consists of transit nodes and
@@ -47,7 +47,7 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The unique ID generated used for edges.
+   * The unique ID generator used for edges.
    */
   private final UniqueIdGenerator mEdgeIdGenerator;
   /**
@@ -59,7 +59,7 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
    */
   private boolean mIsReversed;
   /**
-   * The unique ID generated used for nodes.
+   * The unique ID generator used for nodes.
    */
   private final UniqueIdGenerator mNodeIdGenerator;
   /**
@@ -88,8 +88,8 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
     mEdgeIdGenerator = new UniqueIdGenerator();
 
     // Assume node IDs are close to each other and have no, or only few, gaps.
-    mNodeToIncomingEdges = new ArrayMap<>();
-    mNodeToOutgoingEdges = new ArrayMap<>();
+    mNodeToIncomingEdges = new IdMap<>();
+    mNodeToOutgoingEdges = new IdMap<>();
     mStops = Sets.mutable.empty();
   }
 
@@ -131,10 +131,10 @@ public final class TransitGraph<N extends INode & IHasId & ISpatial & Serializab
 
   @Override
   public Stream<E> getEdges() {
-    if (mNodeToOutgoingEdges instanceof ArrayMap) {
-      final ArrayMap<N, Set<E>> asArrayMap = (ArrayMap<N, Set<E>>) mNodeToOutgoingEdges;
-      // Fall back to streamValues() since ArrayMap does not support values()
-      return asArrayMap.streamValues().flatMap(Collection::stream);
+    if (mNodeToOutgoingEdges instanceof IdMap) {
+      final IdMap<N, Set<E>> asIdMap = (IdMap<N, Set<E>>) mNodeToOutgoingEdges;
+      // Fall back to streamValues() since IdMap does not support values()
+      return asIdMap.streamValues().flatMap(Collection::stream);
     }
     return super.getEdges();
   }

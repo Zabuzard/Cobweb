@@ -167,7 +167,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
    */
   protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<N> sources,
       final N pathDestination) {
-    // TODO Evaluate if maps should be exchanged against ArrayMap if Dijkstra is
+    // TODO Evaluate if maps should be exchanged against IdMap if Dijkstra is
     // about to settle all reachable nodes. Note that node IDs may have gaps
     // since the set of reachable nodes is in general not equal to all nodes of
     // the graph.

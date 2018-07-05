@@ -73,6 +73,10 @@ public final class RoutingUtil {
    * @return The distance between the given objects
    */
   public static double distanceEquiRect(final ISpatial first, final ISpatial second) {
+    if (first == second) {
+      return 0.0;
+    }
+
     // Convert positions to radians
     final double firstLat = RoutingUtil.degToRad(first.getLatitude());
     final double firstLong = RoutingUtil.degToRad(first.getLongitude());
@@ -133,6 +137,15 @@ public final class RoutingUtil {
       return EnumSet.of(ETransportationMode.BIKE);
     }
     return EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE, ETransportationMode.FOOT);
+  }
+
+  /**
+   * Gets the maximal walking speed in <tt>km/h</tt>.
+   *
+   * @return The maximal walking speed in <tt>km/h</tt>
+   */
+  public static double getWalkingSpeed() {
+    return MAX_FOOT_SPEED;
   }
 
   /**

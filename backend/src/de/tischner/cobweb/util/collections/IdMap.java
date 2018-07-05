@@ -34,7 +34,7 @@ import de.tischner.cobweb.routing.model.graph.IHasId;
  * @param <K> Type of the key, must provide a unique ID
  * @param <V> Type of the value
  */
-public final class ArrayMap<K extends IHasId, V> implements Map<K, V>, Serializable {
+public final class IdMap<K extends IHasId, V> implements Map<K, V>, Serializable {
   /**
    * The serial version UID.
    */
@@ -53,7 +53,7 @@ public final class ArrayMap<K extends IHasId, V> implements Map<K, V>, Serializa
   /**
    * Creates a new initially empty array map.
    */
-  public ArrayMap() {
+  public IdMap() {
     this(FastList.newList());
   }
 
@@ -62,7 +62,7 @@ public final class ArrayMap<K extends IHasId, V> implements Map<K, V>, Serializa
    *
    * @param initialCapacity The initial capacity of the map
    */
-  public ArrayMap(final int initialCapacity) {
+  public IdMap(final int initialCapacity) {
     this(FastList.newList(initialCapacity));
   }
 
@@ -71,7 +71,7 @@ public final class ArrayMap<K extends IHasId, V> implements Map<K, V>, Serializa
    *
    * @param values The values of the map
    */
-  private ArrayMap(final MutableList<V> values) {
+  private IdMap(final MutableList<V> values) {
     mValues = values;
     mSize = mValues.size();
   }
