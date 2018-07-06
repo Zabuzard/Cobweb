@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
@@ -122,5 +123,28 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
 
       return new Footpath(stopId, arrId, duration);
     });
+  }
+
+  /**
+   * Gets a human readable string that contains size information of the table,
+   * i.e. the amount of stopsm trips and connections.
+   *
+   * @return A human readable string containing size information
+   */
+  public String getSizeInformation() {
+    return toString();
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    final StringJoiner sj = new StringJoiner(", ", getClass().getSimpleName() + "[", "]");
+    sj.add("stops=" + mIdToStop.size());
+    sj.add("trips=" + mIdToTrip.size());
+    sj.add("connections=" + mConnections.size());
+    return sj.toString();
   }
 }

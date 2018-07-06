@@ -2,7 +2,6 @@ package de.tischner.cobweb.routing.parsing.gtfs;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +41,7 @@ import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.model.graph.transit.IHasTransitStops;
 import de.tischner.cobweb.routing.model.graph.transit.NodeTime;
 import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
+import de.tischner.cobweb.util.collections.CollectionUtil;
 
 /**
  * Implementation of an {@link IGtfsFileHandler} which constructs a realistic
@@ -68,20 +68,6 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    * Transfer time in seconds.
    */
   private static final int TRANSFER_DELAY = 5 * 60;
-
-  /**
-   * Increases the internal capacity of the given collection by appending
-   * <tt>null</tt> values until the collection has the desired capacity.
-   *
-   * @param            <T> The type of the elements contained in the collection
-   * @param collection The collection to increase
-   * @param capacity   The desired capacity
-   */
-  private static <T> void increaseCapacity(final Collection<T> collection, final int capacity) {
-    for (int i = collection.size(); i < capacity; i++) {
-      collection.add(null);
-    }
-  }
 
   /**
    * Builder to use for constructing edges and nodes that are to be inserted
@@ -240,6 +226,13 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
       mGraph.addStop(stop);
     });
 
+    // Prepare for possible next round
+    mStopToArrNodes.clear();
+    mStopToDepNodes.clear();
+    mStopToTransferNodes.clear();
+    mTripToSequence.clear();
+
+    // Update cache information
     if (mUseGraphCache) {
       mRecentHandler.updateInfo();
     }
@@ -335,7 +328,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     final List<TripStopNodes<N>> sequence = mTripToSequence.getIfAbsentPut(tripId, FastList::new);
     if (sequence.size() <= sequenceIndex) {
       // Fill with null values until the index is available
-      GtfsRealisticTimeExpandedHandler.increaseCapacity(sequence, sequenceIndex + 1);
+      CollectionUtil.increaseCapacity(sequence, sequenceIndex + 1);
     }
     sequence.set(sequenceIndex, tripStopNodes);
 

@@ -200,7 +200,7 @@ public final class IdMap<K extends IHasId, V> implements Map<K, V>, Serializable
       throw new IllegalArgumentException();
     }
     if (index >= mValues.size()) {
-      increaseCapacity(index + 1);
+      CollectionUtil.increaseCapacity(mValues, index + 1);
     }
     final V previous = mValues.set(index, value);
     if (previous == null) {
@@ -268,18 +268,6 @@ public final class IdMap<K extends IHasId, V> implements Map<K, V>, Serializable
   @Override
   public Collection<V> values() {
     throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Increases the internal capacity by appending <tt>null</tt> values until the
-   * internal collection has the desired capacity.
-   *
-   * @param capacity The desired capacity
-   */
-  private void increaseCapacity(final int capacity) {
-    for (int i = mValues.size(); i < capacity; i++) {
-      mValues.add(null);
-    }
   }
 
 }
