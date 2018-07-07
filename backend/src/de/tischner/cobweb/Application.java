@@ -1,15 +1,12 @@
 package de.tischner.cobweb;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,33 +23,19 @@ import de.tischner.cobweb.db.MemoryDatabase;
 import de.tischner.cobweb.db.OsmDatabaseHandler;
 import de.tischner.cobweb.parsing.DataParser;
 import de.tischner.cobweb.parsing.ParseException;
-import de.tischner.cobweb.parsing.gtfs.IGtfsFileHandler;
 import de.tischner.cobweb.parsing.osm.IOsmFileHandler;
-import de.tischner.cobweb.parsing.osm.IOsmFilter;
 import de.tischner.cobweb.parsing.osm.OsmReducer;
-import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
-import de.tischner.cobweb.routing.algorithms.nearestneighbor.CoverTree;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
+import de.tischner.cobweb.routing.model.RoutingModel;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
-import de.tischner.cobweb.routing.model.graph.link.LinkGraph;
-import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
-import de.tischner.cobweb.routing.model.graph.road.RoadNode;
-import de.tischner.cobweb.routing.model.graph.transit.TransitGraph;
-import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
-import de.tischner.cobweb.routing.parsing.gtfs.GtfsConnectionBuilder;
-import de.tischner.cobweb.routing.parsing.gtfs.GtfsRealisticTimeExpandedHandler;
-import de.tischner.cobweb.routing.parsing.gtfs.IGtfsConnectionBuilder;
-import de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder;
-import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
+import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
-import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.routing.server.RoutingServer;
 import de.tischner.cobweb.searching.name.server.NameSearchServer;
 import de.tischner.cobweb.searching.nearest.server.NearestSearchServer;
 import de.tischner.cobweb.util.CleanUtil;
-import de.tischner.cobweb.util.SerializationUtil;
 
 /**
  * The whole application. Supports various commands, see the documentation of
@@ -77,10 +60,6 @@ public final class Application {
    */
   private final CommandData mCommandData;
   /**
-   * Factory to use for generating algorithms for shortest path computation.
-   */
-  private ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> mComputationFactory;
-  /**
    * Provides the configuration of the application.
    */
   private ConfigStore mConfig;
@@ -92,10 +71,6 @@ public final class Application {
    * Database to use for storing meta data.
    */
   private ADatabase mDatabase;
-  /**
-   * Link graph to route on.
-   */
-  private LinkGraph mLinkGraph;
   /**
    * Logger to use for logging.
    */
@@ -113,17 +88,13 @@ public final class Application {
    */
   private NearestSearchServer mNearestSearchServer;
   /**
-   * Road graph to route on.
+   * The model to use for routing.
    */
-  private RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mRoadGraph;
+  private RoutingModel mRoutingModel;
   /**
    * Server to use for responding to routing requests. Offers a REST API.
    */
-  private RoutingServer<ICoreNode, ICoreEdge<ICoreNode>, LinkGraph> mRoutingServer;
-  /**
-   * Transit graph to route on.
-   */
-  private TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> mTransitGraph;
+  private RoutingServer<ICoreNode, ICoreEdge<ICoreNode>> mRoutingServer;
 
   /**
    * Creates a new application using the given arguments. After creation use
@@ -234,57 +205,6 @@ public final class Application {
   }
 
   /**
-   * Completes the initialization of the graph model.
-   *
-   * @param graphSizeBefore The size of the graph after it was deserialized.
-   *                        Used to determine if the current graph has changed
-   *                        compared to the serialized version.
-   */
-  private void completeGraphInitialization(final int graphSizeBefore) {
-    if (mConfig.useGraphCache() && mLinkGraph.size() == graphSizeBefore) {
-      return;
-    }
-    mLogger.debug("Initializing hub connections");
-    final Instant hubStartTime = Instant.now();
-
-    final Map<ICoreNode, TransitStop<ICoreNode>> hubConnections = new HashMap<>();
-    // For each transit stop retrieve the nearest road node
-    final RoadNode stopLocationWrapper = new RoadNode(-1, 0, 0);
-    for (final TransitStop<ICoreNode> stop : mTransitGraph.getStops()) {
-      stopLocationWrapper.setLatitude(stop.getLatitude());
-      stopLocationWrapper.setLongitude(stop.getLongitude());
-      final ICoreNode hubNode = mNearestNeighborComputation.getNearestNeighbor(stopLocationWrapper).get();
-      hubConnections.put(hubNode, stop);
-    }
-    mLinkGraph.initializeHubConnections(hubConnections);
-
-    final Instant hubEndTime = Instant.now();
-    mLogger.info("Hub connections took: {}", Duration.between(hubStartTime, hubEndTime));
-  }
-
-  /**
-   * Creates file handler that handle GTFS files for routing. If they are
-   * notified when parsing GTFS data, they will adjust models used for routing
-   * like the graph accordingly.
-   *
-   * @return An iterable consisting of all routing file handlers that adjust
-   *         routing models
-   * @throws ParseException If an exception occurred while parsing data like
-   *                        configuration files
-   */
-  private Iterable<IGtfsFileHandler> createGtfsRoutingHandler() throws ParseException {
-    try {
-      final IGtfsConnectionBuilder<ICoreNode, ICoreEdge<ICoreNode>> connectionBuilder =
-          new GtfsConnectionBuilder(mTransitGraph);
-      final IGtfsFileHandler transitHandler =
-          new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, connectionBuilder, mConfig);
-      return Collections.singletonList(transitHandler);
-    } catch (final IOException e) {
-      throw new ParseException(e);
-    }
-  }
-
-  /**
    * Creates file handler that handle OSM files for the database. If they are
    * notified when parsing OSM data, they will adjust the database accordingly.
    *
@@ -301,45 +221,6 @@ public final class Application {
   }
 
   /**
-   * Creates file handler that handle OSM files for routing. If they are
-   * notified when parsing OSM data, they will adjust models used for routing
-   * like the graph accordingly.
-   *
-   * @return An iterable consisting of all routing file handlers that adjust
-   *         routing models
-   * @throws ParseException If an exception occurred while parsing data like
-   *                        configuration files
-   */
-  private Iterable<IOsmFileHandler> createOsmRoutingHandler() throws ParseException {
-    final IOsmRoadBuilder<ICoreNode, ICoreEdge<ICoreNode>> roadBuilder = new OsmRoadBuilder<>(mRoadGraph, mRoadGraph);
-    final IOsmFilter roadFilter = new OsmRoadFilter(mConfig);
-    try {
-      final IOsmFileHandler roadHandler = new OsmRoadHandler<>(mRoadGraph, roadFilter, roadBuilder, mDatabase, mConfig);
-      return Collections.singletonList(roadHandler);
-    } catch (final IOException e) {
-      throw new ParseException(e);
-    }
-  }
-
-  /**
-   * Initializes the nearest neighbor computation algorithm. Depending on the
-   * size of the graph this method may take a while.
-   */
-  private void initalizeNearestNeighborComputation() {
-    mLogger.info("Initializing nearest neighbor computation");
-    final Instant nearestNeighborsStartTime = Instant.now();
-
-    final CoverTree<ICoreNode> nearestNeighborComputation = new CoverTree<>(new AsTheCrowFliesMetric<>());
-    for (final ICoreNode node : mRoadGraph.getNodes()) {
-      nearestNeighborComputation.insert(node);
-    }
-    mNearestNeighborComputation = nearestNeighborComputation;
-
-    final Instant nearestNeighborsEndTime = Instant.now();
-    mLogger.info("Nearest neighbors took: {}", Duration.between(nearestNeighborsStartTime, nearestNeighborsEndTime));
-  }
-
-  /**
    * Initializes the API of the application. This consists of the routing
    * server, the database, the search server and all corresponding utilities and
    * models.
@@ -351,9 +232,8 @@ public final class Application {
     final Instant initStartTime = Instant.now();
 
     initializeDatabase();
-    initializeGraph();
-
-    final int graphSizeBefore = mLinkGraph.size();
+    mRoutingModel = new RoutingModel(mDatabase, mConfig);
+    mRoutingModel.prepareModelBeforeData();
 
     // Prepare data parsing
     final Collection<Path> paths = mCommandData.getPaths();
@@ -368,9 +248,9 @@ public final class Application {
 
     // Add OSM handler
     createOsmDatabaseHandler().forEach(dataParser::addOsmHandler);
-    createOsmRoutingHandler().forEach(dataParser::addOsmHandler);
+    mRoutingModel.createOsmHandler().forEach(dataParser::addOsmHandler);
     // Add GTFS handler
-    createGtfsRoutingHandler().forEach(dataParser::addGtfsHandler);
+    mRoutingModel.createGtfsHandler().forEach(dataParser::addGtfsHandler);
 
     // Parse all data
     final Instant parseStartTime = Instant.now();
@@ -379,12 +259,11 @@ public final class Application {
     mLogger.info("Parsing took: {}", Duration.between(parseStartTime, parseEndTime));
     dataParser.clearHandler();
 
-    initalizeNearestNeighborComputation();
+    mRoutingModel.prepareModelAfterData();
+    mNearestNeighborComputation = mRoutingModel.getNearestNeighborComputation();
 
-    completeGraphInitialization(graphSizeBefore);
-    serializeGraphIfDesired(graphSizeBefore);
-
-    mLogger.info("Graph size: {}", mLinkGraph.getSizeInformation());
+    mRoutingModel.finishModel();
+    mLogger.info("Model size: {}", mRoutingModel.getSizeInformation());
 
     initializeRouting();
     initializeNameSearch();
@@ -414,43 +293,6 @@ public final class Application {
     }
 
     mDatabase.initialize();
-  }
-
-  /**
-   * Initializes the graph model to use for routing. Depending on the
-   * configuration this may deserialize a previous serialized graph. If the
-   * deserialized graph is big this method may take a while.
-   *
-   * @throws ParseException If an exception occurred while parsing data like
-   *                        configuration files or if the graph to deserialize
-   *                        is invalid.
-   */
-  private void initializeGraph() throws ParseException {
-    mLogger.info("Initializing graph");
-
-    final Path graphCache = mConfig.getGraphCache();
-    if (!mConfig.useGraphCache() || !Files.isRegularFile(graphCache)) {
-      mRoadGraph = new RoadGraph<>();
-      mTransitGraph = new TransitGraph<>();
-      mLinkGraph = new LinkGraph(mRoadGraph, mTransitGraph);
-      return;
-    }
-
-    // Deserialize graph
-    mLogger.info("Deserializing graph from: {}", graphCache);
-    final Instant deserializeStartTime = Instant.now();
-
-    final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
-    try {
-      mLinkGraph = serializationUtil.deserialize(graphCache);
-    } catch (ClassNotFoundException | ClassCastException | IOException e) {
-      throw new ParseException(e);
-    }
-    mRoadGraph = mLinkGraph.getRoadGraph();
-    mTransitGraph = mLinkGraph.getTransitGraph();
-
-    final Instant deserializeEndTime = Instant.now();
-    mLogger.info("Deserialization took: {}", Duration.between(deserializeStartTime, deserializeEndTime));
   }
 
   /**
@@ -494,47 +336,12 @@ public final class Application {
   private void initializeRouting() {
     mLogger.info("Initializing routing");
 
-    final Instant preCompTimeStart = Instant.now();
-    // Create the shortest path algorithm
-    mComputationFactory = new ShortestPathComputationFactory<>(mLinkGraph);
-    mComputationFactory.initialize();
-    final Instant preCompTimeEnd = Instant.now();
-    mLogger.info("Precomputation took: {}", Duration.between(preCompTimeStart, preCompTimeEnd));
+    final IGetNodeById<ICoreNode> nodeProvider = mRoutingModel.getNodeProvider();
+    final ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> computationFactory =
+        mRoutingModel.createShortestPathComputationFactory();
 
-    mRoutingServer = new RoutingServer<>(mConfig, mLinkGraph, mComputationFactory, mDatabase);
+    mRoutingServer = new RoutingServer<>(mConfig, nodeProvider, computationFactory, mDatabase);
     mRoutingServer.initialize();
-  }
-
-  /**
-   * Serializes the graph model if desired. That is, if the size of the graph
-   * has changed and the configuration contains the property to use the graph
-   * cache.
-   *
-   * @param graphSizeBefore The size of the graph after it was deserialized.
-   *                        Used to determine if the current graph has changed
-   *                        compared to the serialized version.
-   * @throws ParseException If an exception occurred while parsing data like
-   *                        configuration files or if an exception at
-   *                        serialization occurred
-   */
-  private void serializeGraphIfDesired(final int graphSizeBefore) throws ParseException {
-    if (!mConfig.useGraphCache() || mLinkGraph.size() == graphSizeBefore) {
-      return;
-    }
-
-    final Path graphCache = mConfig.getGraphCache();
-    mLogger.info("Serializing graph to: {}", graphCache);
-    final Instant serializeStartTime = Instant.now();
-
-    final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
-    try {
-      serializationUtil.serialize(mLinkGraph, graphCache);
-    } catch (final IOException e) {
-      throw new ParseException(e);
-    }
-
-    final Instant serializeEndTime = Instant.now();
-    mLogger.info("Serialization took: {}", Duration.between(serializeStartTime, serializeEndTime));
   }
 
   /**

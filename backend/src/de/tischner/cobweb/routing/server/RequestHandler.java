@@ -23,7 +23,6 @@ import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.EdgeCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.IHasTransportationMode;
 import de.tischner.cobweb.routing.model.graph.INode;
@@ -50,10 +49,8 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the node
  * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & IGetNodeById<N>> {
+public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> {
   /**
    * Logger used for logging
    */
@@ -71,13 +68,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    */
   private final IRoutingDatabase mDatabase;
   /**
-   * The graph used for shortest path computation.
-   */
-  private final G mGraph;
-  /**
    * The GSON object used to format JSON responses.
    */
   private final Gson mGson;
+  /**
+   * The object that provides nodes by their ID.
+   */
+  private final IGetNodeById<N> mNodeProvider;
   /**
    * Comparator that sorts transportation modes ascending in their speed.
    */
@@ -91,17 +88,17 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    *
    * @param client             The client whose request to handle
    * @param gson               The GSON object used to format JSON responses
-   * @param graph              The graph used for shortest path computation
+   * @param nodeProvider       The object that provides nodes by their ID
    * @param computationFactory The factory to use for generating algorithms for
    *                           shortest path computation
    * @param database           The database to use for fetching meta data for
    *                           nodes and edges
    */
-  public RequestHandler(final Socket client, final Gson gson, final G graph,
+  public RequestHandler(final Socket client, final Gson gson, final IGetNodeById<N> nodeProvider,
       final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mClient = client;
     mGson = gson;
-    mGraph = graph;
+    mNodeProvider = nodeProvider;
     mComputationFactory = computationFactory;
     mDatabase = database;
     mSpeedComparator = new SpeedTransportationModeComparator();
@@ -122,13 +119,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
 
     // Get the source and destination
     final Optional<N> sourceOptional =
-        mDatabase.getInternalNodeByOsm(request.getFrom()).flatMap(id -> mGraph.getNodeById(id));
+        mDatabase.getInternalNodeByOsm(request.getFrom()).flatMap(id -> mNodeProvider.getNodeById(id));
     if (!sourceOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
       return;
     }
     final Optional<N> destinationOptional =
-        mDatabase.getInternalNodeByOsm(request.getTo()).flatMap(id -> mGraph.getNodeById(id));
+        mDatabase.getInternalNodeByOsm(request.getTo()).flatMap(id -> mNodeProvider.getNodeById(id));
     if (!destinationOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
       return;

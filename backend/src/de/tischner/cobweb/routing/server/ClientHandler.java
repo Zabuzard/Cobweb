@@ -15,7 +15,6 @@ import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
@@ -41,10 +40,8 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the node
  * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & IGetNodeById<N>> implements Runnable {
+public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> implements Runnable {
   /**
    * Resource that is to be requested from a client if he submits a routing
    * query.
@@ -67,13 +64,13 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    */
   private final IRoutingDatabase mDatabase;
   /**
-   * The graph used for shortest path computation.
-   */
-  private final G mGraph;
-  /**
    * The unique ID of this client request.
    */
   private final int mId;
+  /**
+   * The object that provides nodes by their ID.
+   */
+  private final IGetNodeById<N> mNodeProvider;
 
   /**
    * Creates a new handler which handles the given client using the given
@@ -84,17 +81,17 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    *
    * @param id                 The unique ID of this client request
    * @param client             The client to handle
-   * @param graph              The graph used for shortest path computation
+   * @param nodeProvider       The object that provides nodes by their ID
    * @param computationFactory The factory to use for generating algorithms for
    *                           shortest path computation
    * @param database           The database to use for fetching meta data for
    *                           nodes and edges
    */
-  public ClientHandler(final int id, final Socket client, final G graph,
+  public ClientHandler(final int id, final Socket client, final IGetNodeById<N> nodeProvider,
       final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mId = id;
     mClient = client;
-    mGraph = graph;
+    mNodeProvider = nodeProvider;
     mComputationFactory = computationFactory;
     mDatabase = database;
   }
@@ -194,8 +191,8 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
     try {
       final RoutingRequest routingRequest = gson.fromJson(request.getContent(), RoutingRequest.class);
-      final RequestHandler<N, E, G> handler =
-          new RequestHandler<>(mClient, gson, mGraph, mComputationFactory, mDatabase);
+      final RequestHandler<N, E> handler =
+          new RequestHandler<>(mClient, gson, mNodeProvider, mComputationFactory, mDatabase);
       handler.handleRequest(routingRequest);
     } catch (final JsonSyntaxException e) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);

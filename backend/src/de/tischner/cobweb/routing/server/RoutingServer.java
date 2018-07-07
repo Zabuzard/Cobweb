@@ -16,7 +16,6 @@ import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
@@ -50,10 +49,8 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> Type of the node
  * @param <E> Type of the edge
- * @param <G> Type of the graph
  */
-public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId,
-    G extends IGraph<N, E> & IGetNodeById<N>> implements Runnable {
+public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> implements Runnable {
   /**
    * Logger used for logging.
    */
@@ -78,9 +75,9 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    */
   private final IRoutingDatabase mDatabase;
   /**
-   * The graph to route on.
+   * The object that provides nodes by their ID.
    */
-  private final G mGraph;
+  private final IGetNodeById<N> mNodeProvider;
   /**
    * The server socket to use for communication.
    */
@@ -106,16 +103,16 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    *
    * @param config             Configuration provider which provides the port
    *                           that should be used by the server
-   * @param graph              The graph to route on
+   * @param nodeProvider       The object that provides nodes by their ID
    * @param computationFactory The factory to use for generating algorithms for
    *                           shortest path computation
    * @param database           Database used for retrieving meta-data about
    *                           graph objects like nodes and edges
    */
-  public RoutingServer(final IRoutingConfigProvider config, final G graph,
+  public RoutingServer(final IRoutingConfigProvider config, final IGetNodeById<N> nodeProvider,
       final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
     mConfig = config;
-    mGraph = graph;
+    mNodeProvider = nodeProvider;
     mComputationFactory = computationFactory;
     mDatabase = database;
   }
@@ -166,8 +163,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
         // Handle the client
         requestId++;
-        final ClientHandler<N, E, G> handler =
-            new ClientHandler<>(requestId, client, mGraph, mComputationFactory, mDatabase);
+        final ClientHandler<N, E> handler =
+            new ClientHandler<>(requestId, client, mNodeProvider, mComputationFactory, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
         // Ignore the exception. The timeout is used to repeatedly check if the
