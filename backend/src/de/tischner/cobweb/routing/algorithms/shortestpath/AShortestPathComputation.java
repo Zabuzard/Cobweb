@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;

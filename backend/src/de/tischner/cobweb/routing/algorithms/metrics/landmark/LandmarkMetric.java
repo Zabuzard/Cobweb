@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
+import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra;
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;

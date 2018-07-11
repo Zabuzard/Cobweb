@@ -1,5 +1,6 @@
 package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra;
 
+import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.INode;
 

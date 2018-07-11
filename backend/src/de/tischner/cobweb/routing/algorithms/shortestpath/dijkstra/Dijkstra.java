@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import de.tischner.cobweb.routing.algorithms.shortestpath.AShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
 import de.tischner.cobweb.routing.algorithms.shortestpath.EmptyPath;
+import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;

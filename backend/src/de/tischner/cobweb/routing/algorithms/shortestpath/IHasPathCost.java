@@ -1,4 +1,4 @@
-package de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra;
+package de.tischner.cobweb.routing.algorithms.shortestpath;
 
 /**
  * Interface for classes that provide path costs.

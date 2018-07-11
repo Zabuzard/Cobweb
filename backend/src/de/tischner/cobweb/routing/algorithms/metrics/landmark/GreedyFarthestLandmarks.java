@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.RandomAccess;
 
+import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra;
-import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.IEdge;
 import de.tischner.cobweb.routing.model.graph.IGraph;
 import de.tischner.cobweb.routing.model.graph.INode;

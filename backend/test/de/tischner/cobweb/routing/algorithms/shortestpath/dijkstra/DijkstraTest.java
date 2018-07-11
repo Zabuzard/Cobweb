@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.model.graph.BasicEdge;
 import de.tischner.cobweb.routing.model.graph.BasicGraph;
 import de.tischner.cobweb.routing.model.graph.BasicNode;

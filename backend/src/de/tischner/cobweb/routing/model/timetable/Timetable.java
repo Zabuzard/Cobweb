@@ -135,6 +135,14 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
     return toString();
   }
 
+  public Stop getStop(final int id) {
+    return mIdToStop.get(id);
+  }
+
+  public Trip getTrip(final int id) {
+    return mIdToTrip.get(id);
+  }
+
   /*
    * (non-Javadoc)
    * @see java.lang.Object#toString()
