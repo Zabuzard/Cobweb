@@ -19,6 +19,8 @@ import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
 import de.tischner.cobweb.routing.model.timetable.Connection;
 import de.tischner.cobweb.routing.model.timetable.Stop;
 import de.tischner.cobweb.routing.model.timetable.Timetable;
+import de.tischner.cobweb.routing.model.timetable.Trip;
+import de.tischner.cobweb.util.collections.ReverseIterator;
 
 public final class ConnectionScan extends AShortestPathComputation<TransitNode, TransitEdge<TransitNode>> {
 
@@ -28,9 +30,15 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
   private static final int SECONDS_OF_DAY = 24 * 60 * 60;
 
   private static void addEdgeToPath(final EdgePath<TransitNode, TransitEdge<TransitNode>> path,
-      final TransitNode source, final TransitNode destination) {
+      final TransitNode source, final TransitNode destination, final boolean walkByFoot) {
     final double cost = destination.getTime() - source.getTime();
-    path.addEdge(new TransitEdge<>(0, source, destination, cost), cost);
+    final TransitEdge<TransitNode> edge;
+    if (walkByFoot) {
+      edge = new FootpathTransitEdge<>(0, source, destination, cost);
+    } else {
+      edge = new TransitEdge<>(0, source, destination, cost);
+    }
+    path.addEdge(edge, cost);
   }
 
   private static double computeDuration(final int depTime, final int arrTime) {
@@ -96,22 +104,30 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
     TransitNode currentDestination = createNodeForStop(currentStopId, stopToArrTime[currentStopId]);
     while (stopToJourney[currentStopId] != null) {
       final JourneyPointer pointer = stopToJourney[currentStopId];
+      final Trip trip = mTable.getTrip(pointer.getExitConnection().getTripId());
       final Connection exitConnection = pointer.getExitConnection();
+      final Connection enterConnection = pointer.getEnterConnection();
 
-      // TODO Path construction is likely wrong, investigate
+      // Departure of footpath, arrival of trip exit
+      final TransitNode tripArr = createNodeForStop(exitConnection.getArrStopId(), exitConnection.getArrTime());
+      ConnectionScan.addEdgeToPath(path, tripArr, currentDestination, true);
 
-      // Footpath to destination
-      final TransitNode betweenExitAndFootpath =
-          createNodeForStop(exitConnection.getArrStopId(), exitConnection.getArrTime());
-      ConnectionScan.addEdgeToPath(path, betweenExitAndFootpath, currentDestination);
+      // Add the trip
+      final Iterator<Connection> tripSequenceIter = new ReverseIterator<>(trip.getSequence());
+      TransitNode currentConnectionArr = tripArr;
+      while (tripSequenceIter.hasNext()) {
+        final Connection connection = tripSequenceIter.next();
 
-      // Exit to footpath
-      final TransitNode exitDeparture = createNodeForStop(exitConnection.getDepStopId(), exitConnection.getDepTime());
-      ConnectionScan.addEdgeToPath(path, exitDeparture, betweenExitAndFootpath);
+        final TransitNode connectionDep = createNodeForStop(connection.getDepStopId(), connection.getDepTime());
+        ConnectionScan.addEdgeToPath(path, connectionDep, currentConnectionArr, false);
 
-      // Prepare for next round
-      currentStopId = pointer.getEnterConnection().getDepStopId();
-      currentDestination = exitDeparture;
+        // Prepare next connection of the trip
+        currentConnectionArr = connectionDep;
+      }
+
+      // Prepare next journey pointer
+      currentStopId = enterConnection.getDepStopId();
+      currentDestination = currentConnectionArr;
     }
 
     return Optional.of(path);
@@ -174,7 +190,7 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
 
     // Relax all initial footpaths
     sources.stream().map(IHasId::getId).flatMap(mTable::getOutgoingFootpaths).forEach(footpath -> {
-      stopToTentativeArrTime[footpath.getArrId()] = startingTime + footpath.getDuration();
+      stopToTentativeArrTime[footpath.getArrStopId()] = startingTime + footpath.getDuration();
     });
 
     // Process all connections ordered starting from the first after the
@@ -213,7 +229,7 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
 
       // Relax all outgoing footpaths
       mTable.getOutgoingFootpaths(arrStopId).forEach(footpath -> {
-        final int footpathArrStopId = footpath.getArrId();
+        final int footpathArrStopId = footpath.getArrStopId();
         final int footpathTime = arrTime + footpath.getDuration();
 
         // Only use footpath if it improves the arrival time at the destination

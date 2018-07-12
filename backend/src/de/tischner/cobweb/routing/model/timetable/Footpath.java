@@ -11,11 +11,11 @@ public final class Footpath {
     mDuration = duration;
   }
 
-  public int getArrId() {
+  public int getArrStopId() {
     return mArrId;
   }
 
-  public int getDepId() {
+  public int getDepStopId() {
     return mDepId;
   }
 

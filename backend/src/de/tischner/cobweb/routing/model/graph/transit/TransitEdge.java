@@ -19,7 +19,7 @@ import de.tischner.cobweb.routing.model.graph.IReversedProvider;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> The type of the node which must have an ID and be spatial
  */
-public final class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
+public class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
   /**
    * The serial version UID.
    */

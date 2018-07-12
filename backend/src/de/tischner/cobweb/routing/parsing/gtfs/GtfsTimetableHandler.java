@@ -92,6 +92,7 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
 
         final Connection connection = new Connection(trip.getId(), lastDepStopId, arrStopId, lastDepTime, arrTime);
         connections.add(connection);
+        trip.addConnectionToSequence(connection);
 
         // Prepare next round
         lastDepStopId = arrStopId;

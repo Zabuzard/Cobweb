@@ -1,6 +1,9 @@
 package de.tischner.cobweb.routing.model.timetable;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import de.tischner.cobweb.routing.model.graph.IHasId;
 
@@ -11,9 +14,15 @@ public final class Trip implements IHasId, Serializable {
   private static final long serialVersionUID = 1L;
 
   private final int mId;
+  private final List<Connection> mSequence;
 
   public Trip(final int id) {
     mId = id;
+    mSequence = FastList.newList();
+  }
+
+  public void addConnectionToSequence(final Connection connection) {
+    mSequence.add(connection);
   }
 
   @Override
@@ -37,6 +46,10 @@ public final class Trip implements IHasId, Serializable {
   @Override
   public int getId() {
     return mId;
+  }
+
+  public List<Connection> getSequence() {
+    return mSequence;
   }
 
   @Override
