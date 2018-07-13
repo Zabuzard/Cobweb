@@ -14,21 +14,39 @@ import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
 import de.tischner.cobweb.routing.model.timetable.Stop;
 import de.tischner.cobweb.routing.model.timetable.Timetable;
 
+/**
+ * Implementation of a translation that translates road nodes to their nearest
+ * transit node representing a stop at the given time.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public class RoadToNearestQueryTransitTranslation implements ITranslationWithTime<ICoreNode, ICoreNode> {
-
+  /**
+   * Creates a data-structure for fast computation of nearest stops based on the
+   * stops contained in the given timetable.
+   *
+   * @param table The timetable containing the stops to consider
+   * @return The constructed data-structure for fast nearest stop computation
+   */
   private static INearestNeighborComputation<Stop> createNearestStopComputation(final Timetable table) {
     final CoverTree<Stop> nearestStopComputation = new CoverTree<>(new AsTheCrowFliesMetric<>());
     table.getStops().forEach(nearestStopComputation::insert);
     return nearestStopComputation;
   }
 
+  /**
+   * The data-structure to use for fast nearest stop computation.
+   */
   private final INearestNeighborComputation<Stop> mNearestStopComputation;
 
-  private final Timetable mTable;
-
+  /**
+   * Creates a new translation that translates to the stops contained in the
+   * given timetable.
+   *
+   * @param table The timetable that contains the stops to consider
+   */
   public RoadToNearestQueryTransitTranslation(final Timetable table) {
-    mTable = table;
-    mNearestStopComputation = RoadToNearestQueryTransitTranslation.createNearestStopComputation(mTable);
+    mNearestStopComputation = RoadToNearestQueryTransitTranslation.createNearestStopComputation(table);
   }
 
   @Override

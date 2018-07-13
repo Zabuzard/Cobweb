@@ -259,7 +259,7 @@ public final class Application {
     dataParser.clearHandler();
 
     mRoutingModel.prepareModelAfterData();
-    mNearestNeighborComputation = mRoutingModel.getNearestNeighborComputation();
+    mNearestNeighborComputation = mRoutingModel.getNearestRoadNodeComputation();
 
     mRoutingModel.finishModel();
     mLogger.info("Model size: {}", mRoutingModel.getSizeInformation());

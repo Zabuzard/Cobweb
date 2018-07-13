@@ -23,8 +23,21 @@ import de.tischner.cobweb.routing.model.timetable.Connection;
 import de.tischner.cobweb.routing.model.timetable.Stop;
 import de.tischner.cobweb.routing.model.timetable.Timetable;
 import de.tischner.cobweb.routing.model.timetable.Trip;
-import de.tischner.cobweb.util.collections.ReverseIterator;
 
+/**
+ * Implementation of the Connection-Scan algorithm that is able to compute
+ * shortest paths on a given timetable. A timetable represents a transit
+ * network.<br>
+ * <br>
+ * For details refer to:
+ * <ul>
+ * <li><tt>Connection Scan Algorithm</tt> - Dibbelt J., Pajor T., Strasser B.
+ * and Wagner D. - 2017 -
+ * <a href="https://arxiv.org/abs/1703.05997">arxiv.org/abs/1703.05997</a></li>
+ * </ul>
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public final class ConnectionScan extends AShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> {
 
   /**
@@ -32,6 +45,17 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
    */
   private static final int SECONDS_OF_DAY = 24 * 60 * 60;
 
+  /**
+   * Creates and adds an edge from the given source to destination to the given
+   * path. The cost of the edge is determined by the time difference of both
+   * nodes.
+   *
+   * @param path        The path to add the edge to
+   * @param source      The source node of the edge
+   * @param destination The destination node of the edge
+   * @param walkByFoot  <tt>True</tt> if the transportation mode of the edge is
+   *                    by foot, <tt>false</tt> if by tram.
+   */
   private static void addEdgeToPath(final EdgePath<ICoreNode, ICoreEdge<ICoreNode>> path, final TransitNode source,
       final TransitNode destination, final boolean walkByFoot) {
     final double cost = destination.getTime() - source.getTime();
@@ -44,7 +68,16 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     path.addEdge(edge, cost);
   }
 
-  private static double computeDuration(final int depTime, final int arrTime) {
+  /**
+   * Computes the duration between given departure and arrival times.
+   *
+   * @param depTime The departure time in seconds since midnight.
+   * @param arrTime The arrival time in seconds since midnight
+   * @return The duration between given departure and arrival, in seconds
+   * @throws IllegalArgumentException If the departure time is greater than the
+   *                                  arrival time
+   */
+  private static double computeDuration(final int depTime, final int arrTime) throws IllegalArgumentException {
     if (depTime > arrTime) {
       throw new IllegalArgumentException();
     }
@@ -52,13 +85,32 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     return arrTime - depTime;
   }
 
-  private static final int extractStartingTime(final ICoreNode node) {
+  /**
+   * Extracts the time from the given node.
+   *
+   * @param node The node to extract the time from
+   * @return The extracted time
+   * @throws IllegalArgumentException If the given node has no time
+   */
+  private static final int extractStartingTime(final ICoreNode node) throws IllegalArgumentException {
     if (!(node instanceof IHasTime)) {
       throw new IllegalArgumentException();
     }
     return ((IHasTime) node).getTime();
   }
 
+  /**
+   * Validates the given time against the threshold. If the time is before the
+   * threshold it is increased by one day. By that it is ensured that the result
+   * is always after the threshold.
+   *
+   * @param time      The time to validate in seconds since midnight
+   * @param threshold The threshold to validate against in seconds since
+   *                  midnight
+   * @return The validated time in seconds since midnight. Either the given
+   *         argument, if it was already after the threshold, or shifted by the
+   *         amount of seconds of one whole day.
+   */
   private static int validateTimeBeforeAfter(final int time, final int threshold) {
     if (time < threshold) {
       return time + SECONDS_OF_DAY;
@@ -66,8 +118,16 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     return time;
   }
 
+  /**
+   * The timetable data to route on.
+   */
   private final Timetable mTable;
 
+  /**
+   * Creates a new connection scan algorithm.
+   *
+   * @param table The timetable data to route on
+   */
   public ConnectionScan(final Timetable table) {
     mTable = table;
   }
@@ -108,9 +168,19 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     // Construct path
     final JourneyPointer[] stopToJourney = result.getStopToJourney();
     final EdgePath<ICoreNode, ICoreEdge<ICoreNode>> path = new EdgePath<>(true);
-
     int currentStopId = destination.getId();
     TransitNode currentDestination = createNodeForStop(currentStopId, stopToArrTime[currentStopId]);
+
+    // Special case where the shortest path only consists of the direct footpath
+    // between the source and destination.
+    if (stopToJourney[currentStopId] == null) {
+      // TODO The source should be the chosen, not any. Unfortunately that
+      // information is lost.
+      final TransitNode sourceNode = createNodeForStop(sources.iterator().next().getId(), startingTime);
+      ConnectionScan.addEdgeToPath(path, sourceNode, currentDestination, true);
+      return Optional.of(path);
+    }
+
     while (stopToJourney[currentStopId] != null) {
       final JourneyPointer pointer = stopToJourney[currentStopId];
       final Trip trip = mTable.getTrip(pointer.getExitConnection().getTripId());
@@ -122,32 +192,18 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
       ConnectionScan.addEdgeToPath(path, tripPartArr, currentDestination, true);
 
       // Add the trip
-      final Iterator<Connection> tripSequenceIter = new ReverseIterator<>(trip.getSequence());
       TransitNode currentConnectionArr = tripPartArr;
-
-      boolean inSequencePart = false;
-      while (tripSequenceIter.hasNext()) {
-        final Connection connection = tripSequenceIter.next();
-        // Identify the used part of the sequence, determined by exit and enter
-        // connection
-        if (!inSequencePart) {
-          // Skip all connections until the exit connection
-          if (connection != exitConnection) {
-            continue;
-          }
-          inSequencePart = true;
-        }
+      final int exitIndex = exitConnection.getSequenceIndex();
+      final int enterIndex = enterConnection.getSequenceIndex();
+      // Traverse the used part of the sequence reversely
+      for (int i = exitIndex; i >= enterIndex; i--) {
+        final Connection connection = trip.getConnectionAtSequenceIndex(i);
 
         final TransitNode connectionDep = createNodeForStop(connection.getDepStopId(), connection.getDepTime());
         ConnectionScan.addEdgeToPath(path, connectionDep, currentConnectionArr, false);
 
         // Prepare next connection of the trip
         currentConnectionArr = connectionDep;
-
-        // End sequence part after processing the enter connection
-        if (connection == enterConnection) {
-          break;
-        }
       }
 
       // Prepare next journey pointer
@@ -196,6 +252,18 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     return stopToCost;
   }
 
+  /**
+   * Helper method to compute shortest paths from the given sources to a
+   * possible destination.
+   *
+   * @param sources         The sources to start computation from, must not be
+   *                        empty.
+   * @param pathDestination The destination to route to or <tt>null</tt> if
+   *                        routing to all reachable stops is desired
+   * @param startingTime    The time to start routing at in seconds since
+   *                        midnight
+   * @return An object containing the results of the algorithm
+   */
   private ConnectionScanResult computeShortestPathHelper(final Collection<ICoreNode> sources,
       final ICoreNode pathDestination, final int startingTime) {
     final Integer destinationStop;
@@ -270,6 +338,13 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     return new ConnectionScanResult(stopToTentativeArrTime, stopToJourney);
   }
 
+  /**
+   * Creates and returns a node for the given stop at the given time.
+   *
+   * @param stopId The ID of the stop to create a node for
+   * @param time   The time at the stop to create a node for
+   * @return The created node
+   */
   private TransitNode createNodeForStop(final int stopId, final int time) {
     final Stop stop = mTable.getStop(stopId);
     return new TransitNode(stopId, stop.getLatitude(), stop.getLongitude(), time);

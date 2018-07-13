@@ -35,6 +35,13 @@ import de.tischner.cobweb.routing.model.timetable.Timetable;
 import de.tischner.cobweb.routing.model.timetable.Trip;
 import de.tischner.cobweb.util.collections.CollectionUtil;
 
+/**
+ * Implementation of an {@link IGtfsFileHandler} which constructs a timetable
+ * for transit data that consists of stops, trips, connections and footpaths out
+ * of the given GTFS data.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public final class GtfsTimetableHandler extends GtfsEntityForwarder implements IGtfsFileHandler {
   /**
    * Logger used for logging.
@@ -48,13 +55,25 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
    * Map connecting trip IDs to their to their corresponding object.
    */
   private final MutableMap<AgencyAndId, Trip> mExtIdToTrip;
+  /**
+   * The generator to use for ID generation.
+   */
   private final ITimetableIdGenerator mIdGenerator;
+  /**
+   * The timetable to fill with data.
+   */
   private final Timetable mTable;
   /**
    * Map connecting trip IDs to sequence stop times in the sequence of the trip.
    */
   private final MutableMap<AgencyAndId, List<SequenceStopTime>> mTripToSequence;
 
+  /**
+   * Creates a new handler that fills the given table.
+   *
+   * @param table       The timetable to fill with data
+   * @param idGenerator The generator to use for ID generation
+   */
   public GtfsTimetableHandler(final Timetable table, final ITimetableIdGenerator idGenerator) {
     mTable = table;
     mIdGenerator = idGenerator;
@@ -84,13 +103,16 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
       int lastDepStopId = mExtIdToStop.get(sequenceStopTime.getStopId()).getId();
       int lastDepTime = sequenceStopTime.getDepTime();
 
+      int sequenceIndex = 0;
       while (sequenceIter.hasNext()) {
         sequenceStopTime = sequenceIter.next();
         // Connect last departure to current arrival
         final int arrStopId = mExtIdToStop.get(sequenceStopTime.getStopId()).getId();
         final int arrTime = sequenceStopTime.getArrTime();
 
-        final Connection connection = new Connection(trip.getId(), lastDepStopId, arrStopId, lastDepTime, arrTime);
+        final Connection connection =
+            new Connection(trip.getId(), sequenceIndex, lastDepStopId, arrStopId, lastDepTime, arrTime);
+        sequenceIndex++;
         connections.add(connection);
         trip.addConnectionToSequence(connection);
 

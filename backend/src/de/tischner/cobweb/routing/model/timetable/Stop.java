@@ -5,18 +5,36 @@ import java.io.Serializable;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.ISpatial;
 
+/**
+ * A stop of a transit network. Has spatial data and an unique ID.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public final class Stop implements ISpatial, IHasId, Serializable {
   /**
    * The serial version UID.
    */
   private static final long serialVersionUID = 1L;
-
+  /**
+   * The unique ID of the stop.
+   */
   private final int mId;
-
+  /**
+   * The latitude of the stop.
+   */
   private float mLatitude;
-
+  /**
+   * The longitude of the stop.
+   */
   private float mLongitude;
 
+  /**
+   * Creates a new stop.
+   *
+   * @param id        The unique ID of the stop
+   * @param latitude  The latitude of the stop
+   * @param longitude The longitude of the stop
+   */
   public Stop(final int id, final float latitude, final float longitude) {
     mId = id;
     mLatitude = latitude;

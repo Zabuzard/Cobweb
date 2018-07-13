@@ -135,7 +135,7 @@ final class ConfigUtil {
   /**
    * The default mode to use for the routing model.
    */
-  static final String VALUE_ROUTING_MODEL_MODE = "CONNECTION_SCAN";
+  static final String VALUE_ROUTING_MODEL_MODE = "GRAPH_WITH_TIMETABLE";
   /**
    * Default port to use by the routing server.
    */

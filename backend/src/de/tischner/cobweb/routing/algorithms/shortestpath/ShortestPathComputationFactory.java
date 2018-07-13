@@ -45,8 +45,19 @@ public final class ShortestPathComputationFactory {
    * The metric to use for the {@link AStarModule} module.
    */
   private IMetric<ICoreNode> mMetric;
+  /**
+   * The mode to use for the routing model. Determines which algorithms to
+   * choose.
+   */
   private final ERoutingModelMode mMode;
+  /**
+   * The timetable to use for transit data, or <tt>null</tt> if not used.
+   */
   private final Timetable mTable;
+  /**
+   * Object to use for translating a given road node into a transit node at a
+   * given time. Or <tt>null</tt> if not used.
+   */
   private final ITranslationWithTime<ICoreNode, ICoreNode> mTranslation;
 
   /**
@@ -96,7 +107,7 @@ public final class ShortestPathComputationFactory {
   public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> createAlgorithm(final long depTime,
       final Set<ETransportationMode> modes) {
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         return new HybridRoadTimetable(ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), MultiModalModule.of(modes)),
             new ConnectionScan(mTable), mTranslation, modes, depTime);
       case LINK_GRAPH:

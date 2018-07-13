@@ -28,7 +28,7 @@ public final class RoutingUtil {
   /**
    * Maximal walking speed in <tt>km/h</tt>.
    */
-  private static final int MAX_FOOT_SPEED = 7;
+  private static final int MAX_FOOT_SPEED = 5;
   /**
    * The maximal possible speed on a road in <tt>km/h</tt>
    */

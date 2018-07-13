@@ -43,30 +43,64 @@ import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadHandler;
 import de.tischner.cobweb.util.SerializationUtil;
 
+/**
+ * The routing model to use for routing. The model and algorithms can be changed
+ * by using modes.
+ *
+ * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
+ */
 public final class RoutingModel {
   /**
    * Logger used for logging.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(RoutingModel.class);
+  /**
+   * The routing configuration provider.
+   */
   private final IRoutingConfigProvider mConfig;
+  /**
+   * The database for routing.
+   */
   private final IRoutingDatabase mDatabase;
+  /**
+   * The size of the graph before data was read, i.e. after deserializing but
+   * before reading in new data. May refer to a different graph depending on the
+   * mode.
+   */
   private int mGraphSizeBeforeData;
   /**
-   * Link graph to route on.
+   * Link graph to route on or <tt>null</tt> if not used according to the mode.
    */
   private LinkGraph mLinkGraph;
+  /**
+   * The routing model mode to use.
+   */
   private final ERoutingModelMode mMode;
-  private INearestNeighborComputation<ICoreNode> mNearestNeighborComputation;
+  /**
+   * The algorithm to use for computing nearest road nodes.
+   */
+  private INearestNeighborComputation<ICoreNode> mNearestRoadNodeComputation;
   /**
    * Road graph to route on.
    */
   private RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mRoadGraph;
+  /**
+   * The timetable to route on or <tt>null</tt> if not used according to the
+   * mode.
+   */
   private Timetable mTimetable;
   /**
-   * Transit graph to route on.
+   * Transit graph to route on or <tt>null</tt> if not used according to the
+   * mode.
    */
   private TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> mTransitGraph;
 
+  /**
+   * Creates a new routing model.
+   *
+   * @param database The database to use
+   * @param config   The configuration to use
+   */
   public RoutingModel(final IRoutingDatabase database, final IRoutingConfigProvider config) {
     mDatabase = database;
     mConfig = config;
@@ -76,7 +110,7 @@ public final class RoutingModel {
   /**
    * Creates file handler that handle GTFS files for routing. If they are
    * notified when parsing GTFS data, they will adjust models used for routing
-   * like the graph accordingly.
+   * like a graph or timetable accordingly.
    *
    * @return An iterable consisting of all routing file handlers that adjust
    *         routing models
@@ -85,7 +119,7 @@ public final class RoutingModel {
    */
   public Iterable<IGtfsFileHandler> createGtfsHandler() throws ParseException {
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         final IGtfsFileHandler timetableHandler = new GtfsTimetableHandler(mTimetable, mTimetable);
         return Collections.singletonList(timetableHandler);
       case LINK_GRAPH:
@@ -124,11 +158,17 @@ public final class RoutingModel {
     }
   }
 
+  /**
+   * Creates a factory used for creating shortest path computation algorithm.
+   * The exact factory depends on the routing model mode.
+   *
+   * @return The constructed factory
+   */
   public ShortestPathComputationFactory createShortestPathComputationFactory() {
     final Instant preCompTimeStart = Instant.now();
     final ShortestPathComputationFactory factory;
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         // TODO Exchange with a translation that is based on access nodes or a
         // perimeter
         final ITranslationWithTime<ICoreNode, ICoreNode> roadToTransitTranslation =
@@ -159,7 +199,7 @@ public final class RoutingModel {
   public void finishModel() throws ParseException {
     final int currentGraphSize;
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         currentGraphSize = mRoadGraph.size();
         break;
       case LINK_GRAPH:
@@ -178,7 +218,7 @@ public final class RoutingModel {
 
     try {
       switch (mMode) {
-        case CONNECTION_SCAN:
+        case GRAPH_WITH_TIMETABLE:
           final SerializationUtil<RoadGraph<ICoreNode, ICoreEdge<ICoreNode>>> serializationUtilRoad =
               new SerializationUtil<>();
           serializationUtilRoad.serialize(mRoadGraph, graphCache);
@@ -198,13 +238,23 @@ public final class RoutingModel {
     LOGGER.info("Serialization took: {}", Duration.between(serializeStartTime, serializeEndTime));
   }
 
-  public INearestNeighborComputation<ICoreNode> getNearestNeighborComputation() {
-    return mNearestNeighborComputation;
+  /**
+   * Gets the algorithm to use for nearest road node computation.
+   *
+   * @return The algorithm to use for nearest road node computation
+   */
+  public INearestNeighborComputation<ICoreNode> getNearestRoadNodeComputation() {
+    return mNearestRoadNodeComputation;
   }
 
+  /**
+   * Gets a node provider that is able to get nodes by their ID.
+   *
+   * @return A node provider
+   */
   public IGetNodeById<ICoreNode> getNodeProvider() {
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         return mRoadGraph;
       case LINK_GRAPH:
         return mLinkGraph;
@@ -213,21 +263,23 @@ public final class RoutingModel {
     }
   }
 
+  /**
+   * Gets information about the size of the routing model.
+   *
+   * @return A human readable information of the model size
+   */
   public String getSizeInformation() {
-    switch (mMode) {
-      case CONNECTION_SCAN:
-        return mRoadGraph.getSizeInformation() + ", " + mTimetable.getSizeInformation();
-      case LINK_GRAPH:
-        return mLinkGraph.getSizeInformation();
-      default:
-        throw new AssertionError();
-    }
+    return toString();
   }
 
+  /**
+   * Prepares the model after reading in new data. Should be called after
+   * {@link #prepareModelBeforeData()} and before {@link #finishModel()}.
+   */
   public void prepareModelAfterData() {
-    initializeNearestNeighborComputation();
+    initializeNearestRoadNodeComputation();
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         // TODO Link road graph to timetable
         break;
       case LINK_GRAPH:
@@ -238,10 +290,17 @@ public final class RoutingModel {
     }
   }
 
+  /**
+   * Prepares the model before reading in new data. Should be called before
+   * {@link #prepareModelAfterData()} and before {@link #finishModel()}.<br>
+   * <br>
+   * This may deserialize the model which might take a while depending on the
+   * size of the model.
+   */
   public void prepareModelBeforeData() {
     LOGGER.info("Initializing model");
 
-    if (mMode == ERoutingModelMode.CONNECTION_SCAN) {
+    if (mMode == ERoutingModelMode.GRAPH_WITH_TIMETABLE) {
       // TODO Timetable may be cached too
       mTimetable = new Timetable();
     }
@@ -261,7 +320,7 @@ public final class RoutingModel {
     final Instant deserializeStartTime = Instant.now();
     try {
       switch (mMode) {
-        case CONNECTION_SCAN:
+        case GRAPH_WITH_TIMETABLE:
           final SerializationUtil<RoadGraph<ICoreNode, ICoreEdge<ICoreNode>>> serializationUtilRoad =
               new SerializationUtil<>();
           mRoadGraph = serializationUtilRoad.deserialize(graphCache);
@@ -283,7 +342,7 @@ public final class RoutingModel {
     }
 
     switch (mMode) {
-      case CONNECTION_SCAN:
+      case GRAPH_WITH_TIMETABLE:
         mGraphSizeBeforeData = mRoadGraph.size();
         break;
       case LINK_GRAPH:
@@ -297,23 +356,39 @@ public final class RoutingModel {
     LOGGER.info("Deserialization took: {}", Duration.between(deserializeStartTime, deserializeEndTime));
   }
 
-  private void initializeNearestNeighborComputation() {
-    LOGGER.info("Initializing nearest neighbor computation");
-    final Instant nearestNeighborsStartTime = Instant.now();
-
-    final CoverTree<ICoreNode> nearestNeighborComputation = new CoverTree<>(new AsTheCrowFliesMetric<>());
-    for (final ICoreNode node : mRoadGraph.getNodes()) {
-      nearestNeighborComputation.insert(node);
+  @Override
+  public String toString() {
+    switch (mMode) {
+      case GRAPH_WITH_TIMETABLE:
+        return mRoadGraph.getSizeInformation() + ", " + mTimetable.getSizeInformation();
+      case LINK_GRAPH:
+        return mLinkGraph.getSizeInformation();
+      default:
+        throw new AssertionError();
     }
-
-    mNearestNeighborComputation = nearestNeighborComputation;
-
-    final Instant nearestNeighborsEndTime = Instant.now();
-    LOGGER.info("Nearest neighbors took: {}", Duration.between(nearestNeighborsStartTime, nearestNeighborsEndTime));
   }
 
   /**
-   * Links the road and transit graph together.
+   * Initializes the nearest road node computation.
+   */
+  private void initializeNearestRoadNodeComputation() {
+    LOGGER.info("Initializing nearest road node computation");
+    final Instant nearestNeighborsStartTime = Instant.now();
+
+    final CoverTree<ICoreNode> nearestRoadNodeComputation = new CoverTree<>(new AsTheCrowFliesMetric<>());
+    for (final ICoreNode node : mRoadGraph.getNodes()) {
+      nearestRoadNodeComputation.insert(node);
+    }
+
+    mNearestRoadNodeComputation = nearestRoadNodeComputation;
+
+    final Instant nearestNeighborsEndTime = Instant.now();
+    LOGGER.info("Nearest road node took: {}", Duration.between(nearestNeighborsStartTime, nearestNeighborsEndTime));
+  }
+
+  /**
+   * Links the road and transit graph together. Must only be called if the
+   * routing model mode is {@link ERoutingModelMode#LINK_GRAPH}.
    */
   private void linkGraphs() {
     if (mConfig.useGraphCache() && mLinkGraph.size() == mGraphSizeBeforeData) {
@@ -328,7 +403,7 @@ public final class RoutingModel {
     for (final TransitStop<ICoreNode> stop : mTransitGraph.getStops()) {
       stopLocationWrapper.setLatitude(stop.getLatitude());
       stopLocationWrapper.setLongitude(stop.getLongitude());
-      final ICoreNode hubNode = mNearestNeighborComputation.getNearestNeighbor(stopLocationWrapper).get();
+      final ICoreNode hubNode = mNearestRoadNodeComputation.getNearestNeighbor(stopLocationWrapper).get();
       hubConnections.put(hubNode, stop);
     }
     mLinkGraph.initializeHubConnections(hubConnections);
