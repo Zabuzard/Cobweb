@@ -2,6 +2,8 @@ package de.tischner.cobweb.config;
 
 import java.nio.file.Path;
 
+import de.tischner.cobweb.routing.model.ERoutingModelMode;
+
 /**
  * Interface for classes that provide routing related configuration settings.
  *
@@ -32,6 +34,13 @@ public interface IRoutingConfigProvider {
    * @return The path to the filter
    */
   Path getOsmRoadFilter();
+
+  /**
+   * The mode to use for the routing model.
+   *
+   * @return The mode to use for the routing model
+   */
+  ERoutingModelMode getRoutingModelMode();
 
   /**
    * Gets the port used by the routing server.

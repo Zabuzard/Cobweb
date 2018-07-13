@@ -6,14 +6,19 @@ import de.tischner.cobweb.routing.algorithms.metrics.IMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
 import de.tischner.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
+import de.tischner.cobweb.routing.algorithms.shortestpath.connectionscan.ConnectionScan;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStarModule;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.ModuleDijkstra;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.MultiModalModule;
 import de.tischner.cobweb.routing.algorithms.shortestpath.dijkstra.modules.TransitModule;
+import de.tischner.cobweb.routing.algorithms.shortestpath.hybridmodel.HybridRoadTimetable;
+import de.tischner.cobweb.routing.algorithms.shortestpath.hybridmodel.ITranslationWithTime;
+import de.tischner.cobweb.routing.model.ERoutingModelMode;
 import de.tischner.cobweb.routing.model.graph.ETransportationMode;
-import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGraph;
-import de.tischner.cobweb.routing.model.graph.INode;
+import de.tischner.cobweb.routing.model.timetable.Timetable;
 
 /**
  * Factory that generates algorithms for shortest path computation.<br>
@@ -22,10 +27,8 @@ import de.tischner.cobweb.routing.model.graph.INode;
  * {@link #createAlgorithm()} and similar methods to create algorithms.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> The type of the nodes
- * @param <E> The type of the edges
  */
-public final class ShortestPathComputationFactory<N extends INode, E extends IEdge<N>> {
+public final class ShortestPathComputationFactory {
   /**
    * The amount of landmarks to use for the landmark heuristic.
    */
@@ -33,15 +36,18 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
   /**
    * The base algorithm to use for {@link #createAlgorithm()}.
    */
-  private IShortestPathComputation<N, E> mBaseComputation;
+  private IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mBaseComputation;
   /**
    * The graph to route on.
    */
-  private final IGraph<N, E> mGraph;
+  private final IGraph<ICoreNode, ICoreEdge<ICoreNode>> mGraph;
   /**
    * The metric to use for the {@link AStarModule} module.
    */
-  private IMetric<N> mMetric;
+  private IMetric<ICoreNode> mMetric;
+  private final ERoutingModelMode mMode;
+  private final Timetable mTable;
+  private final ITranslationWithTime<ICoreNode, ICoreNode> mTranslation;
 
   /**
    * Creates a new shortest path computation factory which generates algorithms
@@ -49,10 +55,19 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
    * <br>
    * Use {@link #initialize()} after creation.
    *
-   * @param graph The graph to route on
+   * @param graph       The graph to route on
+   * @param table       The timetable to route on, or <tt>null</tt> if not used
+   * @param translation The translation to use, or <tt>null</tt> if not used.
+   *                    The object is used to translate road nodes to nearest
+   *                    transit nodes.
+   * @param mode        The mode to use for the routing model
    */
-  public ShortestPathComputationFactory(final IGraph<N, E> graph) {
+  public ShortestPathComputationFactory(final IGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final Timetable table,
+      final ITranslationWithTime<ICoreNode, ICoreNode> translation, final ERoutingModelMode mode) {
     mGraph = graph;
+    mTable = table;
+    mTranslation = translation;
+    mMode = mode;
   }
 
   /**
@@ -63,7 +78,7 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
    *
    * @return A basic shortest path algorithm
    */
-  public IShortestPathComputation<N, E> createAlgorithm() {
+  public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> createAlgorithm() {
     return mBaseComputation;
   }
 
@@ -78,15 +93,25 @@ public final class ShortestPathComputationFactory<N extends INode, E extends IEd
    * @param modes   The transportation mode restrictions
    * @return A shortest path algorithm with the given constraints
    */
-  public IShortestPathComputation<N, E> createAlgorithm(final long depTime, final Set<ETransportationMode> modes) {
-    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime), MultiModalModule.of(modes));
+  public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> createAlgorithm(final long depTime,
+      final Set<ETransportationMode> modes) {
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        return new HybridRoadTimetable(ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), MultiModalModule.of(modes)),
+            new ConnectionScan(mTable), mTranslation, modes, depTime);
+      case LINK_GRAPH:
+        return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime),
+            MultiModalModule.of(modes));
+      default:
+        throw new AssertionError();
+    }
   }
 
   /**
    * Initializes the factory. Must be used prior to usage.
    */
   public void initialize() {
-    final ILandmarkProvider<N> landmarkProvider = new RandomLandmarks<>(mGraph);
+    final ILandmarkProvider<ICoreNode> landmarkProvider = new RandomLandmarks<>(mGraph);
     mMetric = new LandmarkMetric<>(AMOUNT_OF_LANDMARKS, mGraph, landmarkProvider);
     mBaseComputation = ModuleDijkstra.of(mGraph, AStarModule.of(mMetric));
   }

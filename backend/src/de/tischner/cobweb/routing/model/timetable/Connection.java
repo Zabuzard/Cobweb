@@ -1,8 +1,12 @@
 package de.tischner.cobweb.routing.model.timetable;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 public final class Connection implements Comparable<Connection>, Serializable {
+  private static final Comparator<Connection> DEP_TIME_ASCENDING = Comparator.comparing(Connection::getDepTime)
+      .thenComparing(Connection::getTripId).thenComparing(Connection::getArrTime)
+      .thenComparing(Connection::getDepStopId).thenComparing(Connection::getArrStopId);
   /**
    * The serial version UID.
    */
@@ -23,7 +27,7 @@ public final class Connection implements Comparable<Connection>, Serializable {
 
   @Override
   public int compareTo(final Connection other) {
-    return Integer.compare(mDepTime, other.mDepTime);
+    return DEP_TIME_ASCENDING.compare(this, other);
   }
 
   /*
@@ -94,5 +98,22 @@ public final class Connection implements Comparable<Connection>, Serializable {
     result = prime * result + this.mDepTime;
     result = prime * result + this.mTripId;
     return result;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("Connection [");
+    builder.append(this.mArrStopId);
+    builder.append("@");
+    builder.append(this.mArrTime);
+    builder.append(" -> ");
+    builder.append(this.mDepStopId);
+    builder.append("@");
+    builder.append(this.mDepTime);
+    builder.append(", trip=");
+    builder.append(this.mTripId);
+    builder.append("]");
+    return builder.toString();
   }
 }

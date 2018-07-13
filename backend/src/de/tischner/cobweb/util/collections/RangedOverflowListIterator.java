@@ -15,7 +15,8 @@ public final class RangedOverflowListIterator<E> implements Iterator<E> {
   public RangedOverflowListIterator(final List<E> elements, final int from, final int to)
       throws IllegalArgumentException {
     if (from < 0 || to < 0 || from >= elements.size() || to > elements.size() || !(elements instanceof RandomAccess)) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("Size: " + elements.size() + ", from: " + from + ", to: " + to
+          + ", is RandomAccess: " + (elements instanceof RandomAccess));
     }
 
     if (from < to) {

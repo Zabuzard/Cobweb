@@ -8,6 +8,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tischner.cobweb.routing.model.ERoutingModelMode;
+
 /**
  * Stores configuration properties for the application. Used together with
  * {@link ConfigLoader} to load and save the configuration from and to a
@@ -108,6 +110,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   @Override
+  public ERoutingModelMode getRoutingModelMode() {
+    return ERoutingModelMode.valueOf(getSetting(ConfigUtil.KEY_ROUTING_MODEL_MODE));
+  }
+
+  @Override
   public int getRoutingServerPort() {
     return Integer.valueOf(getSetting(ConfigUtil.KEY_ROUTING_SERVER_PORT));
   }
@@ -179,6 +186,7 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mDefaultSettings.put(ConfigUtil.KEY_GRAPH_CACHE_INFO, ConfigUtil.VALUE_GRAPH_CACHE_INFO.toString());
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_SERVER_PORT, String.valueOf(ConfigUtil.VALUE_ROUTING_SERVER_PORT));
     mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
+    mDefaultSettings.put(ConfigUtil.KEY_ROUTING_MODEL_MODE, ConfigUtil.VALUE_ROUTING_MODEL_MODE);
 
     // Name search settings
     mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT,

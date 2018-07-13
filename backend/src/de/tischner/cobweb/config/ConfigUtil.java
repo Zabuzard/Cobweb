@@ -66,6 +66,10 @@ final class ConfigUtil {
    */
   static final String KEY_OSM_ROAD_FILTER = "osmRoadFilter";
   /**
+   * Name of the key that stores the mode to use for the routing model.
+   */
+  static final String KEY_ROUTING_MODEL_MODE = "routingModelMode";
+  /**
    * Name of the key that stores the port the routing server should use.
    */
   static final String KEY_ROUTING_SERVER_PORT = "routingServerPort";
@@ -128,6 +132,10 @@ final class ConfigUtil {
    * Default path to the filter file used to filter road ways in OSM data.
    */
   static final Path VALUE_OSM_ROAD_FILTER = Paths.get("res", "filter", "osm", "road.filter");
+  /**
+   * The default mode to use for the routing model.
+   */
+  static final String VALUE_ROUTING_MODEL_MODE = "CONNECTION_SCAN";
   /**
    * Default port to use by the routing server.
    */

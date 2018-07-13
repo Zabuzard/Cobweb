@@ -13,11 +13,8 @@ import com.google.gson.JsonSyntaxException;
 
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
-import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IHasId;
-import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
 import de.tischner.cobweb.util.MemberFieldNamingStrategy;
 import de.tischner.cobweb.util.http.EHttpContentType;
@@ -38,10 +35,8 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * closed outside.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> Type of the node
- * @param <E> Type of the edge
  */
-public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> implements Runnable {
+public final class ClientHandler implements Runnable {
   /**
    * Resource that is to be requested from a client if he submits a routing
    * query.
@@ -58,7 +53,7 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   /**
    * The factory to use for generating algorithms for shortest path computation.
    */
-  private final ShortestPathComputationFactory<N, E> mComputationFactory;
+  private final ShortestPathComputationFactory mComputationFactory;
   /**
    * The database to use for fetching meta data for nodes and edges.
    */
@@ -70,7 +65,7 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
   /**
    * The object that provides nodes by their ID.
    */
-  private final IGetNodeById<N> mNodeProvider;
+  private final IGetNodeById<ICoreNode> mNodeProvider;
 
   /**
    * Creates a new handler which handles the given client using the given
@@ -87,8 +82,8 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
    * @param database           The database to use for fetching meta data for
    *                           nodes and edges
    */
-  public ClientHandler(final int id, final Socket client, final IGetNodeById<N> nodeProvider,
-      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
+  public ClientHandler(final int id, final Socket client, final IGetNodeById<ICoreNode> nodeProvider,
+      final ShortestPathComputationFactory computationFactory, final IRoutingDatabase database) {
     mId = id;
     mClient = client;
     mNodeProvider = nodeProvider;
@@ -191,8 +186,7 @@ public final class ClientHandler<N extends INode & IHasId & ISpatial, E extends 
     final Gson gson = new GsonBuilder().setFieldNamingStrategy(new MemberFieldNamingStrategy()).create();
     try {
       final RoutingRequest routingRequest = gson.fromJson(request.getContent(), RoutingRequest.class);
-      final RequestHandler<N, E> handler =
-          new RequestHandler<>(mClient, gson, mNodeProvider, mComputationFactory, mDatabase);
+      final RequestHandler handler = new RequestHandler(mClient, gson, mNodeProvider, mComputationFactory, mDatabase);
       handler.handleRequest(routingRequest);
     } catch (final JsonSyntaxException e) {
       HttpUtil.sendHttpResponse(new HttpResponseBuilder().setStatus(EHttpStatus.BAD_REQUEST).build(), mClient);

@@ -40,7 +40,17 @@ public final class NodeTime<N extends INode> implements Comparable<NodeTime<N>>,
    */
   @Override
   public int compareTo(final NodeTime<N> other) {
-    return Integer.compare(mTime, other.mTime);
+    final int timeCompare = Integer.compare(mTime, other.mTime);
+    if (timeCompare == 0) {
+      if ((mNode != null && other.mNode != null) || (mNode == null && other.mNode == null)) {
+        return 0;
+      } else if (mNode == null && other.mNode != null) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }
+    return timeCompare;
   }
 
   /**

@@ -22,6 +22,8 @@ import de.tischner.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.CoverTree;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
+import de.tischner.cobweb.routing.algorithms.shortestpath.hybridmodel.ITranslationWithTime;
+import de.tischner.cobweb.routing.algorithms.shortestpath.hybridmodel.RoadToNearestQueryTransitTranslation;
 import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
@@ -30,8 +32,10 @@ import de.tischner.cobweb.routing.model.graph.road.RoadGraph;
 import de.tischner.cobweb.routing.model.graph.road.RoadNode;
 import de.tischner.cobweb.routing.model.graph.transit.TransitGraph;
 import de.tischner.cobweb.routing.model.graph.transit.TransitStop;
+import de.tischner.cobweb.routing.model.timetable.Timetable;
 import de.tischner.cobweb.routing.parsing.gtfs.GtfsConnectionBuilder;
 import de.tischner.cobweb.routing.parsing.gtfs.GtfsRealisticTimeExpandedHandler;
+import de.tischner.cobweb.routing.parsing.gtfs.GtfsTimetableHandler;
 import de.tischner.cobweb.routing.parsing.gtfs.IGtfsConnectionBuilder;
 import de.tischner.cobweb.routing.parsing.osm.IOsmRoadBuilder;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadBuilder;
@@ -51,11 +55,13 @@ public final class RoutingModel {
    * Link graph to route on.
    */
   private LinkGraph mLinkGraph;
+  private final ERoutingModelMode mMode;
   private INearestNeighborComputation<ICoreNode> mNearestNeighborComputation;
   /**
    * Road graph to route on.
    */
   private RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mRoadGraph;
+  private Timetable mTimetable;
   /**
    * Transit graph to route on.
    */
@@ -64,6 +70,7 @@ public final class RoutingModel {
   public RoutingModel(final IRoutingDatabase database, final IRoutingConfigProvider config) {
     mDatabase = database;
     mConfig = config;
+    mMode = config.getRoutingModelMode();
   }
 
   /**
@@ -77,14 +84,22 @@ public final class RoutingModel {
    *                        configuration files
    */
   public Iterable<IGtfsFileHandler> createGtfsHandler() throws ParseException {
-    try {
-      final IGtfsConnectionBuilder<ICoreNode, ICoreEdge<ICoreNode>> connectionBuilder =
-          new GtfsConnectionBuilder(mTransitGraph);
-      final IGtfsFileHandler transitHandler =
-          new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, connectionBuilder, mConfig);
-      return Collections.singletonList(transitHandler);
-    } catch (final IOException e) {
-      throw new ParseException(e);
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        final IGtfsFileHandler timetableHandler = new GtfsTimetableHandler(mTimetable, mTimetable);
+        return Collections.singletonList(timetableHandler);
+      case LINK_GRAPH:
+        final IGtfsConnectionBuilder<ICoreNode, ICoreEdge<ICoreNode>> connectionBuilder =
+            new GtfsConnectionBuilder(mTransitGraph);
+        try {
+          final IGtfsFileHandler transitHandler =
+              new GtfsRealisticTimeExpandedHandler<>(mTransitGraph, connectionBuilder, mConfig);
+          return Collections.singletonList(transitHandler);
+        } catch (final IOException e) {
+          throw new ParseException(e);
+        }
+      default:
+        throw new AssertionError();
     }
   }
 
@@ -109,11 +124,23 @@ public final class RoutingModel {
     }
   }
 
-  public ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> createShortestPathComputationFactory() {
+  public ShortestPathComputationFactory createShortestPathComputationFactory() {
     final Instant preCompTimeStart = Instant.now();
-
-    final ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> factory =
-        new ShortestPathComputationFactory<>(mLinkGraph);
+    final ShortestPathComputationFactory factory;
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        // TODO Exchange with a translation that is based on access nodes or a
+        // perimeter
+        final ITranslationWithTime<ICoreNode, ICoreNode> roadToTransitTranslation =
+            new RoadToNearestQueryTransitTranslation(mTimetable);
+        factory = new ShortestPathComputationFactory(mRoadGraph, mTimetable, roadToTransitTranslation, mMode);
+        break;
+      case LINK_GRAPH:
+        factory = new ShortestPathComputationFactory(mLinkGraph, null, null, mMode);
+        break;
+      default:
+        throw new AssertionError();
+    }
     factory.initialize();
 
     final Instant preCompTimeEnd = Instant.now();
@@ -130,7 +157,18 @@ public final class RoutingModel {
    *                        serialization occurred
    */
   public void finishModel() throws ParseException {
-    if (!mConfig.useGraphCache() || mLinkGraph.size() == mGraphSizeBeforeData) {
+    final int currentGraphSize;
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        currentGraphSize = mRoadGraph.size();
+        break;
+      case LINK_GRAPH:
+        currentGraphSize = mLinkGraph.size();
+        break;
+      default:
+        throw new AssertionError();
+    }
+    if (!mConfig.useGraphCache() || currentGraphSize == mGraphSizeBeforeData) {
       return;
     }
 
@@ -138,9 +176,20 @@ public final class RoutingModel {
     LOGGER.info("Serializing model to: {}", graphCache);
     final Instant serializeStartTime = Instant.now();
 
-    final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
     try {
-      serializationUtil.serialize(mLinkGraph, graphCache);
+      switch (mMode) {
+        case CONNECTION_SCAN:
+          final SerializationUtil<RoadGraph<ICoreNode, ICoreEdge<ICoreNode>>> serializationUtilRoad =
+              new SerializationUtil<>();
+          serializationUtilRoad.serialize(mRoadGraph, graphCache);
+          break;
+        case LINK_GRAPH:
+          final SerializationUtil<LinkGraph> serializationUtilLink = new SerializationUtil<>();
+          serializationUtilLink.serialize(mLinkGraph, graphCache);
+          break;
+        default:
+          throw new AssertionError();
+      }
     } catch (final IOException e) {
       throw new ParseException(e);
     }
@@ -154,43 +203,95 @@ public final class RoutingModel {
   }
 
   public IGetNodeById<ICoreNode> getNodeProvider() {
-    return mLinkGraph;
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        return mRoadGraph;
+      case LINK_GRAPH:
+        return mLinkGraph;
+      default:
+        throw new AssertionError();
+    }
   }
 
   public String getSizeInformation() {
-    return mLinkGraph.getSizeInformation();
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        return mRoadGraph.getSizeInformation() + ", " + mTimetable.getSizeInformation();
+      case LINK_GRAPH:
+        return mLinkGraph.getSizeInformation();
+      default:
+        throw new AssertionError();
+    }
   }
 
   public void prepareModelAfterData() {
     initializeNearestNeighborComputation();
-    linkGraphs();
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        // TODO Link road graph to timetable
+        break;
+      case LINK_GRAPH:
+        linkGraphs();
+        break;
+      default:
+        throw new AssertionError();
+    }
   }
 
   public void prepareModelBeforeData() {
     LOGGER.info("Initializing model");
 
+    if (mMode == ERoutingModelMode.CONNECTION_SCAN) {
+      // TODO Timetable may be cached too
+      mTimetable = new Timetable();
+    }
+
     final Path graphCache = mConfig.getGraphCache();
     if (!mConfig.useGraphCache() || !Files.isRegularFile(graphCache)) {
       mRoadGraph = new RoadGraph<>();
-      mTransitGraph = new TransitGraph<>();
-      mLinkGraph = new LinkGraph(mRoadGraph, mTransitGraph);
+      if (mMode == ERoutingModelMode.LINK_GRAPH) {
+        mTransitGraph = new TransitGraph<>();
+        mLinkGraph = new LinkGraph(mRoadGraph, mTransitGraph);
+      }
       return;
     }
 
     // Deserialize model
     LOGGER.info("Deserializing model from: {}", graphCache);
     final Instant deserializeStartTime = Instant.now();
-
-    final SerializationUtil<LinkGraph> serializationUtil = new SerializationUtil<>();
     try {
-      mLinkGraph = serializationUtil.deserialize(graphCache);
+      switch (mMode) {
+        case CONNECTION_SCAN:
+          final SerializationUtil<RoadGraph<ICoreNode, ICoreEdge<ICoreNode>>> serializationUtilRoad =
+              new SerializationUtil<>();
+          mRoadGraph = serializationUtilRoad.deserialize(graphCache);
+          break;
+        case LINK_GRAPH:
+          final SerializationUtil<LinkGraph> serializationUtilLink = new SerializationUtil<>();
+          mLinkGraph = serializationUtilLink.deserialize(graphCache);
+          break;
+        default:
+          throw new AssertionError();
+      }
     } catch (ClassNotFoundException | ClassCastException | IOException e) {
       throw new ParseException(e);
     }
-    mRoadGraph = mLinkGraph.getRoadGraph();
-    mTransitGraph = mLinkGraph.getTransitGraph();
 
-    mGraphSizeBeforeData = mLinkGraph.size();
+    if (mMode == ERoutingModelMode.LINK_GRAPH) {
+      mRoadGraph = mLinkGraph.getRoadGraph();
+      mTransitGraph = mLinkGraph.getTransitGraph();
+    }
+
+    switch (mMode) {
+      case CONNECTION_SCAN:
+        mGraphSizeBeforeData = mRoadGraph.size();
+        break;
+      case LINK_GRAPH:
+        mGraphSizeBeforeData = mLinkGraph.size();
+        break;
+      default:
+        throw new AssertionError();
+    }
 
     final Instant deserializeEndTime = Instant.now();
     LOGGER.info("Deserialization took: {}", Duration.between(deserializeStartTime, deserializeEndTime));

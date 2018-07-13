@@ -14,11 +14,8 @@ import org.slf4j.LoggerFactory;
 import de.tischner.cobweb.config.IRoutingConfigProvider;
 import de.tischner.cobweb.db.IRoutingDatabase;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
-import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IHasId;
-import de.tischner.cobweb.routing.model.graph.INode;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.server.model.RoutingRequest;
 import de.tischner.cobweb.routing.server.model.RoutingResponse;
 
@@ -47,10 +44,8 @@ import de.tischner.cobweb.routing.server.model.RoutingResponse;
  * compute shortest paths with and a database for retrieving meta-data.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> Type of the node
- * @param <E> Type of the edge
  */
-public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> implements Runnable {
+public final class RoutingServer implements Runnable {
   /**
    * Logger used for logging.
    */
@@ -63,7 +58,7 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
   /**
    * The factory to use for generating algorithms for shortest path computation.
    */
-  private final ShortestPathComputationFactory<N, E> mComputationFactory;
+  private final ShortestPathComputationFactory mComputationFactory;
   /**
    * Configuration provider which provides the port that should be used by the
    * server.
@@ -77,7 +72,7 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
   /**
    * The object that provides nodes by their ID.
    */
-  private final IGetNodeById<N> mNodeProvider;
+  private final IGetNodeById<ICoreNode> mNodeProvider;
   /**
    * The server socket to use for communication.
    */
@@ -109,8 +104,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
    * @param database           Database used for retrieving meta-data about
    *                           graph objects like nodes and edges
    */
-  public RoutingServer(final IRoutingConfigProvider config, final IGetNodeById<N> nodeProvider,
-      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
+  public RoutingServer(final IRoutingConfigProvider config, final IGetNodeById<ICoreNode> nodeProvider,
+      final ShortestPathComputationFactory computationFactory, final IRoutingDatabase database) {
     mConfig = config;
     mNodeProvider = nodeProvider;
     mComputationFactory = computationFactory;
@@ -163,8 +158,8 @@ public final class RoutingServer<N extends INode & IHasId & ISpatial, E extends 
 
         // Handle the client
         requestId++;
-        final ClientHandler<N, E> handler =
-            new ClientHandler<>(requestId, client, mNodeProvider, mComputationFactory, mDatabase);
+        final ClientHandler handler =
+            new ClientHandler(requestId, client, mNodeProvider, mComputationFactory, mDatabase);
         executor.execute(handler);
       } catch (final SocketTimeoutException e) {
         // Ignore the exception. The timeout is used to repeatedly check if the

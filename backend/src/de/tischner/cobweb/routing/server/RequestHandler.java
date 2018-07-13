@@ -21,13 +21,11 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.IShortestPathComputati
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.graph.ETransportationMode;
 import de.tischner.cobweb.routing.model.graph.EdgeCost;
-import de.tischner.cobweb.routing.model.graph.IEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
-import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.IHasTransportationMode;
-import de.tischner.cobweb.routing.model.graph.INode;
 import de.tischner.cobweb.routing.model.graph.IPath;
-import de.tischner.cobweb.routing.model.graph.ISpatial;
 import de.tischner.cobweb.routing.model.graph.SpeedTransportationModeComparator;
 import de.tischner.cobweb.routing.model.graph.road.IRoadNode;
 import de.tischner.cobweb.routing.server.model.ERouteElementType;
@@ -47,10 +45,8 @@ import de.tischner.cobweb.util.http.HttpUtil;
  * To handle a request call {@link #handleRequest(RoutingRequest)}.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
- * @param <N> Type of the node
- * @param <E> Type of the edge
  */
-public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends IEdge<N> & IHasId> {
+public final class RequestHandler {
   /**
    * Logger used for logging
    */
@@ -62,7 +58,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   /**
    * The factory to use for generating algorithms for shortest path computation.
    */
-  private final ShortestPathComputationFactory<N, E> mComputationFactory;
+  private final ShortestPathComputationFactory mComputationFactory;
   /**
    * The database to use for fetching meta data for nodes and edges.
    */
@@ -74,7 +70,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
   /**
    * The object that provides nodes by their ID.
    */
-  private final IGetNodeById<N> mNodeProvider;
+  private final IGetNodeById<ICoreNode> mNodeProvider;
   /**
    * Comparator that sorts transportation modes ascending in their speed.
    */
@@ -94,8 +90,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param database           The database to use for fetching meta data for
    *                           nodes and edges
    */
-  public RequestHandler(final Socket client, final Gson gson, final IGetNodeById<N> nodeProvider,
-      final ShortestPathComputationFactory<N, E> computationFactory, final IRoutingDatabase database) {
+  public RequestHandler(final Socket client, final Gson gson, final IGetNodeById<ICoreNode> nodeProvider,
+      final ShortestPathComputationFactory computationFactory, final IRoutingDatabase database) {
     mClient = client;
     mGson = gson;
     mNodeProvider = nodeProvider;
@@ -118,13 +114,13 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     final long startTime = System.nanoTime();
 
     // Get the source and destination
-    final Optional<N> sourceOptional =
+    final Optional<ICoreNode> sourceOptional =
         mDatabase.getInternalNodeByOsm(request.getFrom()).flatMap(id -> mNodeProvider.getNodeById(id));
     if (!sourceOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
       return;
     }
-    final Optional<N> destinationOptional =
+    final Optional<ICoreNode> destinationOptional =
         mDatabase.getInternalNodeByOsm(request.getTo()).flatMap(id -> mNodeProvider.getNodeById(id));
     if (!destinationOptional.isPresent()) {
       sendEmptyResponse(request, startTime);
@@ -132,14 +128,15 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     }
 
     // Nodes are known, compute the path
-    final N source = sourceOptional.get();
-    final N destination = destinationOptional.get();
+    final ICoreNode source = sourceOptional.get();
+    final ICoreNode destination = destinationOptional.get();
 
-    final IShortestPathComputation<N, E> computation =
+    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation =
         mComputationFactory.createAlgorithm(request.getDepTime(), request.getModes());
 
     final long startCompTime = System.nanoTime();
-    final Optional<IPath<N, E>> pathOptional = computation.computeShortestPath(source, destination);
+    final Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> pathOptional =
+        computation.computeShortestPath(source, destination);
     final long endCompTime = System.nanoTime();
     if (!pathOptional.isPresent()) {
       sendNotReachableResponse(request, startTime, startCompTime);
@@ -147,7 +144,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
     }
 
     // Path is present, build the resulting journey
-    final IPath<N, E> path = pathOptional.get();
+    final IPath<ICoreNode, ICoreEdge<ICoreNode>> path = pathOptional.get();
     final Journey journey = buildJourney(request, path);
 
     final long endTime = System.nanoTime();
@@ -166,7 +163,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param mode    The transportation mode to use for this sub-path
    * @param route   The route to add the sub-path to
    */
-  private void appendSubPath(final IPath<N, E> subPath, final ETransportationMode mode,
+  private void appendSubPath(final IPath<ICoreNode, ICoreEdge<ICoreNode>> subPath, final ETransportationMode mode,
       final List<RouteElement> route) {
     route.add(buildNode(subPath.getSource()));
     route.add(buildPath(subPath, mode));
@@ -180,7 +177,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param path    The path the journey represents
    * @return The resulting journey
    */
-  private Journey buildJourney(final RoutingRequest request, final IPath<N, E> path) {
+  private Journey buildJourney(final RoutingRequest request, final IPath<ICoreNode, ICoreEdge<ICoreNode>> path) {
     final long depTime = request.getDepTime();
     final long duration = (long) Math.ceil(RoutingUtil.secondsToMillis(path.getTotalCost()));
     final long arrTime = depTime + duration;
@@ -196,11 +193,11 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
       return new Journey(depTime, arrTime, route);
     }
 
-    EdgePath<N, E> currentPath = null;
+    EdgePath<ICoreNode, ICoreEdge<ICoreNode>> currentPath = null;
     ETransportationMode currentMode = null;
     // Collect sub paths that use a single transportation mode
-    for (final EdgeCost<N, E> edgeCost : path) {
-      final E edge = edgeCost.getEdge();
+    for (final EdgeCost<ICoreNode, ICoreEdge<ICoreNode>> edgeCost : path) {
+      final ICoreEdge<ICoreNode> edge = edgeCost.getEdge();
       final ETransportationMode edgeMode = getModeOfEdge(request.getModes(), edge);
 
       // Mode differs
@@ -229,7 +226,7 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param node The node to represent
    * @return The resulting route element
    */
-  private RouteElement buildNode(final N node) {
+  private RouteElement buildNode(final ICoreNode node) {
     final String name = mDatabase.getOsmNodeByInternal(node.getId()).flatMap(mDatabase::getNodeName).orElse("");
     final float[] coordinates = new float[] { node.getLatitude(), node.getLongitude() };
     return new RouteElement(ERouteElementType.NODE, name, Collections.singletonList(coordinates));
@@ -242,21 +239,21 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param mode The transportation mode to use for this path
    * @return The resulting route element
    */
-  private RouteElement buildPath(final IPath<N, E> path, final ETransportationMode mode) {
+  private RouteElement buildPath(final IPath<ICoreNode, ICoreEdge<ICoreNode>> path, final ETransportationMode mode) {
     // TODO The current way of constructing a name may be inappropriate
     final StringJoiner nameJoiner = new StringJoiner(", ");
     final List<float[]> geom = new ArrayList<>(path.length() + 1);
 
     // Add the source
-    final N source = path.getSource();
+    final ICoreNode source = path.getSource();
     geom.add(new float[] { source.getLatitude(), source.getLongitude() });
     if (source instanceof IRoadNode) {
       mDatabase.getOsmNodeByInternal(source.getId()).flatMap(mDatabase::getNodeName).ifPresent(nameJoiner::add);
     }
 
     // Add all edge destinations
-    for (final EdgeCost<N, E> edgeCost : path) {
-      final N edgeDestination = edgeCost.getEdge().getDestination();
+    for (final EdgeCost<ICoreNode, ICoreEdge<ICoreNode>> edgeCost : path) {
+      final ICoreNode edgeDestination = edgeCost.getEdge().getDestination();
       geom.add(new float[] { edgeDestination.getLatitude(), edgeDestination.getLongitude() });
     }
 
@@ -273,12 +270,8 @@ public final class RequestHandler<N extends INode & IHasId & ISpatial, E extends
    * @param edge             The edge to travel along
    * @return The transportation mode to use for the given edge
    */
-  private ETransportationMode getModeOfEdge(final Set<ETransportationMode> modeRestrictions, final E edge) {
-    if (!(edge instanceof IHasTransportationMode)) {
-      // Fallback mode
-      return ETransportationMode.CAR;
-    }
-
+  private ETransportationMode getModeOfEdge(final Set<ETransportationMode> modeRestrictions,
+      final ICoreEdge<ICoreNode> edge) {
     final Set<ETransportationMode> edgeModes = ((IHasTransportationMode) edge).getTransportationModes();
 
     // Pick the fastest mode that is available after applying the restrictions

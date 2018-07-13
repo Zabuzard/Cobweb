@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tischner.cobweb.routing.model.graph.UniqueIdGenerator;
 import de.tischner.cobweb.util.RoutingUtil;
@@ -19,9 +21,17 @@ import de.tischner.cobweb.util.collections.RangedOverflowListIterator;
 
 public final class Timetable implements ITimetableIdGenerator, Serializable {
   /**
+   * Logger used for logging.
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(Timetable.class);
+  /**
    * The serial version UID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Transfer time in seconds.
+   */
+  private static final int TRANSFER_DELAY = 5 * 60;
   private final List<Connection> mConnections;
   private int mGreatestStopId;
   private int mGreatestTripId;
@@ -31,6 +41,7 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
    * The unique ID generator used for stops.
    */
   private final UniqueIdGenerator mStopIdGenerator;
+
   /**
    * The unique ID generator used for trips.
    */
@@ -78,7 +89,7 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
   }
 
   public Iterator<Connection> getConnectionsStartingSince(final int time) {
-    final Connection searchNeedle = new Connection(0, 0, 0, time, time);
+    final Connection searchNeedle = new Connection(-1, 0, 0, time, time);
     final int indexOfNext = -1 * Collections.binarySearch(mConnections, searchNeedle) - 1;
 
     // If all connections are before the given time
@@ -105,15 +116,14 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
       return Stream.empty();
     }
 
-    // TODO It may be inefficient to construct footpaths on the fly
+    // TODO It may be inefficient to construct footpaths on the fly to all other
+    // stops
     return mIdToStop.values().stream().map(arrStop -> {
       final int arrId = arrStop.getId();
 
       // Footpath to same stop
       if (arrId == stopId) {
-        // TODO Model transfer time but also allow zero transfer time for same
-        // trip
-        return new Footpath(stopId, arrId, 0);
+        return new Footpath(stopId, arrId, TRANSFER_DELAY);
       }
 
       // Compute walking time
@@ -137,6 +147,10 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
 
   public Stop getStop(final int id) {
     return mIdToStop.get(id);
+  }
+
+  public Collection<Stop> getStops() {
+    return mIdToStop.values();
   }
 
   public Trip getTrip(final int id) {

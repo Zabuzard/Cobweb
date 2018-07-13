@@ -12,8 +12,11 @@ import de.tischner.cobweb.routing.algorithms.shortestpath.AShortestPathComputati
 import de.tischner.cobweb.routing.algorithms.shortestpath.EdgePath;
 import de.tischner.cobweb.routing.algorithms.shortestpath.IHasPathCost;
 import de.tischner.cobweb.routing.algorithms.shortestpath.PathCost;
+import de.tischner.cobweb.routing.model.graph.ICoreEdge;
+import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IHasId;
 import de.tischner.cobweb.routing.model.graph.IPath;
+import de.tischner.cobweb.routing.model.graph.transit.IHasTime;
 import de.tischner.cobweb.routing.model.graph.transit.TransitEdge;
 import de.tischner.cobweb.routing.model.graph.transit.TransitNode;
 import de.tischner.cobweb.routing.model.timetable.Connection;
@@ -22,17 +25,17 @@ import de.tischner.cobweb.routing.model.timetable.Timetable;
 import de.tischner.cobweb.routing.model.timetable.Trip;
 import de.tischner.cobweb.util.collections.ReverseIterator;
 
-public final class ConnectionScan extends AShortestPathComputation<TransitNode, TransitEdge<TransitNode>> {
+public final class ConnectionScan extends AShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> {
 
   /**
    * Amount of seconds of a day.
    */
   private static final int SECONDS_OF_DAY = 24 * 60 * 60;
 
-  private static void addEdgeToPath(final EdgePath<TransitNode, TransitEdge<TransitNode>> path,
-      final TransitNode source, final TransitNode destination, final boolean walkByFoot) {
+  private static void addEdgeToPath(final EdgePath<ICoreNode, ICoreEdge<ICoreNode>> path, final TransitNode source,
+      final TransitNode destination, final boolean walkByFoot) {
     final double cost = destination.getTime() - source.getTime();
-    final TransitEdge<TransitNode> edge;
+    final ICoreEdge<ICoreNode> edge;
     if (walkByFoot) {
       edge = new FootpathTransitEdge<>(0, source, destination, cost);
     } else {
@@ -49,6 +52,13 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
     return arrTime - depTime;
   }
 
+  private static final int extractStartingTime(final ICoreNode node) {
+    if (!(node instanceof IHasTime)) {
+      throw new IllegalArgumentException();
+    }
+    return ((IHasTime) node).getTime();
+  }
+
   private static int validateTimeBeforeAfter(final int time, final int threshold) {
     if (time < threshold) {
       return time + SECONDS_OF_DAY;
@@ -63,13 +73,12 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
   }
 
   @Override
-  public Collection<TransitNode> computeSearchSpace(final Collection<TransitNode> sources,
-      final TransitNode destination) {
-    final ConnectionScanResult result =
-        computeShortestPathHelper(sources, destination, sources.iterator().next().getTime());
+  public Collection<ICoreNode> computeSearchSpace(final Collection<ICoreNode> sources, final ICoreNode destination) {
+    final int startingTime = ConnectionScan.extractStartingTime(sources.iterator().next());
+    final ConnectionScanResult result = computeShortestPathHelper(sources, destination, startingTime);
 
     // Collect all visited stops
-    final Collection<TransitNode> searchSpace = new ArrayList<>();
+    final Collection<ICoreNode> searchSpace = new ArrayList<>();
     final int[] stopToArrTime = result.getStopToArrTime();
     for (int i = 0; i < stopToArrTime.length; i++) {
       final int arrTime = stopToArrTime[i];
@@ -85,9 +94,9 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
   }
 
   @Override
-  public Optional<IPath<TransitNode, TransitEdge<TransitNode>>>
-      computeShortestPath(final Collection<TransitNode> sources, final TransitNode destination) {
-    final int startingTime = sources.iterator().next().getTime();
+  public Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> computeShortestPath(final Collection<ICoreNode> sources,
+      final ICoreNode destination) {
+    final int startingTime = ConnectionScan.extractStartingTime(sources.iterator().next());
     final ConnectionScanResult result = computeShortestPathHelper(sources, destination, startingTime);
     final int[] stopToArrTime = result.getStopToArrTime();
 
@@ -98,7 +107,7 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
 
     // Construct path
     final JourneyPointer[] stopToJourney = result.getStopToJourney();
-    final EdgePath<TransitNode, TransitEdge<TransitNode>> path = new EdgePath<>(true);
+    final EdgePath<ICoreNode, ICoreEdge<ICoreNode>> path = new EdgePath<>(true);
 
     int currentStopId = destination.getId();
     TransitNode currentDestination = createNodeForStop(currentStopId, stopToArrTime[currentStopId]);
@@ -109,20 +118,36 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
       final Connection enterConnection = pointer.getEnterConnection();
 
       // Departure of footpath, arrival of trip exit
-      final TransitNode tripArr = createNodeForStop(exitConnection.getArrStopId(), exitConnection.getArrTime());
-      ConnectionScan.addEdgeToPath(path, tripArr, currentDestination, true);
+      final TransitNode tripPartArr = createNodeForStop(exitConnection.getArrStopId(), exitConnection.getArrTime());
+      ConnectionScan.addEdgeToPath(path, tripPartArr, currentDestination, true);
 
       // Add the trip
       final Iterator<Connection> tripSequenceIter = new ReverseIterator<>(trip.getSequence());
-      TransitNode currentConnectionArr = tripArr;
+      TransitNode currentConnectionArr = tripPartArr;
+
+      boolean inSequencePart = false;
       while (tripSequenceIter.hasNext()) {
         final Connection connection = tripSequenceIter.next();
+        // Identify the used part of the sequence, determined by exit and enter
+        // connection
+        if (!inSequencePart) {
+          // Skip all connections until the exit connection
+          if (connection != exitConnection) {
+            continue;
+          }
+          inSequencePart = true;
+        }
 
         final TransitNode connectionDep = createNodeForStop(connection.getDepStopId(), connection.getDepTime());
         ConnectionScan.addEdgeToPath(path, connectionDep, currentConnectionArr, false);
 
         // Prepare next connection of the trip
         currentConnectionArr = connectionDep;
+
+        // End sequence part after processing the enter connection
+        if (connection == enterConnection) {
+          break;
+        }
       }
 
       // Prepare next journey pointer
@@ -134,9 +159,8 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
   }
 
   @Override
-  public Optional<Double> computeShortestPathCost(final Collection<TransitNode> sources,
-      final TransitNode destination) {
-    final int startingTime = sources.iterator().next().getTime();
+  public Optional<Double> computeShortestPathCost(final Collection<ICoreNode> sources, final ICoreNode destination) {
+    final int startingTime = ConnectionScan.extractStartingTime(sources.iterator().next());
     final ConnectionScanResult result = computeShortestPathHelper(sources, destination, startingTime);
 
     final int arrTime = result.getStopToArrTime()[destination.getId()];
@@ -150,14 +174,13 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
   }
 
   @Override
-  public Map<TransitNode, ? extends IHasPathCost>
-      computeShortestPathCostsReachable(final Collection<TransitNode> sources) {
+  public Map<ICoreNode, ? extends IHasPathCost> computeShortestPathCostsReachable(final Collection<ICoreNode> sources) {
 
-    final int startingTime = sources.iterator().next().getTime();
+    final int startingTime = ConnectionScan.extractStartingTime(sources.iterator().next());
     final ConnectionScanResult result = computeShortestPathHelper(sources, null, startingTime);
 
     // Collect all reachable stops
-    final Map<TransitNode, PathCost> stopToCost = new HashMap<>();
+    final Map<ICoreNode, PathCost> stopToCost = new HashMap<>();
     final int[] stopToArrTime = result.getStopToArrTime();
     for (int i = 0; i < stopToArrTime.length; i++) {
       final int arrTime = stopToArrTime[i];
@@ -173,8 +196,8 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
     return stopToCost;
   }
 
-  private ConnectionScanResult computeShortestPathHelper(final Collection<TransitNode> sources,
-      final TransitNode pathDestination, final int startingTime) {
+  private ConnectionScanResult computeShortestPathHelper(final Collection<ICoreNode> sources,
+      final ICoreNode pathDestination, final int startingTime) {
     final Integer destinationStop;
     if (pathDestination == null) {
       destinationStop = null;
@@ -183,10 +206,10 @@ public final class ConnectionScan extends AShortestPathComputation<TransitNode, 
     }
 
     // Initialize data-structures
-    final int[] stopToTentativeArrTime = new int[mTable.getGreatestStopId()];
+    final int[] stopToTentativeArrTime = new int[mTable.getGreatestStopId() + 1];
     Arrays.fill(stopToTentativeArrTime, Integer.MAX_VALUE);
-    final Connection[] tripToEarliestReachableConnection = new Connection[mTable.getGreatestTripId()];
-    final JourneyPointer[] stopToJourney = new JourneyPointer[mTable.getGreatestStopId()];
+    final Connection[] tripToEarliestReachableConnection = new Connection[mTable.getGreatestTripId() + 1];
+    final JourneyPointer[] stopToJourney = new JourneyPointer[mTable.getGreatestStopId() + 1];
 
     // Relax all initial footpaths
     sources.stream().map(IHasId::getId).flatMap(mTable::getOutgoingFootpaths).forEach(footpath -> {

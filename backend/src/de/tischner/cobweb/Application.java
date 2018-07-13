@@ -28,7 +28,6 @@ import de.tischner.cobweb.parsing.osm.OsmReducer;
 import de.tischner.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.tischner.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.tischner.cobweb.routing.model.RoutingModel;
-import de.tischner.cobweb.routing.model.graph.ICoreEdge;
 import de.tischner.cobweb.routing.model.graph.ICoreNode;
 import de.tischner.cobweb.routing.model.graph.IGetNodeById;
 import de.tischner.cobweb.routing.parsing.osm.OsmRoadFilter;
@@ -94,7 +93,7 @@ public final class Application {
   /**
    * Server to use for responding to routing requests. Offers a REST API.
    */
-  private RoutingServer<ICoreNode, ICoreEdge<ICoreNode>> mRoutingServer;
+  private RoutingServer mRoutingServer;
 
   /**
    * Creates a new application using the given arguments. After creation use
@@ -337,10 +336,9 @@ public final class Application {
     mLogger.info("Initializing routing");
 
     final IGetNodeById<ICoreNode> nodeProvider = mRoutingModel.getNodeProvider();
-    final ShortestPathComputationFactory<ICoreNode, ICoreEdge<ICoreNode>> computationFactory =
-        mRoutingModel.createShortestPathComputationFactory();
+    final ShortestPathComputationFactory computationFactory = mRoutingModel.createShortestPathComputationFactory();
 
-    mRoutingServer = new RoutingServer<>(mConfig, nodeProvider, computationFactory, mDatabase);
+    mRoutingServer = new RoutingServer(mConfig, nodeProvider, computationFactory, mDatabase);
     mRoutingServer.initialize();
   }
 
