@@ -63,6 +63,8 @@ public final class RangedOverflowListIterator<E> implements Iterator<E> {
 
     if (from < to) {
       mIterator = new RangedListIterator<>(elements, from, to);
+    } else if (to == 0) {
+      mIterator = new RangedListIterator<>(elements, from, elements.size());
     } else {
       final Iterator<E> fromToEnd = new RangedListIterator<>(elements, from, elements.size());
       final Iterator<E> startToTo = new RangedListIterator<>(elements, 0, to);
