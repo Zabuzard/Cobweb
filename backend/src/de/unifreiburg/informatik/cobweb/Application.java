@@ -173,12 +173,20 @@ public final class Application {
       return;
     }
     mWasShutdownRequested = true;
-    mLogger.info("Shutting down application");
+    if (mLogger != null) {
+      mLogger.info("Shutting down application");
+    }
     try {
-      mRoutingServer.shutdown();
-      mDatabase.shutdown();
+      if (mRoutingServer != null) {
+        mRoutingServer.shutdown();
+      }
+      if (mDatabase != null) {
+        mDatabase.shutdown();
+      }
     } catch (final Throwable e) {
-      mLogger.error("Error while shutting down application", e);
+      if (mLogger != null) {
+        mLogger.error("Error while shutting down application", e);
+      }
       throw e;
     }
   }
