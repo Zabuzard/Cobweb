@@ -1,7 +1,7 @@
 <project default="all">
   <property name="version" value="0.1" />
   <property name="projectdir" value="./" />
-  <property name="Main-class" value="de.tischner.cobweb.Main" />
+  <property name="Main-class" value="de.unifreiburg.informatik.cobweb.Main" />
   <property name="app-name" value="Cobweb" />
   <property name="jar-name" value="cobwebBackend" />
   <property name="src-dir" location="${projectdir}/src" />
