@@ -30,8 +30,6 @@ public final class Main {
       System.err.println("An unknown error occurred");
       e.printStackTrace();
     }
-
-    // TODO Make sure shutdown is always called, should be a shutdown hook
   }
 
   /**

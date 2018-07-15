@@ -9,7 +9,7 @@ import java.util.RandomAccess;
  * range is allowed to overflow the bound.<br>
  * <br>
  * For example iterating over a list of size <tt>7</tt> from index <tt>5</tt> to
- * </tt>2</tt> (exclusive) which would return indices <tt>5, 6, 0, 1</tt>.
+ * <tt>2</tt> (exclusive) which would return indices <tt>5, 6, 0, 1</tt>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <E> The type of the elements

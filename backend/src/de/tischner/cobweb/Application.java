@@ -94,6 +94,10 @@ public final class Application {
    * Server to use for responding to routing requests. Offers a REST API.
    */
   private RoutingServer mRoutingServer;
+  /**
+   * Whether the application was requested to shutdown.
+   */
+  private volatile boolean mWasShutdownRequested;
 
   /**
    * Creates a new application using the given arguments. After creation use
@@ -124,6 +128,7 @@ public final class Application {
    * @param args The arguments that specify which command to use.
    */
   public Application(final String[] args) {
+    mWasShutdownRequested = false;
     mCommandData = CommandParser.parseCommands(args);
   }
 
@@ -133,6 +138,10 @@ public final class Application {
    */
   public void initialize() {
     initializeLogger();
+
+    // Add shutdown hook for a controlled shutdown when killed
+    Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+
     mLogger.info("Command is: {}", mCommandData.getCommand().getName());
     mLogger.info("Initializing application");
     try {
@@ -159,8 +168,11 @@ public final class Application {
    * called. The application should not be used anymore after this method.
    * Instead create a new one.
    */
-  public void shutdown() {
-    // TODO Make sure this is always called, register some shutdown hook
+  public synchronized void shutdown() {
+    if (mWasShutdownRequested) {
+      return;
+    }
+    mWasShutdownRequested = true;
     mLogger.info("Shutting down application");
     try {
       mRoutingServer.shutdown();
@@ -201,6 +213,16 @@ public final class Application {
       mLogger.error("Error while starting application", e);
       throw e;
     }
+  }
+
+  /**
+   * Returns whether the application was requested to shutdown.
+   *
+   * @return <tt>True</tt> if the application was requested to shutdown,
+   *         <tt>false</tt> otherwise
+   */
+  public synchronized boolean wasShutdownRequested() {
+    return mWasShutdownRequested;
   }
 
   /**
