@@ -119,11 +119,11 @@ final class ConfigUtil {
   /**
    * Default port to use by the name search server.
    */
-  static final int VALUE_NAME_SEARCH_SERVER_PORT = 846;
+  static final int VALUE_NAME_SEARCH_SERVER_PORT = 2846;
   /**
    * Default port to use by the nearest search server.
    */
-  static final int VALUE_NEAREST_SEARCH_SERVER_PORT = 847;
+  static final int VALUE_NEAREST_SEARCH_SERVER_PORT = 2847;
   /**
    * Default path to the directory that contains all OSM data.
    */
@@ -139,7 +139,7 @@ final class ConfigUtil {
   /**
    * Default port to use by the routing server.
    */
-  static final int VALUE_ROUTING_SERVER_PORT = 845;
+  static final int VALUE_ROUTING_SERVER_PORT = 2845;
   /**
    * Whether an external or an internal in-memory database should be used.
    */

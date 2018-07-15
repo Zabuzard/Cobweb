@@ -20,6 +20,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.transit.IHasTime;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.transit.TransitEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.transit.TransitNode;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Connection;
+import de.unifreiburg.informatik.cobweb.routing.model.timetable.Footpath;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Stop;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Trip;
@@ -171,17 +172,10 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     int currentStopId = destination.getId();
     TransitNode currentDestination = createNodeForStop(currentStopId, stopToArrTime[currentStopId]);
 
-    // Special case where the shortest path only consists of the direct footpath
-    // between the source and destination.
-    if (stopToJourney[currentStopId] == null) {
-      // TODO The source should be the chosen, not any. Unfortunately that
-      // information is lost.
-      final TransitNode sourceNode = createNodeForStop(sources.iterator().next().getId(), startingTime);
-      ConnectionScan.addEdgeToPath(path, sourceNode, currentDestination, true);
-      return Optional.of(path);
-    }
-
-    while (stopToJourney[currentStopId] != null) {
+    // Backtrack journey pointers from destination to source. Stop when the
+    // initial pointer was found, i.e. a pointer only containing an initial
+    // footpath.
+    while (stopToJourney[currentStopId].getEnterConnection() != null) {
       final JourneyPointer pointer = stopToJourney[currentStopId];
       final Trip trip = mTable.getTrip(pointer.getExitConnection().getTripId());
       final Connection exitConnection = pointer.getExitConnection();
@@ -210,6 +204,13 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
       currentStopId = enterConnection.getDepStopId();
       currentDestination = currentConnectionArr;
     }
+
+    // Add the initial footpath from the source to the first connection. This
+    // also handles the special case were the shortest path only consists of a
+    // direct footpath between the source and destination.
+    final Footpath initialFootpath = stopToJourney[currentStopId].getFootpath();
+    final TransitNode sourceNode = createNodeForStop(initialFootpath.getDepStopId(), startingTime);
+    ConnectionScan.addEdgeToPath(path, sourceNode, currentDestination, true);
 
     return Optional.of(path);
   }
@@ -282,6 +283,8 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     // Relax all initial footpaths
     sources.stream().map(IHasId::getId).flatMap(mTable::getOutgoingFootpaths).forEach(footpath -> {
       stopToTentativeArrTime[footpath.getArrStopId()] = startingTime + footpath.getDuration();
+      // Add an initial footpath as journey pointer
+      stopToJourney[footpath.getArrStopId()] = new JourneyPointer(null, null, footpath);
     });
 
     // Process all connections ordered starting from the first after the
