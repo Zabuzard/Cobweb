@@ -106,8 +106,15 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
       int sequenceIndex = 0;
       while (sequenceIter.hasNext()) {
         sequenceStopTime = sequenceIter.next();
+        // The standard allows gaps in-between the external sequence indices. We
+        // do not, skip null entries.
+        if (sequenceStopTime == null) {
+          continue;
+        }
+
         // Connect last departure to current arrival
         final int arrStopId = mExtIdToStop.get(sequenceStopTime.getStopId()).getId();
+
         final int arrTime = sequenceStopTime.getArrTime();
 
         final Connection connection =

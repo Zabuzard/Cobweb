@@ -1,8 +1,11 @@
 package de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,8 +88,18 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
       return mRoadComputation.computeSearchSpace(sources, destination);
     }
     // TODO Don't ignore road nodes and road paths
-    final Collection<ICoreNode> transitSources = sources.stream().map(this::translate).collect(Collectors.toList());
+    final Collection<ICoreNode> transitSources =
+        sources.stream().map(this::translate).filter(Objects::nonNull).collect(Collectors.toList());
     final ICoreNode transitDestination = translate(destination);
+
+    // Special case where there is no translation for any of the nodes, for
+    // example if the transit network is empty
+    if (transitSources.isEmpty() || transitDestination == null) {
+      final Collection<ICoreNode> searchSpace = new ArrayList<>();
+      searchSpace.addAll(sources);
+      searchSpace.add(destination);
+      return searchSpace;
+    }
 
     final Collection<ICoreNode> searchSpace =
         mTransitComputation.computeSearchSpace(transitSources, transitDestination);
@@ -103,8 +116,15 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
       return mRoadComputation.computeShortestPath(sources, destination);
     }
     // TODO Don't ignore road nodes and road paths
-    final Collection<ICoreNode> transitSources = sources.stream().map(this::translate).collect(Collectors.toList());
+    final Collection<ICoreNode> transitSources =
+        sources.stream().map(this::translate).filter(Objects::nonNull).collect(Collectors.toList());
     final ICoreNode transitDestination = translate(destination);
+
+    // Special case where there is no translation for any of the nodes, for
+    // example if the transit network is empty
+    if (transitSources.isEmpty() || transitDestination == null) {
+      return Optional.empty();
+    }
 
     final Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> possiblePath =
         mTransitComputation.computeShortestPath(transitSources, transitDestination);
@@ -130,8 +150,15 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
       return mRoadComputation.computeShortestPathCost(sources, destination);
     }
     // TODO Don't ignore road nodes and road paths
-    final Collection<ICoreNode> transitSources = sources.stream().map(this::translate).collect(Collectors.toList());
+    final Collection<ICoreNode> transitSources =
+        sources.stream().map(this::translate).filter(Objects::nonNull).collect(Collectors.toList());
     final ICoreNode transitDestination = translate(destination);
+
+    // Special case where there is no translation for any of the nodes, for
+    // example if the transit network is empty
+    if (transitSources.isEmpty() || transitDestination == null) {
+      return Optional.empty();
+    }
 
     return mTransitComputation.computeShortestPathCost(transitSources, transitDestination);
   }
@@ -142,7 +169,14 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
       return mRoadComputation.computeShortestPathCostsReachable(sources);
     }
     // TODO Don't ignore road nodes and road paths
-    final Collection<ICoreNode> transitSources = sources.stream().map(this::translate).collect(Collectors.toList());
+    final Collection<ICoreNode> transitSources =
+        sources.stream().map(this::translate).filter(Objects::nonNull).collect(Collectors.toList());
+
+    // Special case where there is no translation for any of the nodes, for
+    // example if the transit network is empty
+    if (transitSources.isEmpty()) {
+      return Collections.emptyMap();
+    }
 
     final Map<ICoreNode, ? extends IHasPathCost> transitCostsReachable =
         mTransitComputation.computeShortestPathCostsReachable(transitSources);

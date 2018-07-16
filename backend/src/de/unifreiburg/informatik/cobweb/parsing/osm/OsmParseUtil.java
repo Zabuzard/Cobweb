@@ -16,6 +16,19 @@ import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
  */
 public final class OsmParseUtil {
   /**
+   * The maximal speed allowed on motorways in switzerland, in <tt>km/h</tt>.
+   */
+  public static final int CH_MOTORWAY_SPEED = 120;
+  /**
+   * The maximal speed allowed on rural highways in switzerland, in
+   * <tt>km/h</tt>.
+   */
+  public static final int CH_RURAL_SPEED = 80;
+  /**
+   * The maximal speed allowed in urban areas in switzerland, in <tt>km/h</tt>.
+   */
+  public static final int CH_URBAN_SPEED = 50;
+  /**
    * Tag name for OSM ways that contains the highway property.
    */
   public static final String HIGHWAY_TAG = "highway";
@@ -91,18 +104,58 @@ public final class OsmParseUtil {
     if (maxSpeedText.equals("signals")) {
       return EHighwayType.MOTORWAY.getAverageSpeed();
     }
+    // "CH:rural" refers to the maximal speed on rural highways in switzerland
+    if (maxSpeedText.equals("CH:rural")) {
+      return CH_RURAL_SPEED;
+    }
+    // "CH:motorway" refers to the maximal speed on motorways in switzerland
+    if (maxSpeedText.equals("CH:motorway")) {
+      return CH_MOTORWAY_SPEED;
+    }
+    // "CH:urban" refers to the maximal speed in urban areas in switzerland
+    if (maxSpeedText.equals("CH:urban")) {
+      return CH_URBAN_SPEED;
+    }
+    // "5p" is a typo referring to "50" (p and 0 are close to each other on the
+    // keyboard).
+    if (maxSpeedText.equals("5p")) {
+      return 50;
+    }
+    // "tp" is a typo referring to "50" (t and p are close to 5 and 0 on the
+    // keyboard).
+    if (maxSpeedText.equals("tp")) {
+      return 50;
+    }
 
     try {
+      // 50 mph
       if (maxSpeedText.matches("\\d+ mph")) {
         final int speedAsMph = Integer.parseInt(maxSpeedText.split(" ", 2)[0]);
         return (int) RoutingUtil.mphToKmh(speedAsMph);
       }
+      // 50, 60
       if (maxSpeedText.matches("\\d+, \\d+")) {
         final String[] valuesAsText = maxSpeedText.split(", ", 2);
         return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
       }
+      // 50;60
       if (maxSpeedText.matches("\\d+;\\d+")) {
         final String[] valuesAsText = maxSpeedText.split(";", 2);
+        return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
+      }
+      // 50; 60
+      if (maxSpeedText.matches("\\d+; \\d+")) {
+        final String[] valuesAsText = maxSpeedText.split("; ", 2);
+        return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
+      }
+      // 50;60;70
+      if (maxSpeedText.matches("\\d+;\\d+;\\d+")) {
+        final String[] valuesAsText = maxSpeedText.split(";", 3);
+        return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
+      }
+      // 50 / 60
+      if (maxSpeedText.matches("\\d+ / \\d+")) {
+        final String[] valuesAsText = maxSpeedText.split(" / ", 2);
         return Arrays.stream(valuesAsText).mapToInt(Integer::parseInt).min().getAsInt();
       }
 
