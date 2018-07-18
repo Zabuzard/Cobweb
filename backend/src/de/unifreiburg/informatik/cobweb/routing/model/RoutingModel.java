@@ -22,8 +22,8 @@ import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.AsTheCrowFlie
 import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.CoverTree;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
-import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.ITranslationWithTime;
-import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.RoadToNearestQueryTransitTranslation;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.IAccessNodeComputation;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.RoadToPerimeterTransitAccess;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IGetNodeById;
@@ -169,14 +169,13 @@ public final class RoutingModel {
     final ShortestPathComputationFactory factory;
     switch (mMode) {
       case GRAPH_WITH_TIMETABLE:
-        // TODO Exchange with a translation that is based on access nodes or a
-        // perimeter
-        final ITranslationWithTime<ICoreNode, ICoreNode> roadToTransitTranslation =
-            new RoadToNearestQueryTransitTranslation(mTimetable);
-        factory = new ShortestPathComputationFactory(mRoadGraph, mTimetable, roadToTransitTranslation, mMode);
+        final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation =
+            new RoadToPerimeterTransitAccess(mTimetable, mConfig.getRoadToTransitTransferRange());
+        factory = new ShortestPathComputationFactory(mRoadGraph, mTimetable, accessNodeComputation,
+            mNearestRoadNodeComputation, mMode);
         break;
       case LINK_GRAPH:
-        factory = new ShortestPathComputationFactory(mLinkGraph, null, null, mMode);
+        factory = new ShortestPathComputationFactory(mLinkGraph, null, null, null, mMode);
         break;
       default:
         throw new AssertionError();

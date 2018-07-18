@@ -6,13 +6,14 @@ import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.IMetric;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.landmark.ILandmarkProvider;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.landmark.LandmarkMetric;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.landmark.RandomLandmarks;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.connectionscan.ConnectionScan;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.modules.AStarModule;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.modules.ModuleDijkstra;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.modules.MultiModalModule;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.modules.TransitModule;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.HybridRoadTimetable;
-import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.ITranslationWithTime;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.IAccessNodeComputation;
 import de.unifreiburg.informatik.cobweb.routing.model.ERoutingModelMode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ETransportationMode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreEdge;
@@ -34,6 +35,10 @@ public final class ShortestPathComputationFactory {
    */
   private static final int AMOUNT_OF_LANDMARKS = 20;
   /**
+   * Object to use for computing access nodes. Or <tt>null</tt> if not used.
+   */
+  private final IAccessNodeComputation<ICoreNode, ICoreNode> mAccessNodeComputation;
+  /**
    * The base algorithm to use for {@link #createAlgorithm()}.
    */
   private IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mBaseComputation;
@@ -51,14 +56,14 @@ public final class ShortestPathComputationFactory {
    */
   private final ERoutingModelMode mMode;
   /**
+   * Object to use for retrieving the nearest road node to a given stop, or
+   * <tt>null</tt> if not used.
+   */
+  private final INearestNeighborComputation<ICoreNode> mStopToNearestRoadNode;
+  /**
    * The timetable to use for transit data, or <tt>null</tt> if not used.
    */
   private final Timetable mTable;
-  /**
-   * Object to use for translating a given road node into a transit node at a
-   * given time. Or <tt>null</tt> if not used.
-   */
-  private final ITranslationWithTime<ICoreNode, ICoreNode> mTranslation;
 
   /**
    * Creates a new shortest path computation factory which generates algorithms
@@ -66,18 +71,23 @@ public final class ShortestPathComputationFactory {
    * <br>
    * Use {@link #initialize()} after creation.
    *
-   * @param graph       The graph to route on
-   * @param table       The timetable to route on, or <tt>null</tt> if not used
-   * @param translation The translation to use, or <tt>null</tt> if not used.
-   *                    The object is used to translate road nodes to nearest
-   *                    transit nodes.
-   * @param mode        The mode to use for the routing model
+   * @param graph                 The graph to route on
+   * @param table                 The timetable to route on, or <tt>null</tt> if
+   *                              not used
+   * @param accessNodeComputation The access node computation to use, or
+   *                              <tt>null</tt> if not used.
+   * @param stopToNearestRoadNode Object to use for retrieving the nearest road
+   *                              node to a given stop, or <tt>null</tt> if not
+   *                              used.
+   * @param mode                  The mode to use for the routing model
    */
   public ShortestPathComputationFactory(final IGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final Timetable table,
-      final ITranslationWithTime<ICoreNode, ICoreNode> translation, final ERoutingModelMode mode) {
+      final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation,
+      final INearestNeighborComputation<ICoreNode> stopToNearestRoadNode, final ERoutingModelMode mode) {
     mGraph = graph;
     mTable = table;
-    mTranslation = translation;
+    mAccessNodeComputation = accessNodeComputation;
+    mStopToNearestRoadNode = stopToNearestRoadNode;
     mMode = mode;
   }
 
@@ -109,7 +119,7 @@ public final class ShortestPathComputationFactory {
     switch (mMode) {
       case GRAPH_WITH_TIMETABLE:
         return new HybridRoadTimetable(ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), MultiModalModule.of(modes)),
-            new ConnectionScan(mTable), mTranslation, modes, depTime);
+            new ConnectionScan(mTable), mAccessNodeComputation, mStopToNearestRoadNode, modes, depTime);
       case LINK_GRAPH:
         return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime),
             MultiModalModule.of(modes));

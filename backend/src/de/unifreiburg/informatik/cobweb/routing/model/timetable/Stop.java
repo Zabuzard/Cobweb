@@ -1,16 +1,13 @@
 package de.unifreiburg.informatik.cobweb.routing.model.timetable;
 
-import java.io.Serializable;
-
-import de.unifreiburg.informatik.cobweb.routing.model.graph.IHasId;
-import de.unifreiburg.informatik.cobweb.routing.model.graph.ISpatial;
+import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 
 /**
  * A stop of a transit network. Has spatial data and an unique ID.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class Stop implements ISpatial, IHasId, Serializable {
+public final class Stop implements ICoreNode {
   /**
    * The serial version UID.
    */

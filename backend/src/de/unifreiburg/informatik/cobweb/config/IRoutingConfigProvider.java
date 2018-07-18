@@ -36,6 +36,15 @@ public interface IRoutingConfigProvider {
   Path getOsmRoadFilter();
 
   /**
+   * Gets the maximal allowed range to transfer from a road node to a transit
+   * stop, in meters.
+   *
+   * @return The maximal allowed range to transfer from a road node to a transit
+   *         stop, in meters
+   */
+  int getRoadToTransitTransferRange();
+
+  /**
    * The mode to use for the routing model.
    *
    * @return The mode to use for the routing model

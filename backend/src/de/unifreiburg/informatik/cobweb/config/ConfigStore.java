@@ -110,6 +110,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   @Override
+  public int getRoadToTransitTransferRange() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_ROAD_TO_TRANSIT_TRANSFER_RANGE));
+  }
+
+  @Override
   public ERoutingModelMode getRoutingModelMode() {
     return ERoutingModelMode.valueOf(getSetting(ConfigUtil.KEY_ROUTING_MODEL_MODE));
   }
@@ -187,6 +192,8 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_SERVER_PORT, String.valueOf(ConfigUtil.VALUE_ROUTING_SERVER_PORT));
     mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_MODEL_MODE, ConfigUtil.VALUE_ROUTING_MODEL_MODE);
+    mDefaultSettings.put(ConfigUtil.KEY_ROAD_TO_TRANSIT_TRANSFER_RANGE,
+        String.valueOf(ConfigUtil.VALUE_ROAD_TO_TRANSIT_TRANSFER_RANGE));
 
     // Name search settings
     mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT,

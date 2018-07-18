@@ -1,26 +1,24 @@
 package de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Optional;
+import java.util.Collection;
+import java.util.Collections;
 
 import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.AsTheCrowFliesMetric;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.CoverTree;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.road.IRoadNode;
-import de.unifreiburg.informatik.cobweb.routing.model.graph.transit.TransitNode;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Stop;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable;
+import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
 
 /**
- * Implementation of a translation that translates road nodes to their nearest
- * transit node representing a stop at the given time.
+ * Implementation of an access node computation that, given a road node,
+ * provides all transit stops in a given range as access nodes.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public class RoadToNearestQueryTransitTranslation implements ITranslationWithTime<ICoreNode, ICoreNode> {
+public class RoadToPerimeterTransitAccess implements IAccessNodeComputation<ICoreNode, ICoreNode> {
   /**
    * Creates a data-structure for fast computation of nearest stops based on the
    * stops contained in the given timetable.
@@ -38,38 +36,36 @@ public class RoadToNearestQueryTransitTranslation implements ITranslationWithTim
    * The data-structure to use for fast nearest stop computation.
    */
   private final INearestNeighborComputation<Stop> mNearestStopComputation;
+  /**
+   * The range to search access nodes in, in seconds need to travel the
+   * distance.
+   */
+  private final double mRangeInTravelTime;
 
   /**
    * Creates a new translation that translates to the stops contained in the
    * given timetable.
    *
    * @param table The timetable that contains the stops to consider
+   * @param range The range to search access nodes in, in metres
    */
-  public RoadToNearestQueryTransitTranslation(final Timetable table) {
-    mNearestStopComputation = RoadToNearestQueryTransitTranslation.createNearestStopComputation(table);
+  public RoadToPerimeterTransitAccess(final Timetable table, final int range) {
+    mNearestStopComputation = RoadToPerimeterTransitAccess.createNearestStopComputation(table);
+
+    final double maximalSpeed = RoutingUtil.maximalRoadSpeed();
+    mRangeInTravelTime = RoutingUtil.travelTime(range, maximalSpeed);
   }
 
   @Override
-  public ICoreNode translate(final ICoreNode element, final long time) {
+  public Collection<ICoreNode> computeAccessNodes(final ICoreNode element) {
     if (!(element instanceof IRoadNode)) {
       throw new IllegalArgumentException();
     }
 
-    // Search stop nearest to the given road node
+    // Search stops in the given range to the given road node
     final Stop searchNeedle = new Stop(0, element.getLatitude(), element.getLongitude());
-    final Optional<Stop> possibleNearestStop = mNearestStopComputation.getNearestNeighbor(searchNeedle);
-    if (!possibleNearestStop.isPresent()) {
-      return null;
-    }
-    final Stop nearestStop = possibleNearestStop.get();
-
-    // Convert millis since epoch to seconds since midnight at the given date
-    final LocalDateTime dateTimeAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
-    final int secondsSinceMidnight = dateTimeAt.toLocalTime().toSecondOfDay();
-
-    // Construct the query transit node
-    return new TransitNode(nearestStop.getId(), nearestStop.getLatitude(), nearestStop.getLongitude(),
-        secondsSinceMidnight);
+    return Collections
+        .unmodifiableCollection(mNearestStopComputation.getNeighborhood(searchNeedle, mRangeInTravelTime));
   }
 
 }
