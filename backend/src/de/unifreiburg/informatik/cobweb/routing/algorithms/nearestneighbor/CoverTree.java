@@ -1,9 +1,11 @@
 package de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
 
@@ -118,6 +120,20 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private Node<E> mRootNode;
 
   /**
+   * Create an initially empty cover tree at level <tt>0</tt> which
+   * automatically expands above and below.
+   *
+   * @param base   The base of the tree
+   * @param metric The metric to use for determining distance between elements
+   */
+  public CoverTree(final double base, final IMetric<E> metric) {
+    mMetric = metric;
+    mMaxMinLevel = Integer.MIN_VALUE;
+    mNumLevels = new int[mMaxNumLevels - mMinNumLevels];
+    mBase = base;
+  }
+
+  /**
    * Create an initially empty cover tree which stops increasing the minimum
    * level as soon as the given number of nodes is reached.
    *
@@ -144,10 +160,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * @param metric The metric to use for determining distance between elements
    */
   public CoverTree(final IMetric<E> metric) {
-    mMetric = metric;
-    mMaxMinLevel = Integer.MIN_VALUE;
-    mNumLevels = new int[mMaxNumLevels - mMinNumLevels];
-    mBase = DEFAULT_BASE;
+    this(DEFAULT_BASE, metric);
   }
 
   /**
@@ -202,7 +215,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   @Override
-  public Optional<E> getNearestNeighbor(final E point) {
+  public synchronized Optional<E> getNearestNeighbor(final E point) {
     if (size() == 0) {
       return Optional.empty();
     }
@@ -248,13 +261,51 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     return Optional.empty();
   }
 
+  @Override
+  public synchronized Collection<E> getNeighborhood(final E point, final double range) {
+    if (size() == 0) {
+      return Collections.emptyList();
+    }
+
+    final List<Node<E>> candidates = CoverTree.createList();
+    candidates.add(mRootNode);
+    mRootNode.setDistance(distance(mRootNode, point));
+    for (int level = mMaxLevel; level > mMinLevel; level--) {
+      final List<Node<E>> nextCandidates = CoverTree.createList();
+      for (final Node<E> candidate : candidates) {
+        for (final Node<E> child : candidate.getChildren()) {
+          // Do not compute distances twice
+          if (!areAtSameLocation(candidate, child)) {
+            child.setDistance(distance(child, point));
+          } else {
+            child.setDistance(candidate.getDistance());
+          }
+          nextCandidates.add(child);
+        }
+      }
+
+      candidates.clear();
+
+      // Create a set of nearest neighbor candidates
+      for (final Node<E> nextCandidate : nextCandidates) {
+        if (nextCandidate.getDistance() < range + Math.pow(mBase, level)) {
+          candidates.add(nextCandidate);
+        }
+      }
+    }
+
+    // Check the remaining candidates and transform to the elements
+    return candidates.stream().filter(candidate -> candidate.getDistance() <= range).map(Node::getElement)
+        .collect(Collectors.toList());
+  }
+
   /**
    * Insert the given element into the tree.
    *
    * @param element The element to insert
    * @return If the element was inserted
    */
-  public boolean insert(final E element) {
+  public synchronized boolean insert(final E element) {
     if (mHasBounds) {
       // Elements outside of the bounding box will not be added to the tree
       final float latitude = element.getLatitude();
@@ -596,7 +647,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * @param numCenters The amount of elements to keep
    * @return The cover-set
    */
-  private List<Node<E>> removeNodes(final int numCenters) {
+  private synchronized List<Node<E>> removeNodes(final int numCenters) {
     List<Node<E>> coverset = CoverTree.createList();
     coverset.add(mRootNode);
     for (int level = mMaxLevel; level > mMinLevel + 1; level--) {
