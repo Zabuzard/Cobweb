@@ -124,7 +124,8 @@ function validateRequest(request) {
 		return null;
 	}
 
-	if (typeof request.modes == 'undefined' || request.modes.length == 0) {
+	if (typeof request.modes == 'undefined' || request.modes.length == 0
+			|| (request.modes.length == 1 && request.modes[0] == transModeToId.tramMode)) {
 		return null;
 	}
 
