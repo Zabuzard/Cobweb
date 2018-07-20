@@ -91,7 +91,7 @@ final class ConfigUtil {
    * Default maximal allowed amount of access nodes to use when transferring
    * from a road node to a transit stop.
    */
-  static final int VALUE_ACCESS_NODES_MAXIMUM = 5;
+  static final int VALUE_ACCESS_NODES_MAXIMUM = 3;
   /**
    * Default path to the SQL script that is executed when cleaning the external
    * database.

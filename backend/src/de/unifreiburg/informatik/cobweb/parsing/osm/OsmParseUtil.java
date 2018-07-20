@@ -29,6 +29,14 @@ public final class OsmParseUtil {
    */
   public static final int CH_URBAN_SPEED = 50;
   /**
+   * The maximal speed allowed on living streets in germany, in <tt>km/h</tt>.
+   */
+  public static final int DE_LIVING_STREET_SPEED = 7;
+  /**
+   * The maximal walking speed in germany, in <tt>km/h</tt>.
+   */
+  public static final int DE_WALK_SPEED = 7;
+  /**
    * Tag name for OSM ways that contains the highway property.
    */
   public static final String HIGHWAY_TAG = "highway";
@@ -75,6 +83,8 @@ public final class OsmParseUtil {
    *         present. The speed is in <tt>km/h</tt>.
    */
   public static int parseMaxSpeed(final Map<String, String> tagToValue) {
+    // TODO This method should be made more abstract, using maps for the
+    // exceptions and external files
     final String maxSpeedText = tagToValue.get(MAXSPEED_TAG);
     if (maxSpeedText == null) {
       return -1;
@@ -115,6 +125,15 @@ public final class OsmParseUtil {
     // "CH:urban" refers to the maximal speed in urban areas in switzerland
     if (maxSpeedText.equals("CH:urban")) {
       return CH_URBAN_SPEED;
+    }
+    // "DE:living_street" refers to the maximal speed on living streets in
+    // germany
+    if (maxSpeedText.equals("DE:living_street")) {
+      return DE_LIVING_STREET_SPEED;
+    }
+    // "DE:walk" refers to the maximal walking speed in germany
+    if (maxSpeedText.equals("DE:walk")) {
+      return DE_WALK_SPEED;
     }
     // "5p" is a typo referring to "50" (p and 0 are close to each other on the
     // keyboard).
