@@ -11,6 +11,15 @@ import de.unifreiburg.informatik.cobweb.routing.model.ERoutingModelMode;
  */
 public interface IRoutingConfigProvider {
   /**
+   * Gets the maximal allowed amount of access nodes to use when transferring
+   * from a road node to a transit stop.
+   *
+   * @return The maximal allowed amount of access nodes to use when transferring
+   *         from a road node to a transit stop
+   */
+  int getAccessNodesMaximum();
+
+  /**
    * Gets the path to the graph cache. Is used to serialize and deserialize a
    * graph.
    *
@@ -34,15 +43,6 @@ public interface IRoutingConfigProvider {
    * @return The path to the filter
    */
   Path getOsmRoadFilter();
-
-  /**
-   * Gets the maximal allowed range to transfer from a road node to a transit
-   * stop, in meters.
-   *
-   * @return The maximal allowed range to transfer from a road node to a transit
-   *         stop, in meters
-   */
-  int getRoadToTransitTransferRange();
 
   /**
    * The mode to use for the routing model.

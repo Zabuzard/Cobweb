@@ -13,6 +13,18 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.ISpatial;
  */
 public interface INearestNeighborComputation<E extends ISpatial> {
   /**
+   * Gets the <tt>k</tt> neighbors nearest to the given point. That are the
+   * <tt>k</tt> elements closest to the given point.
+   *
+   * @param point The point in question
+   * @param k     The amount of neighbors to get, a value of <tt>0</tt> yields
+   *              an empty result
+   * @return The <tt>k</tt> neighbors nearest to the given point, ascending in
+   *         distance to the point
+   */
+  Collection<E> getKNearestNeighbors(E point, int k);
+
+  /**
    * Gets the neighbor nearest to the given point. That is the element closest
    * to the given point.
    *

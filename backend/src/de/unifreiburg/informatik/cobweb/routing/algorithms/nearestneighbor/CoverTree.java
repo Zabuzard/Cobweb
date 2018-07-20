@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
+import org.eclipse.collections.impl.block.factory.Comparators;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
 import de.unifreiburg.informatik.cobweb.routing.algorithms.metrics.IMetric;
@@ -212,6 +214,59 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
     }
     return cover;
 
+  }
+
+  @Override
+  public synchronized Collection<E> getKNearestNeighbors(final E point, final int k) {
+    if (size() == 0 || k == 0) {
+      return Collections.emptyList();
+    }
+
+    final PriorityQueue<Double> minDists = new PriorityQueue<>(k, Comparators.reverseNaturalOrder());
+
+    final List<Node<E>> candidates = CoverTree.createList();
+    candidates.add(mRootNode);
+    mRootNode.setDistance(distance(mRootNode, point));
+    minDists.add(mRootNode.getDistance());
+    for (int level = mMaxLevel; level > mMinLevel; level--) {
+      final List<Node<E>> nextCandidates = CoverTree.createList();
+      for (final Node<E> candidate : candidates) {
+        for (final Node<E> child : candidate.getChildren()) {
+          // Do not compute distances twice
+          if (!areAtSameLocation(candidate, child)) {
+            child.setDistance(distance(child, point));
+            // Remember the element if not collected enough already or better
+            // than current greatest minimal distance
+            if (minDists.size() < k) {
+              minDists.add(child.getDistance());
+            } else if (child.getDistance() < minDists.peek()) {
+              // Throw away current greatest minimal distance to make place for
+              // the closer child
+              minDists.remove();
+              minDists.add(child.getDistance());
+            }
+          } else {
+            child.setDistance(candidate.getDistance());
+          }
+          nextCandidates.add(child);
+        }
+      }
+
+      candidates.clear();
+
+      // Create a set of nearest neighbor candidates
+      final double greatestMinDist = minDists.peek();
+      for (final Node<E> nextCandidate : nextCandidates) {
+        if (nextCandidate.getDistance() < greatestMinDist + Math.pow(mBase, level)) {
+          candidates.add(nextCandidate);
+        }
+      }
+    }
+
+    // Check the remaining candidates and transform to the elements
+    final double greatestMinDist = minDists.peek();
+    return candidates.stream().filter(candidate -> candidate.getDistance() <= greatestMinDist).sorted()
+        .map(Node::getElement).collect(Collectors.toList());
   }
 
   @Override

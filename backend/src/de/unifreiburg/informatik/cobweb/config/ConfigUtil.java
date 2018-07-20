@@ -11,6 +11,11 @@ import java.nio.file.Paths;
  */
 final class ConfigUtil {
   /**
+   * Name of the key that stores the maximal allowed amount of access nodes to
+   * use when transferring from a road node to a transit stop.
+   */
+  static final String KEY_ACCESS_NODES_MAXIMUM = "accessNodesMaximum";
+  /**
    * Name of the key that stores the path to the SQL script to execute when
    * cleaning the external database.
    */
@@ -66,11 +71,6 @@ final class ConfigUtil {
    */
   static final String KEY_OSM_ROAD_FILTER = "osmRoadFilter";
   /**
-   * Name of the key that stores the maximal allowed range to transfer from a
-   * road node to a transit stop, in meters.
-   */
-  static final String KEY_ROAD_TO_TRANSIT_TRANSFER_RANGE = "roadToTransitTransferRange";
-  /**
    * Name of the key that stores the mode to use for the routing model.
    */
   static final String KEY_ROUTING_MODEL_MODE = "routingModelMode";
@@ -87,6 +87,11 @@ final class ConfigUtil {
    * Name of the key that stores whether or not the graph cache should be used.
    */
   static final String KEY_USE_GRAPH_CACHE = "useGraphCache";
+  /**
+   * Default maximal allowed amount of access nodes to use when transferring
+   * from a road node to a transit stop.
+   */
+  static final int VALUE_ACCESS_NODES_MAXIMUM = 5;
   /**
    * Default path to the SQL script that is executed when cleaning the external
    * database.
@@ -137,11 +142,6 @@ final class ConfigUtil {
    * Default path to the filter file used to filter road ways in OSM data.
    */
   static final Path VALUE_OSM_ROAD_FILTER = Paths.get("res", "filter", "osm", "road.filter");
-  /**
-   * Default maximal allowed range to transfer from a road node to a transit
-   * stop, in meters
-   */
-  static final int VALUE_ROAD_TO_TRANSIT_TRANSFER_RANGE = 300;
   /**
    * The default mode to use for the routing model.
    */

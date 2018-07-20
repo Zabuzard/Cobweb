@@ -102,6 +102,47 @@ public final class CoverTreeTest {
 
   /**
    * Test method for
+   * {@link de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.CoverTree#getKNearestNeighbors(de.unifreiburg.informatik.cobweb.routing.model.graph.ISpatial, int)}.
+   */
+  @Test
+  public void testGetKNearestNeighbors() {
+    final TransitNode point = new TransitNode(1, 20.0F, 70.0F, 1);
+
+    Assert.assertTrue(mTreeSecond.getKNearestNeighbors(point, 0).isEmpty());
+
+    Assert.assertEquals(Arrays.asList(10),
+        mTreeSecond.getKNearestNeighbors(point, 1).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3),
+        mTreeSecond.getKNearestNeighbors(point, 2).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11),
+        mTreeSecond.getKNearestNeighbors(point, 3).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1),
+        mTreeSecond.getKNearestNeighbors(point, 4).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7),
+        mTreeSecond.getKNearestNeighbors(point, 5).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2),
+        mTreeSecond.getKNearestNeighbors(point, 6).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5),
+        mTreeSecond.getKNearestNeighbors(point, 7).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6),
+        mTreeSecond.getKNearestNeighbors(point, 8).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4),
+        mTreeSecond.getKNearestNeighbors(point, 9).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4, 8),
+        mTreeSecond.getKNearestNeighbors(point, 10).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4, 8, 9),
+        mTreeSecond.getKNearestNeighbors(point, 11).stream().map(IHasId::getId).collect(Collectors.toList()));
+
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4, 8, 9),
+        mTreeSecond.getKNearestNeighbors(point, 12).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4, 8, 9),
+        mTreeSecond.getKNearestNeighbors(point, 13).stream().map(IHasId::getId).collect(Collectors.toList()));
+    Assert.assertEquals(Arrays.asList(10, 3, 11, 1, 7, 2, 5, 6, 4, 8, 9),
+        mTreeSecond.getKNearestNeighbors(point, 100).stream().map(IHasId::getId).collect(Collectors.toList()));
+  }
+
+  /**
+   * Test method for
    * {@link de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.CoverTree#getNearestNeighbor(de.unifreiburg.informatik.cobweb.routing.model.graph.ISpatial)}.
    */
   @Test

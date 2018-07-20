@@ -23,7 +23,7 @@ import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.Cover
 import de.unifreiburg.informatik.cobweb.routing.algorithms.nearestneighbor.INearestNeighborComputation;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.IAccessNodeComputation;
-import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.RoadToPerimeterTransitAccess;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.RoadToKNearestTransitAccess;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IGetNodeById;
@@ -170,7 +170,7 @@ public final class RoutingModel {
     switch (mMode) {
       case GRAPH_WITH_TIMETABLE:
         final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation =
-            new RoadToPerimeterTransitAccess(mTimetable, mConfig.getRoadToTransitTransferRange());
+            new RoadToKNearestTransitAccess(mTimetable, mConfig.getAccessNodesMaximum());
         factory = new ShortestPathComputationFactory(mRoadGraph, mTimetable, accessNodeComputation,
             mNearestRoadNodeComputation, mMode);
         break;
