@@ -27,6 +27,7 @@ import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmo
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IGetNodeById;
+import de.unifreiburg.informatik.cobweb.routing.model.graph.IGraph;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.link.LinkGraph;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.road.RoadGraph;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.road.RoadNode;
@@ -238,6 +239,15 @@ public final class RoutingModel {
   }
 
   /**
+   * Gets the routing model mode used by this model.
+   *
+   * @return The routing model mode used by this model
+   */
+  public ERoutingModelMode getMode() {
+    return mMode;
+  }
+
+  /**
    * Gets the algorithm to use for nearest road node computation.
    *
    * @return The algorithm to use for nearest road node computation
@@ -263,6 +273,16 @@ public final class RoutingModel {
   }
 
   /**
+   * Gets the query graph used by this model. That is the graph that provides
+   * the nodes to query on.
+   *
+   * @return The query graph used by this model
+   */
+  public IGraph<ICoreNode, ICoreEdge<ICoreNode>> getQueryGraph() {
+    return mRoadGraph;
+  }
+
+  /**
    * Gets information about the size of the routing model.
    *
    * @return A human readable information of the model size
@@ -279,7 +299,8 @@ public final class RoutingModel {
     initializeNearestRoadNodeComputation();
     switch (mMode) {
       case GRAPH_WITH_TIMETABLE:
-        // TODO Link road graph to timetable
+        // Road graph is implicitly linked by access node computation which is
+        // done on-the-fly
         break;
       case LINK_GRAPH:
         linkGraphs();

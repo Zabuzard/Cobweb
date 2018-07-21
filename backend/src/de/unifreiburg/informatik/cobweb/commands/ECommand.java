@@ -7,6 +7,10 @@ package de.unifreiburg.informatik.cobweb.commands;
  */
 public enum ECommand {
   /**
+   * Command which starts the API and then runs benchmarks on it.
+   */
+  BENCHMARK("benchmark"),
+  /**
    * Command which clears the database and all cached and serialized data.
    */
   CLEAN("clean"),

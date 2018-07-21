@@ -28,6 +28,8 @@ public final class CommandParser {
    * default service will run faster.</li>
    * <li><b><tt>args[0] = clean</tt></b>: Clears the database and all cached and
    * serialized data.</li>
+   * <li><b><tt>args[0] = benchmark</tt></b>: Initializes the API and benchmarks
+   * the routing model.</li>
    * <li><b><tt>args[1+]</tt></b>: Paths to data files that should be used by
    * the commands instead of the files from the directories set in the
    * configuration file.
@@ -37,6 +39,8 @@ public final class CommandParser {
    * <li><tt>reduce</tt>: Reduces the given unreduced data files (OSM, GTFS)
    * instead of the unreduced files in the set directories.</li>
    * <li><tt>clean</tt>: Not supported, will ignore paths.</li>
+   * <li><tt>benchmark</tt>: Uses the given files as data files (OSM, GTFS)
+   * instead of the set directories.</li>
    * </ul>
    * </li>
    * </ul>

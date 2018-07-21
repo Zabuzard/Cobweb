@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.util.ContextInitializer;
+import de.unifreiburg.informatik.cobweb.benchmark.BenchmarkSuite;
 import de.unifreiburg.informatik.cobweb.commands.CommandData;
 import de.unifreiburg.informatik.cobweb.commands.CommandParser;
 import de.unifreiburg.informatik.cobweb.commands.ECommand;
@@ -112,6 +113,8 @@ public final class Application {
    * default service will run faster.</li>
    * <li><b><tt>args[0] = clean</tt></b>: Clears the database and all cached and
    * serialized data.</li>
+   * <li><b><tt>args[0] = benchmark</tt></b>: Initializes the API and benchmarks
+   * the routing model.</li>
    * <li><b><tt>args[1+]</tt></b>: Paths to data files that should be used by
    * the commands instead of the files from the directories set in the
    * configuration file.
@@ -121,6 +124,8 @@ public final class Application {
    * <li><tt>reduce</tt>: Reduces the given unreduced data files (OSM, GTFS)
    * instead of the unreduced files in the set directories.</li>
    * <li><tt>clean</tt>: Not supported, will ignore paths.</li>
+   * <li><tt>benchmark</tt>: Uses the given files as data files (OSM, GTFS)
+   * instead of the set directories.</li>
    * </ul>
    * </li>
    * </ul>
@@ -152,7 +157,7 @@ public final class Application {
       // Save to ensure old configuration files get new default parameter
       mConfigLoader.saveConfig(mConfig);
 
-      if (mCommandData.getCommand() == ECommand.START) {
+      if (mCommandData.getCommand() == ECommand.START || mCommandData.getCommand() == ECommand.BENCHMARK) {
         initializeApi();
       }
       final Instant initEndTime = Instant.now();
@@ -213,6 +218,9 @@ public final class Application {
           break;
         case REDUCE:
           startReducer();
+          break;
+        case BENCHMARK:
+          startBenchmark();
           break;
         default:
           throw new AssertionError();
@@ -294,9 +302,11 @@ public final class Application {
     mRoutingModel.finishModel();
     mLogger.info("Model size: {}", mRoutingModel.getSizeInformation());
 
-    initializeRouting();
-    initializeNameSearch();
-    initializeNearestSearch();
+    if (mCommandData.getCommand() == ECommand.START) {
+      initializeRouting();
+      initializeNameSearch();
+      initializeNearestSearch();
+    }
 
     final Instant initEndTime = Instant.now();
     mLogger.info("Initialization of API took: {}", Duration.between(initStartTime, initEndTime));
@@ -370,6 +380,14 @@ public final class Application {
 
     mRoutingServer = new RoutingServer(mConfig, nodeProvider, computationFactory, mDatabase);
     mRoutingServer.initialize();
+  }
+
+  /**
+   * Starts the benchmark command.
+   */
+  private void startBenchmark() {
+    final BenchmarkSuite suite = new BenchmarkSuite(mRoutingModel);
+    suite.start();
   }
 
   /**
