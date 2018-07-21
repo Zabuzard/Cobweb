@@ -22,11 +22,11 @@ public final class Benchmark implements Runnable {
   /**
    * The amount of how often a measurement is to be repeated for averaging.
    */
-  private static final int AVERAGE_AMOUNT = 100;
+  private static final int AVERAGE_AMOUNT = 25;
   /**
    * The amount of steps after which to generate a log message.
    */
-  private static final int LOG_EVERY = 6;
+  private static final int LOG_EVERY = 3;
   /**
    * Logger used for logging.
    */
@@ -112,8 +112,9 @@ public final class Benchmark implements Runnable {
 
   @Override
   public void run() {
-    final int amountOfSteps = (int) ((mDepTimeEnd - mDepTimeStart) / mDepTimeSteps);
+    final int amountOfSteps = (int) ((mDepTimeEnd - mDepTimeStart) / mDepTimeSteps) + 1;
     int stepCounter = 0;
+    LOGGER.info(stepCounter + " of " + amountOfSteps);
 
     for (long depTime = mDepTimeStart; depTime <= mDepTimeEnd; depTime += mDepTimeSteps) {
       final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> shortestPathComputation =
@@ -130,16 +131,19 @@ public final class Benchmark implements Runnable {
         final long duration = endTime - startTime;
         final long durationMillis = RoutingUtil.nanosToMillis(duration);
         durationsMillis[i] = durationMillis;
+
+        if (i % 5 == 0) {
+          LOGGER.info("\t" + i + " of " + AVERAGE_AMOUNT);
+        }
       }
 
       final long durationMillisAverage = (long) Arrays.stream(durationsMillis).average().getAsDouble();
       mResults.addMeasurement(depTime, durationMillisAverage);
 
+      stepCounter++;
       if (stepCounter % LOG_EVERY == 0) {
         LOGGER.info(stepCounter + " of " + amountOfSteps);
       }
-
-      stepCounter++;
     }
   }
 }

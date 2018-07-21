@@ -174,12 +174,10 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    */
   public void start() {
     LOGGER.info("Starting benchmarks");
-    BenchmarkSuite.warmup();
-
     // Write a header with the seed
     try {
       Files.write(RESULTS_PATH, Collections.singletonList("#Benchmark with seed: " + mSeed), StandardOpenOption.CREATE,
-          StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+          StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     } catch (final IOException e) {
       e.printStackTrace();
       return;
@@ -187,6 +185,8 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
     mQueryNodes = mQueryGraph.getNodes().toArray(new ICoreNode[0]);
     final ShortestPathComputationFactory factory = mModel.createShortestPathComputationFactory();
+
+    BenchmarkSuite.warmup();
 
     try {
       // Road only
