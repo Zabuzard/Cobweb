@@ -25,6 +25,11 @@ final class ConfigUtil {
    */
   static final String KEY_DB_INFO = "dbInfo";
   /**
+   * Name of the key that stores the range in meters stops should get connected
+   * by footpaths.
+   */
+  static final String KEY_FOOTPATH_REACHABILITY = "footpathReachability";
+  /**
    * Name of the key that stores the path to the graph cache.
    */
   static final String KEY_GRAPH_CACHE = "graphCache";
@@ -79,6 +84,11 @@ final class ConfigUtil {
    */
   static final String KEY_ROUTING_SERVER_PORT = "routingServerPort";
   /**
+   * Name of the key that stores the amount in seconds a transfer at the same
+   * stop takes.
+   */
+  static final String KEY_TRANSFER_DELAY = "transferDelay";
+  /**
    * Name of the key that stores whether the external or an internal in-memory
    * database should be used.
    */
@@ -101,6 +111,10 @@ final class ConfigUtil {
    * Default path to the database info object.
    */
   static final Path VALUE_DB_INFO = Paths.get("res", "cache", "db", "db.info");
+  /**
+   * Default range in meters stops should get connected by footpaths.
+   */
+  static final int VALUE_FOOTPATH_REACHABILITY = 600;
   /**
    * Default path to the graph cache.
    */
@@ -150,6 +164,10 @@ final class ConfigUtil {
    * Default port to use by the routing server.
    */
   static final int VALUE_ROUTING_SERVER_PORT = 2845;
+  /**
+   * Default amount in seconds a transfer at the same stop takes.
+   */
+  static final int VALUE_TRANSFER_DELAY = 300;
   /**
    * Whether an external or an internal in-memory database should be used.
    */

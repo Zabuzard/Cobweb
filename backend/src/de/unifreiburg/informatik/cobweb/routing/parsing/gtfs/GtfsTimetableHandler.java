@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import de.unifreiburg.informatik.cobweb.parsing.gtfs.GtfsEntityForwarder;
 import de.unifreiburg.informatik.cobweb.parsing.gtfs.IGtfsFileHandler;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Connection;
+import de.unifreiburg.informatik.cobweb.routing.model.timetable.Footpath;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.ITimetableIdGenerator;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.SequenceStopTime;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Stop;
@@ -52,7 +53,7 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
    */
   private final MutableMap<AgencyAndId, Stop> mExtIdToStop;
   /**
-   * Map connecting trip IDs to their to their corresponding object.
+   * Map connecting trip IDs to their corresponding object.
    */
   private final MutableMap<AgencyAndId, Trip> mExtIdToTrip;
   /**
@@ -63,6 +64,10 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
    * The timetable to fill with data.
    */
   private final Timetable mTable;
+  /**
+   * A collection of all transfers to add.
+   */
+  private final Collection<Transfer> mTransfers;
   /**
    * Map connecting trip IDs to sequence stop times in the sequence of the trip.
    */
@@ -80,6 +85,7 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
     mExtIdToStop = Maps.mutable.empty();
     mExtIdToTrip = Maps.mutable.empty();
     mTripToSequence = Maps.mutable.empty();
+    mTransfers = FastList.newList();
   }
 
   @Override
@@ -132,7 +138,17 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
     // Add all connections to the table
     mTable.addConnections(connections);
 
+    // Construct and add footpaths out of transfers
+    mTransfers.forEach(transfer -> {
+      final int fromId = mExtIdToStop.get(transfer.getFromStop().getId()).getId();
+      final int toId = mExtIdToStop.get(transfer.getToStop().getId()).getId();
+      final int duration = transfer.getMinTransferTime();
+
+      mTable.addFootpath(new Footpath(fromId, toId, duration));
+    });
+
     // Prepare for possible next round
+    mTransfers.clear();
     mExtIdToStop.clear();
     mExtIdToTrip.clear();
     mTripToSequence.clear();
@@ -232,7 +248,8 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
 
   @Override
   public void handle(final Transfer transfer) {
-    // Ignore, not interested in
+    // Used for footpath construction
+    mTransfers.add(transfer);
   }
 
   @Override

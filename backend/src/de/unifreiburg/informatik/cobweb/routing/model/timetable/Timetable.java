@@ -1,17 +1,24 @@
 package de.unifreiburg.informatik.cobweb.routing.model.timetable;
 
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.api.set.primitive.MutableIntSet;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
+import org.eclipse.collections.impl.factory.primitive.IntSets;
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.unifreiburg.informatik.cobweb.routing.model.graph.UniqueIdGenerator;
 import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
@@ -21,8 +28,10 @@ import de.unifreiburg.informatik.cobweb.util.collections.RangedOverflowListItera
  * A timetable for representing a transit network consisting of stops, trips,
  * connections and footpaths.<br>
  * <br>
- * Use methods like {@link #addConnections(Collection)}, {@link #addStop(Stop)}
- * and {@link #addTrip(Trip)} to modify the table. Methods are
+ * Use methods like {@link #addConnections(Collection)}, {@link #addStop(Stop)},
+ * {@link #addTrip(Trip)} and {@link #addFootpath(Footpath)} to modify the
+ * table. After finishing modifying use {@link #correctFootpaths(int, int)} to
+ * correct the footpath model. Methods like
  * {@link #getConnectionsStartingSince(int)} and other getters can be used to
  * retrieve data.
  *
@@ -30,17 +39,26 @@ import de.unifreiburg.informatik.cobweb.util.collections.RangedOverflowListItera
  */
 public final class Timetable implements ITimetableIdGenerator, Serializable {
   /**
+   * Logger used for logging.
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(Timetable.class);
+  /**
    * The serial version UID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Transfer time in seconds.
+   * The amount of footpaths contained in the timetable.
    */
-  private static final int TRANSFER_DELAY = 5 * 60;
+  private int mAmountOfFootpaths;
   /**
    * The list of all connections, sorted ascending in departure time.
    */
   private final List<Connection> mConnections;
+  /**
+   * Data-structure mapping stop IDs to all IDs of stops that can be reached
+   * from them by foot.
+   */
+  private final MutableIntObjectMap<MutableIntSet> mFootpathReachability;
   /**
    * The greatest ID currently in use for a stop in this table.
    */
@@ -62,6 +80,10 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
    */
   private final UniqueIdGenerator mStopIdGenerator;
   /**
+   * Data-structure mapping stop IDs to all outgoing footpaths.
+   */
+  private final MutableIntObjectMap<Collection<Footpath>> mStopIdToOutgoingFootpaths;
+  /**
    * The unique ID generator used for trips.
    */
   private final UniqueIdGenerator mTripIdGenerator;
@@ -75,6 +97,8 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
     mConnections = new ArrayList<>();
     mIdToStop = IntObjectMaps.mutable.empty();
     mIdToTrip = IntObjectMaps.mutable.empty();
+    mStopIdToOutgoingFootpaths = IntObjectMaps.mutable.empty();
+    mFootpathReachability = IntObjectMaps.mutable.empty();
   }
 
   /**
@@ -93,6 +117,17 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
   }
 
   /**
+   * Adds the given footpath to the timetable.
+   *
+   * @param footpath The footpath to add
+   */
+  public void addFootpath(final Footpath footpath) {
+    mStopIdToOutgoingFootpaths.getIfAbsentPut(footpath.getDepStopId(), FastList::new).add(footpath);
+    mFootpathReachability.getIfAbsentPut(footpath.getDepStopId(), IntSets.mutable.empty()).add(footpath.getArrStopId());
+    mAmountOfFootpaths++;
+  }
+
+  /**
    * Adds the given stop to the table.
    *
    * @param stop The stop to add
@@ -108,6 +143,106 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
    */
   public void addTrip(final Trip trip) {
     mIdToTrip.put(trip.getId(), trip);
+  }
+
+  /**
+   * Corrects the footpath model by adding missing self-loops and all missing
+   * edges such that the graph is transitively closed.
+   *
+   * @param transferDelay        The amount in seconds a transfer at the same
+   *                             stop takes, in case there was no such transfer
+   *                             added before
+   * @param footpathReachability The range in meters stops are connected by
+   *                             footpaths, in case there was no such transfer
+   *                             added before. Walking duration is approximated
+   *                             based on the stop coordinates
+   */
+  public void correctFootpaths(final int transferDelay, final int footpathReachability) {
+    LOGGER.debug("Correcting footpaths");
+
+    // Add missing self-loops
+    LOGGER.debug("Computing missing self-loops");
+    final Collection<Footpath> selfLoopsToAdd = FastList.newList();
+    mIdToStop.keysView().forEach(fromId -> {
+      final MutableIntSet reachableStopIds = mFootpathReachability.get(fromId);
+      if (reachableStopIds == null || !reachableStopIds.contains(fromId)) {
+        // Self-loop is missing
+        selfLoopsToAdd.add(new Footpath(fromId, fromId, transferDelay));
+      }
+    });
+    selfLoopsToAdd.forEach(this::addFootpath);
+    LOGGER.debug("Adding {} self-loops", selfLoopsToAdd.size());
+
+    // Connect close stops
+    LOGGER.debug("Connecting close stops");
+    final Collection<Footpath> closeFootpathsToAdd = FastList.newList();
+    mIdToStop.values().forEach(fromStop -> {
+      final int fromStopId = fromStop.getId();
+      final MutableIntSet reachableStopIds = mFootpathReachability.get(fromStopId);
+      mIdToStop.values().stream().forEach(toStop -> {
+        // Ignore already reachable stops
+        if (reachableStopIds != null && reachableStopIds.contains(toStop.getId())) {
+          return;
+        }
+
+        // Do not consider stop as target if not close enough
+        final double distance = RoutingUtil.distanceEquiRect(fromStop, toStop);
+        if (distance > footpathReachability) {
+          return;
+        }
+
+        // Construct footpath
+        final double speed = RoutingUtil.getWalkingSpeed();
+        final int duration = (int) RoutingUtil.travelTime(distance, speed);
+        closeFootpathsToAdd.add(new Footpath(fromStopId, toStop.getId(), duration));
+      });
+    });
+    closeFootpathsToAdd.forEach(this::addFootpath);
+    LOGGER.debug("Adding {} footpaths to close stops", closeFootpathsToAdd.size());
+
+    // Compute transitive closure
+    LOGGER.debug("Computing transitive closure");
+    final Collection<Footpath> transitiveClosureToAdd = FastList.newList();
+    // Breadth-first-search per stop
+    mIdToStop.keysView().forEach(fromStopId -> {
+      // Find all reachable stops
+      final Queue<Integer> stopsToRelax = new ArrayDeque<>();
+      stopsToRelax.add(fromStopId);
+      final MutableIntSet deepReachable = IntSets.mutable.empty();
+      deepReachable.add(fromStopId);
+
+      while (!stopsToRelax.isEmpty()) {
+        final int currentStop = stopsToRelax.poll();
+        final MutableIntSet directReachable = mFootpathReachability.get(currentStop);
+        if (directReachable == null) {
+          continue;
+        }
+        directReachable.forEach(directTarget -> {
+          // Target was not visited already
+          if (!deepReachable.contains(directTarget)) {
+            stopsToRelax.add(directTarget);
+            deepReachable.add(directTarget);
+          }
+        });
+      }
+
+      // Compute the difference between direct and deep reachable, those are the
+      // edges to add for the transitive closure
+      if (mFootpathReachability != null) {
+        deepReachable.removeAll(mFootpathReachability.get(fromStopId));
+      }
+      final Stop fromStop = mIdToStop.get(fromStopId);
+      deepReachable.forEach(toStopId -> {
+        final Stop toStop = mIdToStop.get(toStopId);
+        // Construct footpath
+        final double distance = RoutingUtil.distanceEquiRect(fromStop, toStop);
+        final double speed = RoutingUtil.getWalkingSpeed();
+        final int duration = (int) RoutingUtil.travelTime(distance, speed);
+        transitiveClosureToAdd.add(new Footpath(fromStopId, toStopId, duration));
+      });
+    });
+    transitiveClosureToAdd.forEach(this::addFootpath);
+    LOGGER.debug("Adding {} footpaths for transitive closure", transitiveClosureToAdd.size());
   }
 
   @Override
@@ -179,28 +314,7 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
    * @return A stream over all footpaths going out of the given stop
    */
   public Stream<Footpath> getOutgoingFootpaths(final int stopId) {
-    final Stop stop = mIdToStop.get(stopId);
-    if (stop == null) {
-      return Stream.empty();
-    }
-
-    // TODO It may be inefficient to construct footpaths on the fly to all other
-    // stops
-    return mIdToStop.values().stream().map(arrStop -> {
-      final int arrId = arrStop.getId();
-
-      // Footpath to same stop
-      if (arrId == stopId) {
-        return new Footpath(stopId, arrId, TRANSFER_DELAY);
-      }
-
-      // Compute walking time
-      final double distance = RoutingUtil.distanceEquiRect(stop, arrStop);
-      final double speed = RoutingUtil.getWalkingSpeed();
-      final int duration = (int) RoutingUtil.travelTime(distance, speed);
-
-      return new Footpath(stopId, arrId, duration);
-    });
+    return mStopIdToOutgoingFootpaths.get(stopId).stream();
   }
 
   /**
@@ -252,6 +366,7 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
     sj.add("stops=" + mIdToStop.size());
     sj.add("trips=" + mIdToTrip.size());
     sj.add("connections=" + mConnections.size());
+    sj.add("footpaths=" + mAmountOfFootpaths);
     return sj.toString();
   }
 }

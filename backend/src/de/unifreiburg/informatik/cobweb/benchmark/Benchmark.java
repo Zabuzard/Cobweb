@@ -129,6 +129,7 @@ public final class Benchmark implements Runnable {
         final ICoreNode destination = mProvider.getQueryNode();
 
         final long startTime = System.nanoTime();
+        // TODO Should the benchmark include or exclude not reachable paths?
         shortestPathComputation.computeShortestPath(source, destination);
         final long endTime = System.nanoTime();
         final long duration = endTime - startTime;

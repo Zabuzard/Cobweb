@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -137,20 +136,6 @@ public final class TimetableTest {
     Assert.assertTrue(connectionIter.hasNext());
     Assert.assertEquals(1, connectionIter.next().getSequenceIndex());
     Assert.assertFalse(connectionIter.hasNext());
-  }
-
-  /**
-   * Test method for
-   * {@link de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable#getOutgoingFootpaths(int)}.
-   */
-  @Test
-  public void testGetOutgoingFootpaths() {
-    final Set<Integer> arrStops =
-        mTable.getOutgoingFootpaths(1).map(Footpath::getArrStopId).collect(Collectors.toSet());
-    Assert.assertEquals(3, arrStops.size());
-    Assert.assertTrue(arrStops.contains(1));
-    Assert.assertTrue(arrStops.contains(2));
-    Assert.assertTrue(arrStops.contains(3));
   }
 
   /**

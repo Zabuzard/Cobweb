@@ -301,6 +301,8 @@ public final class RoutingModel {
       case GRAPH_WITH_TIMETABLE:
         // Road graph is implicitly linked by access node computation which is
         // done on-the-fly
+        // Correct the footpath model of the timetable
+        mTimetable.correctFootpaths(mConfig.getTransferDelay(), mConfig.getFootpathReachability());
         break;
       case LINK_GRAPH:
         linkGraphs();

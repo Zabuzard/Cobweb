@@ -65,6 +65,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   @Override
+  public int getFootpathReachability() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_FOOTPATH_REACHABILITY));
+  }
+
+  @Override
   public Path getGraphCache() {
     return Paths.get(getSetting(ConfigUtil.KEY_GRAPH_CACHE));
   }
@@ -133,6 +138,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     return value;
   }
 
+  @Override
+  public int getTransferDelay() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_TRANSFER_DELAY));
+  }
+
   /**
    * Resets all settings of the store to their default values.
    */
@@ -193,6 +203,8 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mDefaultSettings.put(ConfigUtil.KEY_OSM_ROAD_FILTER, ConfigUtil.VALUE_OSM_ROAD_FILTER.toString());
     mDefaultSettings.put(ConfigUtil.KEY_ROUTING_MODEL_MODE, ConfigUtil.VALUE_ROUTING_MODEL_MODE);
     mDefaultSettings.put(ConfigUtil.KEY_ACCESS_NODES_MAXIMUM, String.valueOf(ConfigUtil.VALUE_ACCESS_NODES_MAXIMUM));
+    mDefaultSettings.put(ConfigUtil.KEY_FOOTPATH_REACHABILITY, String.valueOf(ConfigUtil.VALUE_FOOTPATH_REACHABILITY));
+    mDefaultSettings.put(ConfigUtil.KEY_TRANSFER_DELAY, String.valueOf(ConfigUtil.VALUE_TRANSFER_DELAY));
 
     // Name search settings
     mDefaultSettings.put(ConfigUtil.KEY_NAME_SEARCH_SERVER_PORT,

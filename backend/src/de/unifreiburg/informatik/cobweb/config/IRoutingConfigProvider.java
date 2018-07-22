@@ -20,6 +20,13 @@ public interface IRoutingConfigProvider {
   int getAccessNodesMaximum();
 
   /**
+   * Gets the range in meters stops should get connected by footpaths.
+   *
+   * @return The range in meters stops should get connected by footpaths
+   */
+  int getFootpathReachability();
+
+  /**
    * Gets the path to the graph cache. Is used to serialize and deserialize a
    * graph.
    *
@@ -57,6 +64,13 @@ public interface IRoutingConfigProvider {
    * @return The port used by the routing server
    */
   int getRoutingServerPort();
+
+  /**
+   * Gets the amount in seconds a transfer at the same stop takes.
+   *
+   * @return The amount in seconds a transfer at the same stop takes
+   */
+  int getTransferDelay();
 
   /**
    * Whether or not the graph cache should be used.

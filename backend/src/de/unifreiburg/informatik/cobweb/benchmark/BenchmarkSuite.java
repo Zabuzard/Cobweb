@@ -196,13 +196,14 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
     try {
       // Road only
       Set<ETransportationMode> modes = EnumSet.of(ETransportationMode.CAR);
-      BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(15, 0),
-          BenchmarkSuite.atTimeToMillis(15, 1), DEP_TIME_STEPS, "Road only"));
+      BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(0, 0),
+          BenchmarkSuite.atTimeToMillis(23, 59), DEP_TIME_STEPS, "Road only, LALT"));
 
       // With tram
       modes = EnumSet.of(ETransportationMode.TRAM, ETransportationMode.FOOT);
       BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(0, 0),
-          BenchmarkSuite.atTimeToMillis(23, 59), DEP_TIME_STEPS, "Tram whole day"));
+          BenchmarkSuite.atTimeToMillis(23, 59), DEP_TIME_STEPS,
+          "Tram only, LALT, 3 nearest access nodes, connection scan, full footpaths"));
     } catch (final IOException e) {
       e.printStackTrace();
       return;

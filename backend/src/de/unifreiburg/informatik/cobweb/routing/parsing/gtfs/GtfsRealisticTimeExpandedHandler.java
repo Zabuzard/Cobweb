@@ -65,15 +65,11 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(GtfsRealisticTimeExpandedHandler.class);
   /**
-   * Transfer time in seconds.
-   */
-  private static final int TRANSFER_DELAY = 5 * 60;
-
-  /**
    * Builder to use for constructing edges and nodes that are to be inserted
    * into the graph.
    */
   private final IGtfsConnectionBuilder<N, E> mBuilder;
+
   /**
    * The graph to insert parsed nodes and edges into.
    */
@@ -100,12 +96,16 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    * Map connecting trip IDs to stop nodes in the sequence of the trip.
    */
   private final MutableMap<AgencyAndId, List<TripStopNodes<N>>> mTripToSequence;
-
   /**
    * Whether or not a graph cache is to be used. This determines if GTFS files
    * should be filtered by a {@link RecentHandler} or not.
    */
   private final boolean mUseGraphCache;
+
+  /**
+   * Transfer time in seconds.
+   */
+  private final int transferDelay;
 
   /**
    * Creates a new GTFS realistic time expanded handler which operates on the
@@ -131,6 +131,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     mStopToTransferNodes = Maps.mutable.empty();
     mStopToDepNodes = Maps.mutable.empty();
     mStopToArrNodes = Maps.mutable.empty();
+    transferDelay = config.getTransferDelay();
 
     mUseGraphCache = config.useGraphCache();
     if (mUseGraphCache) {
@@ -305,7 +306,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
     final int arrTime = stopTime.getArrivalTime();
     final int depTime = stopTime.getDepartureTime();
-    final int transferTime = arrTime + TRANSFER_DELAY;
+    final int transferTime = arrTime + transferDelay;
 
     // Build nodes
     final N arrNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon(), arrTime);
@@ -317,7 +318,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
     // Connect arrival with departure and arrival with transfer
     final E arrToDepEdge = mBuilder.buildEdge(arrNode, depNode, depTime - arrTime);
-    final E arrToTransferEdge = mBuilder.buildEdge(arrNode, transferNode, TRANSFER_DELAY);
+    final E arrToTransferEdge = mBuilder.buildEdge(arrNode, transferNode, transferDelay);
     mGraph.addEdge(arrToDepEdge);
     mGraph.addEdge(arrToTransferEdge);
 
