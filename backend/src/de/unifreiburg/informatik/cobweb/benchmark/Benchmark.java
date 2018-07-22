@@ -28,6 +28,10 @@ public final class Benchmark implements Runnable {
    */
   private static final int LOG_EVERY = 3;
   /**
+   * The amount of sub steps after which to generate a log message.
+   */
+  private static final int LOG_EVERY_SUB_STEP = 5;
+  /**
    * Logger used for logging.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(Benchmark.class);
@@ -114,7 +118,6 @@ public final class Benchmark implements Runnable {
   public void run() {
     final int amountOfSteps = (int) ((mDepTimeEnd - mDepTimeStart) / mDepTimeSteps) + 1;
     int stepCounter = 0;
-    LOGGER.info(stepCounter + " of " + amountOfSteps);
 
     for (long depTime = mDepTimeStart; depTime <= mDepTimeEnd; depTime += mDepTimeSteps) {
       final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> shortestPathComputation =
@@ -132,7 +135,7 @@ public final class Benchmark implements Runnable {
         final long durationMillis = RoutingUtil.nanosToMillis(duration);
         durationsMillis[i] = durationMillis;
 
-        if (i % 5 == 0) {
+        if (i % LOG_EVERY_SUB_STEP == 0) {
           LOGGER.info("\t" + i + " of " + AVERAGE_AMOUNT);
         }
       }

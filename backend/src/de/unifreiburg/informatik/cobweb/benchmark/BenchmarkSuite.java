@@ -8,8 +8,10 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -176,8 +178,11 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
     LOGGER.info("Starting benchmarks");
     // Write a header with the seed
     try {
-      Files.write(RESULTS_PATH, Collections.singletonList("#Benchmark with seed: " + mSeed), StandardOpenOption.CREATE,
-          StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+      final List<String> headerLines = new ArrayList<>();
+      headerLines.add("#Benchmark with seed: " + mSeed);
+      headerLines.add("#At: " + DATE_TO_BENCHMARK.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+      Files.write(RESULTS_PATH, headerLines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+          StandardOpenOption.WRITE);
     } catch (final IOException e) {
       e.printStackTrace();
       return;
@@ -198,10 +203,6 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
       modes = EnumSet.of(ETransportationMode.TRAM, ETransportationMode.FOOT);
       BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(0, 0),
           BenchmarkSuite.atTimeToMillis(23, 59), DEP_TIME_STEPS, "Tram whole day"));
-      BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(6, 0),
-          BenchmarkSuite.atTimeToMillis(10, 00), DEP_TIME_STEPS, "Tram rush-hour morning"));
-      BenchmarkSuite.recordBenchmark(new Benchmark(factory, this, modes, BenchmarkSuite.atTimeToMillis(16, 0),
-          BenchmarkSuite.atTimeToMillis(20, 00), DEP_TIME_STEPS, "Tram rush-hour evening"));
     } catch (final IOException e) {
       e.printStackTrace();
       return;
