@@ -7,8 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.junit.platform.console.shadow.joptsimple.internal.Strings;
+import java.util.stream.Collectors;
 
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ETransportationMode;
 import de.unifreiburg.informatik.cobweb.util.collections.Pair;
@@ -124,7 +123,7 @@ public final class BenchmarkResults {
       entries.add(time);
       entries.add(String.valueOf(duration));
 
-      lines.add(Strings.join(entries, "\t"));
+      lines.add(entries.stream().collect(Collectors.joining("\t")));
     });
     return lines;
   }

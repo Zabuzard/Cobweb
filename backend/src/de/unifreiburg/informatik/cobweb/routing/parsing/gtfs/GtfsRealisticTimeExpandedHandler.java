@@ -93,19 +93,19 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
    */
   private final MutableMap<AgencyAndId, List<NodeTime<N>>> mStopToTransferNodes;
   /**
+   * Transfer time in seconds.
+   */
+  private final int mTransferDelay;
+  /**
    * Map connecting trip IDs to stop nodes in the sequence of the trip.
    */
   private final MutableMap<AgencyAndId, List<TripStopNodes<N>>> mTripToSequence;
+
   /**
    * Whether or not a graph cache is to be used. This determines if GTFS files
    * should be filtered by a {@link RecentHandler} or not.
    */
   private final boolean mUseGraphCache;
-
-  /**
-   * Transfer time in seconds.
-   */
-  private final int transferDelay;
 
   /**
    * Creates a new GTFS realistic time expanded handler which operates on the
@@ -131,7 +131,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
     mStopToTransferNodes = Maps.mutable.empty();
     mStopToDepNodes = Maps.mutable.empty();
     mStopToArrNodes = Maps.mutable.empty();
-    transferDelay = config.getTransferDelay();
+    mTransferDelay = config.getTransferDelay();
 
     mUseGraphCache = config.useGraphCache();
     if (mUseGraphCache) {
@@ -306,7 +306,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
     final int arrTime = stopTime.getArrivalTime();
     final int depTime = stopTime.getDepartureTime();
-    final int transferTime = arrTime + transferDelay;
+    final int transferTime = arrTime + mTransferDelay;
 
     // Build nodes
     final N arrNode = mBuilder.buildNode((float) stop.getLat(), (float) stop.getLon(), arrTime);
@@ -318,7 +318,7 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
     // Connect arrival with departure and arrival with transfer
     final E arrToDepEdge = mBuilder.buildEdge(arrNode, depNode, depTime - arrTime);
-    final E arrToTransferEdge = mBuilder.buildEdge(arrNode, transferNode, transferDelay);
+    final E arrToTransferEdge = mBuilder.buildEdge(arrNode, transferNode, mTransferDelay);
     mGraph.addEdge(arrToDepEdge);
     mGraph.addEdge(arrToTransferEdge);
 
