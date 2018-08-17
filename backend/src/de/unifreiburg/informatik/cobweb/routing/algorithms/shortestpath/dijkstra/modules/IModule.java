@@ -2,6 +2,7 @@ package de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstr
 
 import java.util.OptionalDouble;
 
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.TentativeDistance;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.INode;
 
@@ -62,5 +63,18 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
   default OptionalDouble provideEdgeCost(@SuppressWarnings("unused") final E edge,
       @SuppressWarnings("unused") final double tentativeDistance) {
     return OptionalDouble.empty();
+  }
+
+  /**
+   * Whether or not the algorithm should abort computation of the shortest path.
+   * The method is called right after the given node has been settled.
+   *
+   * @param tentativeDistance The tentative distance wrapper of the node that
+   *                          was settled
+   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   *         if not
+   */
+  default boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+    return false;
   }
 }

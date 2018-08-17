@@ -5,6 +5,7 @@ import java.util.OptionalDouble;
 import java.util.Set;
 
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra;
+import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.TentativeDistance;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IGraph;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.INode;
@@ -140,6 +141,33 @@ public final class ModuleDijkstra<N extends INode, E extends IEdge<N>> extends D
 
     // Fallback to base implementation
     return super.provideEdgeCost(edge, tentativeDistance);
+  }
+
+  /**
+   * Whether or not the algorithm should abort computation of the shortest path.
+   * The method is called right after the given node has been settled.<br>
+   * <br>
+   * This will be the case if any modules
+   * {@link IModule#shouldAbort(TentativeDistance)} method returns
+   * <tt>true</tt>.
+   *
+   * @param tentativeDistance The tentative distance wrapper of the node that
+   *                          was settled
+   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   *         if not
+   */
+  @Override
+  protected boolean shouldAbort(final TentativeDistance<N, E> tentativeDistance) {
+    // Ignore the base, it never aborts computation
+    // Ask all modules and accumulate with logical or
+    for (final IModule<N, E> module : mModules) {
+      final boolean abort = module.shouldAbort(tentativeDistance);
+      if (abort) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

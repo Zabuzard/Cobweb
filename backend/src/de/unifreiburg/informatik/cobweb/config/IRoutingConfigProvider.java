@@ -11,6 +11,15 @@ import de.unifreiburg.informatik.cobweb.routing.model.ERoutingModelMode;
  */
 public interface IRoutingConfigProvider {
   /**
+   * Gets the travel time in seconds after which to abort shortest path
+   * computation.
+   *
+   * @return The travel time in seconds after which to abort shortest path
+   *         computation
+   */
+  int getAbortTravelTime();
+
+  /**
    * Gets the maximal allowed amount of access nodes to use when transferring
    * from a road node to a transit stop.
    *
@@ -18,6 +27,13 @@ public interface IRoutingConfigProvider {
    *         from a road node to a transit stop
    */
   int getAccessNodesMaximum();
+
+  /**
+   * Gets the amount of landmarks to use for the landmark heuristic.
+   *
+   * @return The amount of landmarks to use for the landmark heuristic
+   */
+  int getAmountOfLandmarks();
 
   /**
    * Gets the range in meters stops should get connected by footpaths.

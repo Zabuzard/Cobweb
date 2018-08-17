@@ -11,10 +11,20 @@ import java.nio.file.Paths;
  */
 final class ConfigUtil {
   /**
+   * Name of the key that stores the travel time in seconds after which to abort
+   * shortest path computation.
+   */
+  static final String KEY_ABORT_TRAVEL_TIME = "abortTravelTime";
+  /**
    * Name of the key that stores the maximal allowed amount of access nodes to
    * use when transferring from a road node to a transit stop.
    */
   static final String KEY_ACCESS_NODES_MAXIMUM = "accessNodesMaximum";
+  /**
+   * Name of the key that stores the amount of landmarks to use for the landmark
+   * heuristic.
+   */
+  static final String KEY_AMOUNT_OF_LANDMARKS = "amountOfLandmarks";
   /**
    * Name of the key that stores the path to the SQL script to execute when
    * cleaning the external database.
@@ -98,10 +108,19 @@ final class ConfigUtil {
    */
   static final String KEY_USE_GRAPH_CACHE = "useGraphCache";
   /**
+   * Default travel time in seconds after which to abort shortest path
+   * computation.
+   */
+  static final int VALUE_ABORT_TRAVEL_TIME = 7_200;
+  /**
    * Default maximal allowed amount of access nodes to use when transferring
    * from a road node to a transit stop.
    */
   static final int VALUE_ACCESS_NODES_MAXIMUM = 3;
+  /**
+   * Default maximal amount of landmarks to use for the landmark heuristic.
+   */
+  static final int VALUE_AMOUNT_OF_LANDMARKS = 20;
   /**
    * Default path to the SQL script that is executed when cleaning the external
    * database.

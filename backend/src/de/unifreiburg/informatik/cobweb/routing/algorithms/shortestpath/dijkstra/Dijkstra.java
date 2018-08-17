@@ -201,8 +201,9 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
       // Settle the current node
       nodeToSettledDistance.put(node, distance);
 
-      // End the algorithm if destination was settled
-      if (pathDestination != null && node.equals(pathDestination)) {
+      // End the algorithm if destination was settled or a subclass
+      // implementation demands it
+      if ((pathDestination != null && node.equals(pathDestination)) || shouldAbort(distance)) {
         break;
       }
 
@@ -319,6 +320,23 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
    */
   protected Stream<E> provideEdgesToRelax(final TentativeDistance<N, E> tentativeDistance) {
     return mGraph.getOutgoingEdges(tentativeDistance.getNode());
+  }
+
+  /**
+   * Whether or not the algorithm should abort computation of the shortest path.
+   * The method is called right after the given node has been settled.
+   *
+   * @param tentativeDistance The tentative distance wrapper of the node that
+   *                          was settled
+   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   *         if not
+   */
+  protected boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+    // Dijkstras algorithm relaxes the whole network, it only aborts if the
+    // target was settled. However, the method can be used by subclasses to
+    // abort computation earlier, for example after exploring to a fixed
+    // distance.
+    return false;
   }
 
 }
