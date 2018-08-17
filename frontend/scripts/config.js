@@ -6,11 +6,11 @@
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 
- /** The URL of the routing server which offers a REST API. */
+/** The URL of the routing server which offers a REST API. */
 var routeRequestServer = 'http://localhost:2845/route';
- /** The URL of the name search server which offers a REST API. */
+/** The URL of the name search server which offers a REST API. */
 var nameSearchRequestServer = 'http://localhost:2846/namesearch';
- /** The URL of the nearest search server which offers a REST API. */
+/** The URL of the nearest search server which offers a REST API. */
 var nearestSearchRequestServer = 'http://localhost:2847/nearestsearch';
 /**The access-token of the Mapbox API to use. */
 var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';

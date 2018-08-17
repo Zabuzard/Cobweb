@@ -54,10 +54,6 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    */
   private static final int LINES_BUFFER_SIZE = 200;
   /**
-   * The amount of milliseconds to increase the departure time with each
-   * benchmark step.
-   */
-  /**
    * Logger used for logging.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkSuite.class);

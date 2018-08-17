@@ -40,7 +40,6 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.Trip;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 public final class ConnectionScan extends AShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> {
-
   /**
    * Amount of seconds of a day.
    */

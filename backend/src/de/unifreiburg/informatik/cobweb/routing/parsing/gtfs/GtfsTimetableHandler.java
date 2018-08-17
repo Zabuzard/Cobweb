@@ -249,6 +249,10 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
   @Override
   public void handle(final Transfer transfer) {
     // Used for footpath construction
+    // Do not accepts transfers with a negative or zero transfer time
+    if (transfer.getMinTransferTime() <= 0) {
+      return;
+    }
     mTransfers.add(transfer);
   }
 
