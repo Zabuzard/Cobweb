@@ -65,12 +65,12 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    * The amount of random queries the nearest neighbor computation is averaged
    * over.
    */
-  private static final int NEAREST_NEIGHBOR_AVERAGING = 50;
+  private static final int NEAREST_NEIGHBOR_AVERAGING = 1_000;
   /**
    * The amount of nodes to add to the tree per step in the nearest neighbor
    * computation.
    */
-  private static final int NEAREST_NEIGHBOR_STEPS = 1_000;
+  private static final int NEAREST_NEIGHBOR_STEPS = 10_000;
   /**
    * The path to where the results are saved to.
    */
@@ -84,7 +84,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    * The amount of seconds to increase the departure time with each step for the
    * uni-modal time dependent shortest path computation.
    */
-  private static final long UNI_MODAL_TIME_DEPENDENT_DEP_TIME_STEPS = 30 * 60;
+  private static final long UNI_MODAL_TIME_DEPENDENT_DEP_TIME_STEPS = 10 * 60;
   /**
    * The amount of random queries the uni-modal time independent shortest path
    * computation is averaged over.
@@ -94,7 +94,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    * The Dijkstra rank to start with measuring for the uni-modal time
    * independent shortest path computation.
    */
-  private static final int UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK = 6;
+  private static final int UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK = 0;
   /**
    * The minimal Dijkstra rank to end with measuring for the uni-modal time
    * independent shortest path computation.
@@ -240,11 +240,6 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
       prepareBenchmarkMeasurement();
       uniModalTimeDependent();
-
-      // TODO Remove debugging abort
-      if (true) {
-        return;
-      }
     } catch (final IOException e) {
       e.printStackTrace();
     } finally {
@@ -294,7 +289,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
     // Measurements, periodically increase tree size
     final long[] durationsNanos = new long[NEAREST_NEIGHBOR_AVERAGING];
-    int counter = 0;
+    int stepCounter = 0;
     while (!notContainedNodes.isEmpty()) {
       // Measure configuration with this size
       final int size = containedNodes.size();
@@ -314,7 +309,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
       // Prepare next round, add nodes
       int j;
-      if (counter == 0) {
+      if (stepCounter == 0) {
         j = 1;
       } else {
         j = 0;
@@ -325,10 +320,10 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
         containedNodes.add(node);
       }
 
-      if (counter % 100 == 0) {
+      if (stepCounter % 15 == 0) {
         LOGGER.info("Steps to go: " + notContainedNodes.size());
       }
-      counter++;
+      stepCounter++;
     }
   }
 
