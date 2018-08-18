@@ -295,7 +295,9 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
     LOGGER.info("Starting multi modal");
     final LocalDateTime depDateTime = DATE_TO_BENCHMARK.atTime(TIME_TO_BENCHMARK);
     final long depTime = depDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    final Set<ETransportationMode> modes = EnumSet.of(ETransportationMode.BIKE, ETransportationMode.TRAM);
+    final Set<ETransportationMode> baseLineModes = EnumSet.of(ETransportationMode.CAR, ETransportationMode.BIKE,
+        ETransportationMode.FOOT, ETransportationMode.TRAM);
+    final Set<ETransportationMode> restrictedModes = EnumSet.of(ETransportationMode.BIKE, ETransportationMode.TRAM);
 
     LOGGER.info("Computing Dijkstra ranks");
     // Determine the query pairs by computing Dijkstra ranks
@@ -339,28 +341,29 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
     }
 
     // Start measurements
-    LOGGER.info("Starting measurements");
+    LOGGER.info("Starting measurements, base line modes");
+    // Base line modes
     writeLine("#Multi-modal, size " + mQueryGraph.size() + ", measuring for "
-        + depDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + ", with modes " + modes
+        + depDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + ", with modes " + baseLineModes
         + ", averaged over " + MULTI_MODAL_AVERAGING);
 
     BenchmarkSuite.cleanup();
 
-    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation;
+    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> baseLineComputation;
     if (mModel.getMode() == ERoutingModelMode.GRAPH_WITH_TIMETABLE) {
       // Measuring Hybrid
       LOGGER.info("Measuring Hybrid");
       writeLine("#Hybrid");
       writeLine("DijkstraRank(2^i)\tTime(ns)");
 
-      computation = mFactory.createAlgorithmHybridRoadTimetable(depTime, modes);
+      baseLineComputation = mFactory.createAlgorithmHybridRoadTimetable(depTime, restrictedModes);
     } else if (mModel.getMode() == ERoutingModelMode.LINK_GRAPH) {
       // Measuring LinkGraph
       LOGGER.info("Measuring LinkGraph");
       writeLine("#LinkGraph");
       writeLine("DijkstraRank(2^i)\tTime(ns)");
 
-      computation = mFactory.createAlgorithmLinkGraph(depTime, modes);
+      baseLineComputation = mFactory.createAlgorithmLinkGraph(depTime, restrictedModes);
     } else {
       throw new IllegalStateException("Unknown routing model mode: " + mModel.getMode());
     }
@@ -377,7 +380,62 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
         // Measure this query
         final long startTime = System.nanoTime();
-        computation.computeShortestPath(source, destination);
+        baseLineComputation.computeShortestPath(source, destination);
+        final long endTime = System.nanoTime();
+        final long duration = endTime - startTime;
+        durationsNanos[averagingCounter] = duration;
+        averagingCounter++;
+      }
+      final long durationNanosAverage = (long) Arrays.stream(durationsNanos).average().getAsDouble();
+      writeLine(i + "\t" + durationNanosAverage);
+
+      if (exponentIndex % 3 == 0) {
+        LOGGER.info("Steps to go: " + (greatestCommonExponent - i));
+      }
+    }
+
+    writeSeparator();
+
+    // Restricted modes
+    LOGGER.info("Starting measurements, restricted modes");
+    writeLine("#Multi-modal, size " + mQueryGraph.size() + ", measuring for "
+        + depDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + ", with modes " + restrictedModes
+        + ", averaged over " + MULTI_MODAL_AVERAGING);
+
+    BenchmarkSuite.cleanup();
+
+    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> restrictedComputation;
+    if (mModel.getMode() == ERoutingModelMode.GRAPH_WITH_TIMETABLE) {
+      // Measuring Hybrid
+      LOGGER.info("Measuring Hybrid");
+      writeLine("#Hybrid");
+      writeLine("DijkstraRank(2^i)\tTime(ns)");
+
+      restrictedComputation = mFactory.createAlgorithmHybridRoadTimetable(depTime, restrictedModes);
+    } else if (mModel.getMode() == ERoutingModelMode.LINK_GRAPH) {
+      // Measuring LinkGraph
+      LOGGER.info("Measuring LinkGraph");
+      writeLine("#LinkGraph");
+      writeLine("DijkstraRank(2^i)\tTime(ns)");
+
+      restrictedComputation = mFactory.createAlgorithmLinkGraph(depTime, restrictedModes);
+    } else {
+      throw new IllegalStateException("Unknown routing model mode: " + mModel.getMode());
+    }
+
+    // Measure for all exponents
+    for (int i = UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK; i <= greatestCommonExponent; i++) {
+      final int exponentIndex = i - UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK;
+      // Get source-destination queries with this Dijkstra rank
+      final long[] durationsNanos = new long[querySourceToDestination.size()];
+      int averagingCounter = 0;
+      for (final Entry<ICoreNode, List<ICoreNode>> sourceToDestinations : querySourceToDestination.entrySet()) {
+        final ICoreNode source = sourceToDestinations.getKey();
+        final ICoreNode destination = sourceToDestinations.getValue().get(exponentIndex);
+
+        // Measure this query
+        final long startTime = System.nanoTime();
+        restrictedComputation.computeShortestPath(source, destination);
         final long endTime = System.nanoTime();
         final long duration = endTime - startTime;
         durationsNanos[averagingCounter] = duration;
