@@ -157,6 +157,12 @@ public final class GtfsRealisticTimeExpandedHandler<N extends INode & IHasId & I
 
       while (sequenceIter.hasNext()) {
         tripStopNodes = sequenceIter.next();
+        // The standard allows gaps in-between the external sequence indices. We
+        // do not, skip null entries.
+        if (tripStopNodes == null) {
+          continue;
+        }
+
         // Connect last departure to current arrival node
         final N arrNode = tripStopNodes.getArrNode();
         final int arrTime = tripStopNodes.getArrTime();
