@@ -12,12 +12,12 @@ import de.unifreiburg.informatik.cobweb.routing.model.ERoutingModelMode;
 public interface IRoutingConfigProvider {
   /**
    * Gets the travel time in seconds after which to abort shortest path
-   * computation.
+   * computation to access nodes.
    *
    * @return The travel time in seconds after which to abort shortest path
-   *         computation
+   *         computation to access nodes
    */
-  int getAbortTravelTime();
+  int getAbortTravelTimeToAccessNodes();
 
   /**
    * Gets the maximal allowed amount of access nodes to use when transferring

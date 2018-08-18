@@ -200,13 +200,13 @@ public final class Connection implements Comparable<Connection>, Serializable {
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("Connection [");
-    builder.append(mArrStopId);
-    builder.append("@");
-    builder.append(mArrTime);
-    builder.append(" -> ");
     builder.append(mDepStopId);
     builder.append("@");
     builder.append(mDepTime);
+    builder.append(" -> ");
+    builder.append(mArrStopId);
+    builder.append("@");
+    builder.append(mArrTime);
     builder.append(", trip=");
     builder.append(mTripId);
     builder.append(", sequenceIndex=");

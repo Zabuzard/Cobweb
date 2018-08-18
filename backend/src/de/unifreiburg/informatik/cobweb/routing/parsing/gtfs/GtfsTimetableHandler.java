@@ -34,6 +34,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.SequenceStopTime
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Stop;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable;
 import de.unifreiburg.informatik.cobweb.routing.model.timetable.Trip;
+import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
 import de.unifreiburg.informatik.cobweb.util.collections.CollectionUtil;
 
 /**
@@ -140,11 +141,17 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
 
     // Construct and add footpaths out of transfers
     mTransfers.forEach(transfer -> {
-      final int fromId = mExtIdToStop.get(transfer.getFromStop().getId()).getId();
-      final int toId = mExtIdToStop.get(transfer.getToStop().getId()).getId();
-      final int duration = transfer.getMinTransferTime();
+      final Stop fromStop = mExtIdToStop.get(transfer.getFromStop().getId());
+      final Stop toStop = mExtIdToStop.get(transfer.getToStop().getId());
 
-      mTable.addFootpath(new Footpath(fromId, toId, duration));
+      // Ignore transfer time of data-set, as they do not obey the triangle
+      // inequality. Instead, approximate the transfer time by simulated
+      // straight-line walking.
+      final double distance = RoutingUtil.distanceEquiRect(fromStop, toStop);
+      final double speed = RoutingUtil.getWalkingSpeed();
+      // Ensure the duration is strictly greater than zero
+      final int duration = (int) Math.max(1, RoutingUtil.travelTime(distance, speed));
+      mTable.addFootpath(new Footpath(fromStop.getId(), toStop.getId(), duration));
     });
 
     // Prepare for possible next round
@@ -249,8 +256,10 @@ public final class GtfsTimetableHandler extends GtfsEntityForwarder implements I
   @Override
   public void handle(final Transfer transfer) {
     // Used for footpath construction
-    // Do not accepts transfers with a negative or zero transfer time
-    if (transfer.getMinTransferTime() <= 0) {
+    // Do not accepts transfers with a negative or zero transfer time.
+    // Do also not accept self-loops, as their duration won't satisfy the
+    // triangle inequality. Instead, we add them later.
+    if (transfer.getMinTransferTime() <= 0 || transfer.getFromStop().equals(transfer.getToStop())) {
       return;
     }
     mTransfers.add(transfer);

@@ -34,9 +34,10 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable;
  */
 public final class ShortestPathComputationFactory {
   /**
-   * The travel time in seconds after which to abort shortest path computation.
+   * The travel time in seconds after which to abort shortest path computation
+   * to access nodes.
    */
-  private final int mAbortTravelTime;
+  private final int mAbortTravelTimeToAccessNodes;
   /**
    * Object to use for computing access nodes. Or <tt>null</tt> if not used.
    */
@@ -78,30 +79,31 @@ public final class ShortestPathComputationFactory {
    * <br>
    * Use {@link #initialize()} after creation.
    *
-   * @param graph                 The graph to route on
-   * @param table                 The timetable to route on, or <tt>null</tt> if
-   *                              not used
-   * @param accessNodeComputation The access node computation to use, or
-   *                              <tt>null</tt> if not used.
-   * @param stopToNearestRoadNode Object to use for retrieving the nearest road
-   *                              node to a given stop, or <tt>null</tt> if not
-   *                              used.
-   * @param mode                  The mode to use for the routing model
-   * @param abortTravelTime       The travel time in seconds after which to
-   *                              abort shortest path computation
-   * @param amountOfLandmarks     The amount of landmarks to use for the
-   *                              landmark heuristic
+   * @param graph                        The graph to route on
+   * @param table                        The timetable to route on, or
+   *                                     <tt>null</tt> if not used
+   * @param accessNodeComputation        The access node computation to use, or
+   *                                     <tt>null</tt> if not used.
+   * @param stopToNearestRoadNode        Object to use for retrieving the
+   *                                     nearest road node to a given stop, or
+   *                                     <tt>null</tt> if not used.
+   * @param mode                         The mode to use for the routing model
+   * @param abortTravelTimeToAccessNodes The travel time in seconds after which
+   *                                     to abort shortest path computation to
+   *                                     access nodes
+   * @param amountOfLandmarks            The amount of landmarks to use for the
+   *                                     landmark heuristic
    */
   public ShortestPathComputationFactory(final IGraph<ICoreNode, ICoreEdge<ICoreNode>> graph, final Timetable table,
       final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation,
       final INearestNeighborComputation<ICoreNode> stopToNearestRoadNode, final ERoutingModelMode mode,
-      final int abortTravelTime, final int amountOfLandmarks) {
+      final int abortTravelTimeToAccessNodes, final int amountOfLandmarks) {
     mGraph = graph;
     mTable = table;
     mAccessNodeComputation = accessNodeComputation;
     mStopToNearestRoadNode = stopToNearestRoadNode;
     mMode = mode;
-    mAbortTravelTime = abortTravelTime;
+    mAbortTravelTimeToAccessNodes = abortTravelTimeToAccessNodes;
     mAmountOfLandmarks = amountOfLandmarks;
   }
 
@@ -189,8 +191,8 @@ public final class ShortestPathComputationFactory {
    */
   public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>>
       createAlgorithmHybridRoadTimetable(final long depTime, final Set<ETransportationMode> modes) {
-    return new HybridRoadTimetable(
-        ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), AbortAfterModule.of(mAbortTravelTime),
+    return new HybridRoadTimetable(ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), MultiModalModule.of(modes)),
+        ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), AbortAfterModule.of(mAbortTravelTimeToAccessNodes),
             MultiModalModule.of(modes)),
         new ConnectionScan(mTable), mAccessNodeComputation, mStopToNearestRoadNode, modes, depTime);
   }
@@ -204,8 +206,7 @@ public final class ShortestPathComputationFactory {
    */
   public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> createAlgorithmLinkGraph(final long depTime,
       final Set<ETransportationMode> modes) {
-    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), AbortAfterModule.of(mAbortTravelTime),
-        TransitModule.of(depTime), MultiModalModule.of(modes));
+    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime), MultiModalModule.of(modes));
   }
 
   /**
@@ -215,8 +216,7 @@ public final class ShortestPathComputationFactory {
    * @return The created algorithm
    */
   public IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> createAlgorithmTimeDependentAlt(final long depTime) {
-    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), AbortAfterModule.of(mAbortTravelTime),
-        TransitModule.of(depTime));
+    return ModuleDijkstra.of(mGraph, AStarModule.of(mMetric), TransitModule.of(depTime));
   }
 
   /**

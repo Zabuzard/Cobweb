@@ -12,9 +12,9 @@ import java.nio.file.Paths;
 final class ConfigUtil {
   /**
    * Name of the key that stores the travel time in seconds after which to abort
-   * shortest path computation.
+   * shortest path computation to access nodes.
    */
-  static final String KEY_ABORT_TRAVEL_TIME = "abortTravelTime";
+  static final String KEY_ABORT_TRAVEL_TIME_TO_ACCESS_NODES = "abortTravelTimeToAccessNodes";
   /**
    * Name of the key that stores the maximal allowed amount of access nodes to
    * use when transferring from a road node to a transit stop.
@@ -109,9 +109,9 @@ final class ConfigUtil {
   static final String KEY_USE_GRAPH_CACHE = "useGraphCache";
   /**
    * Default travel time in seconds after which to abort shortest path
-   * computation.
+   * computation to access nodes.
    */
-  static final int VALUE_ABORT_TRAVEL_TIME = 7_200;
+  static final int VALUE_ABORT_TRAVEL_TIME_TO_ACCESS_NODES = 900;
   /**
    * Default maximal allowed amount of access nodes to use when transferring
    * from a road node to a transit stop.
@@ -186,7 +186,7 @@ final class ConfigUtil {
   /**
    * Default amount in seconds a transfer at the same stop takes.
    */
-  static final int VALUE_TRANSFER_DELAY = 300;
+  static final int VALUE_TRANSFER_DELAY = 180;
   /**
    * Whether an external or an internal in-memory database should be used.
    */

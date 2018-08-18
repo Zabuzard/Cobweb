@@ -8,17 +8,20 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +33,9 @@ import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.IShortes
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.ShortestPathComputationFactory;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.dijkstra.Dijkstra;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.hybridmodel.IAccessNodeComputation;
+import de.unifreiburg.informatik.cobweb.routing.model.ERoutingModelMode;
 import de.unifreiburg.informatik.cobweb.routing.model.RoutingModel;
+import de.unifreiburg.informatik.cobweb.routing.model.graph.ETransportationMode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreEdge;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.ICoreNode;
 import de.unifreiburg.informatik.cobweb.routing.model.graph.IGraph;
@@ -58,6 +63,21 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkSuite.class);
   /**
+   * The amount of random queries the multi-modal shortest path computation is
+   * averaged over.
+   */
+  private static final int MULTI_MODAL_AVERAGING = 50;
+  /**
+   * The minimal Dijkstra rank to end with measuring for the multi-modal
+   * shortest path computation.
+   */
+  private static final int MULTI_MODAL_MINIMAL_END_RANK = 15;
+  /**
+   * The Dijkstra rank to start with measuring for the multi-modal shortest path
+   * computation.
+   */
+  private static final int MULTI_MODAL_STARTING_RANK = 0;
+  /**
    * The amount of random queries the nearest neighbor computation is averaged
    * over.
    */
@@ -71,6 +91,10 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    * The path to where the results are saved to.
    */
   private static final Path RESULTS_PATH = Paths.get("benchmarkResults.tsv");
+  /**
+   * The time to use for the benchmark.
+   */
+  private static final LocalTime TIME_TO_BENCHMARK = LocalTime.of(12, 0);
   /**
    * The amount of random queries the uni-modal time dependent shortest path
    * computation is averaged over.
@@ -87,15 +111,15 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    */
   private static final int UNI_MODAL_TIME_INDEPENDENT_AVERAGING = 50;
   /**
+   * The minimal Dijkstra rank to end with measuring for the uni-modal time
+   * independent shortest path computation.
+   */
+  private static final int UNI_MODAL_TIME_INDEPENDENT_MINIMAL_END_RANK = 15;
+  /**
    * The Dijkstra rank to start with measuring for the uni-modal time
    * independent shortest path computation.
    */
   private static final int UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK = 0;
-  /**
-   * The minimal Dijkstra rank to end with measuring for the uni-modal time
-   * independent shortest path computation.
-   */
-  private static final int UNI_MODAL_TIME_MINIMAL_END_RANK = 15;
 
   /**
    * Method to use for increasing measurement accuracy by introducing a cleanup
@@ -232,10 +256,13 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
       nearestNeighborBenchmark();
 
       prepareBenchmarkMeasurement();
-      uniModalTimeIndependent();
+      uniModalTimeIndependentBenchmark();
 
       prepareBenchmarkMeasurement();
-      uniModalTimeDependent();
+      uniModalTimeDependentBenchmark();
+
+      prepareBenchmarkMeasurement();
+      multiModalBenchmark();
     } catch (final IOException e) {
       e.printStackTrace();
     } finally {
@@ -264,10 +291,116 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    *
    * @throws IOException If an I/O-Exception occurred while saving the results
    */
+  private void multiModalBenchmark() throws IOException {
+    LOGGER.info("Starting multi modal");
+    final LocalDateTime depDateTime = DATE_TO_BENCHMARK.atTime(TIME_TO_BENCHMARK);
+    final long depTime = depDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    final Set<ETransportationMode> modes = EnumSet.of(ETransportationMode.BIKE, ETransportationMode.TRAM);
+
+    LOGGER.info("Computing Dijkstra ranks");
+    // Determine the query pairs by computing Dijkstra ranks
+    final Map<ICoreNode, List<ICoreNode>> querySourceToDestination = new HashMap<>();
+    final Dijkstra<ICoreNode, ICoreEdge<ICoreNode>> dijkstraRankComputation = new Dijkstra<>(mQueryGraph);
+    int greatestCommonExponent = Integer.MAX_VALUE;
+
+    for (int i = 0; i < MULTI_MODAL_AVERAGING; i++) {
+      // Pick a random source
+      final ICoreNode source = getQueryNode();
+      final List<ICoreNode> destinations = new ArrayList<>();
+
+      final Map<ICoreNode, ? extends IHasPathCost> nodeToDistance =
+          dijkstraRankComputation.computeShortestPathCostsReachable(source);
+      // Sort the destinations according to their distance
+      final ICoreNode[] destinationsOrdered = nodeToDistance.entrySet().stream()
+          .map(entry -> new CostContainer<>(entry.getKey(), entry.getValue().getPathCost())).sorted()
+          .map(CostContainer::getElement).toArray(ICoreNode[]::new);
+
+      // Pick destinations at 2^j positions
+      final int lastExponent = (int) Math.floor(Math.log(destinationsOrdered.length - 1) / Math.log(2));
+      // Reject node and repeat if it has a very bad connectivity
+      if (lastExponent < MULTI_MODAL_MINIMAL_END_RANK) {
+        LOGGER.info("Rejecting node with bad connectivity");
+        i--;
+        continue;
+      }
+      if (lastExponent < greatestCommonExponent) {
+        greatestCommonExponent = lastExponent;
+      }
+      for (int j = MULTI_MODAL_STARTING_RANK; j <= lastExponent; j++) {
+        final ICoreNode destination = destinationsOrdered[(int) Math.pow(2, j)];
+        destinations.add(destination);
+      }
+
+      querySourceToDestination.put(source, destinations);
+
+      if (i % 5 == 0) {
+        LOGGER.info("Steps to go: " + (MULTI_MODAL_AVERAGING - i));
+      }
+    }
+
+    // Start measurements
+    LOGGER.info("Starting measurements");
+    writeLine("#Multi-modal, size " + mQueryGraph.size() + ", measuring for "
+        + depDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + ", with modes " + modes
+        + ", averaged over " + MULTI_MODAL_AVERAGING);
+
+    BenchmarkSuite.cleanup();
+
+    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation;
+    if (mModel.getMode() == ERoutingModelMode.GRAPH_WITH_TIMETABLE) {
+      // Measuring Hybrid
+      LOGGER.info("Measuring Hybrid");
+      writeLine("#Hybrid");
+      writeLine("DijkstraRank(2^i)\tTime(ns)");
+
+      computation = mFactory.createAlgorithmHybridRoadTimetable(depTime, modes);
+    } else if (mModel.getMode() == ERoutingModelMode.LINK_GRAPH) {
+      // Measuring LinkGraph
+      LOGGER.info("Measuring LinkGraph");
+      writeLine("#LinkGraph");
+      writeLine("DijkstraRank(2^i)\tTime(ns)");
+
+      computation = mFactory.createAlgorithmLinkGraph(depTime, modes);
+    } else {
+      throw new IllegalStateException("Unknown routing model mode: " + mModel.getMode());
+    }
+
+    // Measure for all exponents
+    for (int i = UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK; i <= greatestCommonExponent; i++) {
+      final int exponentIndex = i - UNI_MODAL_TIME_INDEPENDENT_STARTING_RANK;
+      // Get source-destination queries with this Dijkstra rank
+      final long[] durationsNanos = new long[querySourceToDestination.size()];
+      int averagingCounter = 0;
+      for (final Entry<ICoreNode, List<ICoreNode>> sourceToDestinations : querySourceToDestination.entrySet()) {
+        final ICoreNode source = sourceToDestinations.getKey();
+        final ICoreNode destination = sourceToDestinations.getValue().get(exponentIndex);
+
+        // Measure this query
+        final long startTime = System.nanoTime();
+        computation.computeShortestPath(source, destination);
+        final long endTime = System.nanoTime();
+        final long duration = endTime - startTime;
+        durationsNanos[averagingCounter] = duration;
+        averagingCounter++;
+      }
+      final long durationNanosAverage = (long) Arrays.stream(durationsNanos).average().getAsDouble();
+      writeLine(i + "\t" + durationNanosAverage);
+
+      if (exponentIndex % 3 == 0) {
+        LOGGER.info("Steps to go: " + (greatestCommonExponent - i));
+      }
+    }
+  }
+
+  /**
+   * Executes the benchmark for the nearest neighbor computation.
+   *
+   * @throws IOException If an I/O-Exception occurred while saving the results
+   */
   private void nearestNeighborBenchmark() throws IOException {
     LOGGER.info("Starting nearest neighbor, size: " + mQueryNodes.length);
 
-    writeLine("#Nearest neighbor, size: " + mQueryNodes.length);
+    writeLine("#Nearest neighbor, size " + mQueryNodes.length + ", averaged over " + NEAREST_NEIGHBOR_AVERAGING);
     writeLine("Size\tTime(ns)");
     final CoverTree<ICoreNode> tree = new CoverTree<>(new AsTheCrowFliesMetric<>());
 
@@ -339,10 +472,11 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    *
    * @throws IOException If an I/O-Exception occurred while saving the results
    */
-  private void uniModalTimeDependent() throws IOException {
+  private void uniModalTimeDependentBenchmark() throws IOException {
     LOGGER.info("Starting uni modal time dependent");
-    writeLine("#Uni-modal, time-dependent, measuring for date: "
-        + DATE_TO_BENCHMARK.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+    writeLine("#Uni-modal, time-dependent, measuring for date "
+        + DATE_TO_BENCHMARK.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ", averaged over "
+        + UNI_MODAL_TIME_DEPENDENT_AVERAGING);
 
     // Departure time in seconds since midnight
     final int startDepTime = LocalTime.of(0, 0).toSecondOfDay();
@@ -356,43 +490,83 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
       queries.add(new Pair<>(getQueryNode(), getQueryNode()));
     }
 
-    // Measure CSA
-    LOGGER.info("Measuring CSA");
-    writeLine("#CSA");
-    writeLine("DepTime(HH:mm)\tTime(ns)");
-    final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation = mFactory.createAlgorithmCsa();
-    final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation = mFactory.getAccessNodeComputation();
-    // For every departure time point
-    int stepCounter = 0;
-    for (int depTime = startDepTime; depTime <= endDepTime; depTime += UNI_MODAL_TIME_DEPENDENT_DEP_TIME_STEPS) {
-      // Average over selected queries
-      final long[] durationsNanos = new long[queries.size()];
-      int averagingCounter = 0;
-      for (final Pair<ICoreNode, ICoreNode> query : queries) {
-        final ICoreNode sourceRoad = query.getFirst();
-        final ICoreNode destinationRoad = query.getSecond();
-        final ICoreNode sourceAccess = accessNodeComputation.computeAccessNodes(sourceRoad).iterator().next();
-        final ICoreNode destinationAccess = accessNodeComputation.computeAccessNodes(destinationRoad).iterator().next();
-        final TransitNode sourceAccessQuery =
-            new TransitNode(sourceAccess.getId(), sourceAccess.getLatitude(), sourceAccess.getLongitude(), depTime);
+    if (mModel.getMode() == ERoutingModelMode.GRAPH_WITH_TIMETABLE) {
+      // Measure CSA
+      LOGGER.info("Measuring CSA");
+      writeLine("#CSA");
+      writeLine("DepTime(HH:mm)\tTime(ns)");
+      final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation = mFactory.createAlgorithmCsa();
+      final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation = mFactory.getAccessNodeComputation();
+      // For every departure time point
+      int stepCounter = 0;
+      for (int depTime = startDepTime; depTime <= endDepTime; depTime += UNI_MODAL_TIME_DEPENDENT_DEP_TIME_STEPS) {
+        // Average over selected queries
+        final long[] durationsNanos = new long[queries.size()];
+        int averagingCounter = 0;
+        for (final Pair<ICoreNode, ICoreNode> query : queries) {
+          final ICoreNode sourceRoad = query.getFirst();
+          final ICoreNode destinationRoad = query.getSecond();
+          final ICoreNode sourceAccess = accessNodeComputation.computeAccessNodes(sourceRoad).iterator().next();
+          final ICoreNode destinationAccess =
+              accessNodeComputation.computeAccessNodes(destinationRoad).iterator().next();
+          final TransitNode sourceAccessQuery =
+              new TransitNode(sourceAccess.getId(), sourceAccess.getLatitude(), sourceAccess.getLongitude(), depTime);
 
-        // Measure the query
-        final long startTime = System.nanoTime();
-        computation.computeShortestPath(sourceAccessQuery, destinationAccess);
-        final long endTime = System.nanoTime();
-        final long duration = endTime - startTime;
-        durationsNanos[averagingCounter] = duration;
-        averagingCounter++;
+          // Measure the query
+          final long startTime = System.nanoTime();
+          computation.computeShortestPath(sourceAccessQuery, destinationAccess);
+          final long endTime = System.nanoTime();
+          final long duration = endTime - startTime;
+          durationsNanos[averagingCounter] = duration;
+          averagingCounter++;
+        }
+
+        final long durationNanosAverage = (long) Arrays.stream(durationsNanos).average().getAsDouble();
+        final String formattedDepTime = LocalTime.ofSecondOfDay(depTime).format(DateTimeFormatter.ofPattern("HH:mm"));
+        writeLine(formattedDepTime + "\t" + durationNanosAverage);
+
+        if (stepCounter % 8 == 0) {
+          LOGGER.info("Steps to go: " + (amountOfSteps - stepCounter));
+        }
+        stepCounter++;
       }
+    } else if (mModel.getMode() == ERoutingModelMode.LINK_GRAPH) {
+      // Measure Time-dependent ALT
+      LOGGER.info("Measuring Time-dependent ALT");
+      writeLine("#Time-dependent ALT");
+      writeLine("DepTime(HH:mm)\tTime(ns)");
+      // For every departure time point
+      int stepCounter = 0;
+      for (int depTime = startDepTime; depTime <= endDepTime; depTime += UNI_MODAL_TIME_DEPENDENT_DEP_TIME_STEPS) {
+        final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> computation =
+            mFactory.createAlgorithmTimeDependentAlt(depTime);
+        // Average over selected queries
+        final long[] durationsNanos = new long[queries.size()];
+        int averagingCounter = 0;
+        for (final Pair<ICoreNode, ICoreNode> query : queries) {
+          final ICoreNode source = query.getFirst();
+          final ICoreNode destination = query.getSecond();
 
-      final long durationNanosAverage = (long) Arrays.stream(durationsNanos).average().getAsDouble();
-      final String formattedDepTime = LocalTime.ofSecondOfDay(depTime).format(DateTimeFormatter.ofPattern("HH:mm"));
-      writeLine(formattedDepTime + "\t" + durationNanosAverage);
+          // Measure the query
+          final long startTime = System.nanoTime();
+          computation.computeShortestPath(source, destination);
+          final long endTime = System.nanoTime();
+          final long duration = endTime - startTime;
+          durationsNanos[averagingCounter] = duration;
+          averagingCounter++;
+        }
 
-      if (stepCounter % 8 == 0) {
-        LOGGER.info("Steps to go: " + (amountOfSteps - stepCounter));
+        final long durationNanosAverage = (long) Arrays.stream(durationsNanos).average().getAsDouble();
+        final String formattedDepTime = LocalTime.ofSecondOfDay(depTime).format(DateTimeFormatter.ofPattern("HH:mm"));
+        writeLine(formattedDepTime + "\t" + durationNanosAverage);
+
+        if (stepCounter % 8 == 0) {
+          LOGGER.info("Steps to go: " + (amountOfSteps - stepCounter));
+        }
+        stepCounter++;
       }
-      stepCounter++;
+    } else {
+      throw new IllegalStateException("Unknown routing model mode: " + mModel.getMode());
     }
   }
 
@@ -402,7 +576,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
    *
    * @throws IOException If an I/O-Exception occurred while saving the results
    */
-  private void uniModalTimeIndependent() throws IOException {
+  private void uniModalTimeIndependentBenchmark() throws IOException {
     LOGGER.info("Starting uni modal time independent");
 
     LOGGER.info("Computing Dijkstra ranks");
@@ -426,7 +600,7 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
       // Pick destinations at 2^j positions
       final int lastExponent = (int) Math.floor(Math.log(destinationsOrdered.length - 1) / Math.log(2));
       // Reject node and repeat if it has a very bad connectivity
-      if (lastExponent < UNI_MODAL_TIME_MINIMAL_END_RANK) {
+      if (lastExponent < UNI_MODAL_TIME_INDEPENDENT_MINIMAL_END_RANK) {
         LOGGER.info("Rejecting node with bad connectivity");
         i--;
         continue;
@@ -448,7 +622,8 @@ public final class BenchmarkSuite implements IQueryNodeProvider {
 
     // Start measurements
     LOGGER.info("Starting measurements");
-    writeLine("#Uni-modal, time-independent, size: " + mQueryGraph.size());
+    writeLine("#Uni-modal, time-independent, size " + mQueryGraph.size() + ", averaged over "
+        + UNI_MODAL_TIME_INDEPENDENT_AVERAGING);
 
     // Algorithms to measure
     final List<Pair<IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>>, String>> algorithmsWithName =

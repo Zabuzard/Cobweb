@@ -1,12 +1,23 @@
 package de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.connectionscan;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.AShortestPathComputation;
 import de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.EdgePath;
@@ -40,6 +51,10 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.Trip;
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
 public final class ConnectionScan extends AShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> {
+  /**
+   * Logger used for logging.
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionScan.class);
   /**
    * Amount of seconds of a day.
    */
@@ -174,7 +189,46 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
     // Backtrack journey pointers from destination to source. Stop when the
     // initial pointer was found, i.e. a pointer only containing an initial
     // footpath.
+    // TODO CSA is likely to have a bug, sometimes the pointer induce
+    // a loop which should not be possible. Remove the loop detection after
+    // investigating the issue. Current guess: Induced by footpaths not obeying
+    // the triangle inequality (i.e. its cheaper to visit an already visited
+    // stop again for a cheap footpath than using a direct footpath). This was
+    // fixed in the current version. Check if the issue remains.
+    final Set<Integer> visitedStopsLoopDetection = new LinkedHashSet<>();
     while (stopToJourney[currentStopId].getEnterConnection() != null) {
+      // TODO Loop detection from here ...
+      if (visitedStopsLoopDetection.contains(currentStopId)) {
+        // Loop detected
+        final Path dumpPath = Paths.get("bugDump.dmp");
+        LOGGER.info("Bug: Detected a loop, aborting computation and returning empty path.");
+        LOGGER.info("Bug data dumped to: " + dumpPath.toAbsolutePath());
+        final List<String> dumpLines = new ArrayList<>();
+        dumpLines.add("#-----------------------------------------------------------------");
+        dumpLines.add("#Bug dump, detected a loop in CSA path extraction.");
+        dumpLines.add("#Query from " + sources + " to " + destination + " with depTime at " + startingTime);
+        dumpLines.add(
+            "#Visited stops in extraction " + visitedStopsLoopDetection + ", visiting " + currentStopId + " again");
+        dumpLines.add("#Relevant journey pointers:");
+        for (final int visitedStop : visitedStopsLoopDetection) {
+          dumpLines.add("\t" + visitedStop + " -> " + stopToJourney[visitedStop]);
+        }
+        dumpLines.add("\t" + currentStopId + " -> " + stopToJourney[currentStopId]);
+        dumpLines.add("#Complete journey pointer dump:");
+        for (int i = 0; i < stopToJourney.length; i++) {
+          dumpLines.add("\t" + i + " -> " + stopToJourney[i]);
+        }
+        try {
+          Files.write(dumpPath, dumpLines, StandardOpenOption.CREATE, StandardOpenOption.APPEND,
+              StandardOpenOption.WRITE);
+        } catch (final IOException e) {
+          e.printStackTrace();
+        }
+        return Optional.empty();
+      }
+      visitedStopsLoopDetection.add(currentStopId);
+      // TODO ... to here
+
       final JourneyPointer pointer = stopToJourney[currentStopId];
       final Trip trip = mTable.getTrip(pointer.getExitConnection().getTripId());
       final Connection exitConnection = pointer.getExitConnection();

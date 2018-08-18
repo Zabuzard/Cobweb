@@ -45,8 +45,8 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   @Override
-  public int getAbortTravelTime() {
-    return Integer.valueOf(getSetting(ConfigUtil.KEY_ABORT_TRAVEL_TIME));
+  public int getAbortTravelTimeToAccessNodes() {
+    return Integer.valueOf(getSetting(ConfigUtil.KEY_ABORT_TRAVEL_TIME_TO_ACCESS_NODES));
   }
 
   @Override
@@ -215,7 +215,8 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
     mDefaultSettings.put(ConfigUtil.KEY_ACCESS_NODES_MAXIMUM, String.valueOf(ConfigUtil.VALUE_ACCESS_NODES_MAXIMUM));
     mDefaultSettings.put(ConfigUtil.KEY_FOOTPATH_REACHABILITY, String.valueOf(ConfigUtil.VALUE_FOOTPATH_REACHABILITY));
     mDefaultSettings.put(ConfigUtil.KEY_TRANSFER_DELAY, String.valueOf(ConfigUtil.VALUE_TRANSFER_DELAY));
-    mDefaultSettings.put(ConfigUtil.KEY_ABORT_TRAVEL_TIME, String.valueOf(ConfigUtil.VALUE_ABORT_TRAVEL_TIME));
+    mDefaultSettings.put(ConfigUtil.KEY_ABORT_TRAVEL_TIME_TO_ACCESS_NODES,
+        String.valueOf(ConfigUtil.VALUE_ABORT_TRAVEL_TIME_TO_ACCESS_NODES));
     mDefaultSettings.put(ConfigUtil.KEY_AMOUNT_OF_LANDMARKS, String.valueOf(ConfigUtil.VALUE_AMOUNT_OF_LANDMARKS));
 
     // Name search settings

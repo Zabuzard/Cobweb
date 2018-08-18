@@ -18,7 +18,7 @@ public final class Footpath {
   /**
    * The duration it takes to walk the footpath, in seconds.
    */
-  private final int mDuration;
+  private int mDuration;
 
   /**
    * Creates a new footpath.
@@ -58,5 +58,27 @@ public final class Footpath {
    */
   public int getDuration() {
     return mDuration;
+  }
+
+  /**
+   * Sets the duration it takes to walk the footpath.
+   *
+   * @param duration The duration to set, in seconds
+   */
+  public void setDuration(final int duration) {
+    mDuration = duration;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("Footpath [");
+    builder.append(mDepStopId);
+    builder.append(" -> ");
+    builder.append(mArrStopId);
+    builder.append(", duration=");
+    builder.append(mDuration);
+    builder.append("]");
+    return builder.toString();
   }
 }

@@ -173,11 +173,12 @@ public final class RoutingModel {
         final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation =
             new RoadToKNearestTransitAccess(mTimetable, mConfig.getAccessNodesMaximum());
         factory = new ShortestPathComputationFactory(mRoadGraph, mTimetable, accessNodeComputation,
-            mNearestRoadNodeComputation, mMode, mConfig.getAbortTravelTime(), mConfig.getAmountOfLandmarks());
+            mNearestRoadNodeComputation, mMode, mConfig.getAbortTravelTimeToAccessNodes(),
+            mConfig.getAmountOfLandmarks());
         break;
       case LINK_GRAPH:
-        factory = new ShortestPathComputationFactory(mLinkGraph, null, null, null, mMode, mConfig.getAbortTravelTime(),
-            mConfig.getAmountOfLandmarks());
+        factory = new ShortestPathComputationFactory(mLinkGraph, null, null, null, mMode,
+            mConfig.getAbortTravelTimeToAccessNodes(), mConfig.getAmountOfLandmarks());
         break;
       default:
         throw new AssertionError();

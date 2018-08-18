@@ -88,4 +88,17 @@ public final class Stop implements ICoreNode {
   public void setLongitude(final float longitude) {
     mLongitude = longitude;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("Stop [id=");
+    builder.append(mId);
+    builder.append(", latitude=");
+    builder.append(mLatitude);
+    builder.append(", longitude=");
+    builder.append(mLongitude);
+    builder.append("]");
+    return builder.toString();
+  }
 }

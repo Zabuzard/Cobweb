@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
@@ -160,8 +161,19 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
   public void correctFootpaths(final int transferDelay, final int footpathReachability) {
     LOGGER.debug("Correcting footpaths");
 
+    // Ensuring triangle inequality on existing footpaths
+    LOGGER.debug("Ensuring triangle inequality on existing footpaths");
+    final AtomicInteger incorrectFootpathCounter = new AtomicInteger();
+    mStopIdToOutgoingFootpaths.stream().flatMap(Collection::stream)
+        .filter(footpath -> footpath.getDuration() < transferDelay).forEach(footpath -> {
+          footpath.setDuration(transferDelay);
+          incorrectFootpathCounter.incrementAndGet();
+        });
+    LOGGER.debug("Corrected durations of {} footpaths", incorrectFootpathCounter.get());
+
     // Add missing self-loops
     LOGGER.debug("Computing missing self-loops");
+
     final Collection<Footpath> selfLoopsToAdd = FastList.newList();
     mIdToStop.keysView().forEach(fromId -> {
       final MutableIntSet reachableStopIds = mFootpathReachability.get(fromId);
@@ -193,8 +205,9 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
 
         // Construct footpath
         final double speed = RoutingUtil.getWalkingSpeed();
-        // Ensure the duration is strictly greater than zero
-        final int duration = (int) Math.max(1, RoutingUtil.travelTime(distance, speed));
+        // Ensure the duration is at least the transfer time to ensure triangle
+        // inequality when taking self-loops
+        final int duration = (int) Math.max(transferDelay, RoutingUtil.travelTime(distance, speed));
         closeFootpathsToAdd.add(new Footpath(fromStopId, toStop.getId(), duration));
       });
     });
@@ -238,8 +251,9 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
         // Construct footpath
         final double distance = RoutingUtil.distanceEquiRect(fromStop, toStop);
         final double speed = RoutingUtil.getWalkingSpeed();
-        // Ensure the duration is strictly greater than zero
-        final int duration = (int) Math.max(1, RoutingUtil.travelTime(distance, speed));
+        // Ensure the duration is at least the transfer time to ensure triangle
+        // inequality when taking self-loops
+        final int duration = (int) Math.max(transferDelay, RoutingUtil.travelTime(distance, speed));
         transitiveClosureToAdd.add(new Footpath(fromStopId, toStopId, duration));
       });
     });

@@ -61,9 +61,15 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
    */
   private final long mDepTime;
   /**
-   * The algorithm to compute shortest paths on road data.
+   * The algorithm to compute shortest paths on road data, used as fallback if
+   * no hybrid route was found
    */
-  private final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mRoadComputation;
+  private final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mRoadComputationFallback;
+  /**
+   * The algorithm to compute shortest paths on road data, used for small
+   * distances from source and destination to their access nodes
+   */
+  private final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> mRoadComputationToAccessNodes;
   /**
    * Object to use for retrieving the nearest road node to a given stop
    */
@@ -82,23 +88,30 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
   /**
    * Creates a new hybrid road timetable algorithm.
    *
-   * @param roadComputation       The algorithm to compute shortest paths on
-   *                              road data
-   * @param transitComputation    The algorithm to compute shortest paths on
-   *                              transit data
-   * @param accessNodeComputation Object used to compute access nodes
-   * @param stopToNearestRoadNode Object to use for retrieving the nearest road
-   *                              node to a given stop
-   * @param modes                 The allowed transportation modes
-   * @param depTime               Departure time to start routing at, in seconds
-   *                              since midnight
+   * @param roadComputationFallback      The algorithm to compute shortest paths
+   *                                     on road data, used as fallback if no
+   *                                     hybrid route was found
+   * @param roadComputationToAccessNodes The algorithm to compute shortest paths
+   *                                     on road data, used for small distances
+   *                                     from source and destination to their
+   *                                     access nodes
+   * @param transitComputation           The algorithm to compute shortest paths
+   *                                     on transit data
+   * @param accessNodeComputation        Object used to compute access nodes
+   * @param stopToNearestRoadNode        Object to use for retrieving the
+   *                                     nearest road node to a given stop
+   * @param modes                        The allowed transportation modes
+   * @param depTime                      Departure time to start routing at, in
+   *                                     seconds since midnight
    */
-  public HybridRoadTimetable(final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> roadComputation,
+  public HybridRoadTimetable(final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> roadComputationFallback,
+      final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> roadComputationToAccessNodes,
       final IShortestPathComputation<ICoreNode, ICoreEdge<ICoreNode>> transitComputation,
       final IAccessNodeComputation<ICoreNode, ICoreNode> accessNodeComputation,
       final INearestNeighborComputation<ICoreNode> stopToNearestRoadNode, final Set<ETransportationMode> modes,
       final long depTime) {
-    mRoadComputation = roadComputation;
+    mRoadComputationFallback = roadComputationFallback;
+    mRoadComputationToAccessNodes = roadComputationToAccessNodes;
     mTransitComputation = transitComputation;
     mAccessNodeComputation = accessNodeComputation;
     mStopToNearestRoadNode = stopToNearestRoadNode;
@@ -115,7 +128,7 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
   public Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> computeShortestPath(final Collection<ICoreNode> sources,
       final ICoreNode destination) {
     final Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> roadOnlyPath =
-        mRoadComputation.computeShortestPath(sources, destination);
+        mRoadComputationFallback.computeShortestPath(sources, destination);
     if (mUseRoadOnly) {
       return roadOnlyPath;
     }
@@ -138,7 +151,7 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
           continue;
         }
         final Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> path =
-            mRoadComputation.computeShortestPath(source, roadRepresentative.get());
+            mRoadComputationToAccessNodes.computeShortestPath(source, roadRepresentative.get());
         if (!path.isPresent()) {
           continue;
         }
@@ -164,7 +177,7 @@ public final class HybridRoadTimetable extends AShortestPathComputation<ICoreNod
         continue;
       }
       final Optional<IPath<ICoreNode, ICoreEdge<ICoreNode>>> path =
-          mRoadComputation.computeShortestPath(roadRepresentative.get(), destination);
+          mRoadComputationToAccessNodes.computeShortestPath(roadRepresentative.get(), destination);
       if (!path.isPresent()) {
         continue;
       }
