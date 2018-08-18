@@ -181,7 +181,8 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
       final Connection enterConnection = pointer.getEnterConnection();
 
       // Departure of footpath, arrival of trip exit
-      final TransitNode tripPartArr = createNodeForStop(exitConnection.getArrStopId(), exitConnection.getArrTime());
+      final TransitNode tripPartArr = createNodeForStop(exitConnection.getArrStopId(),
+          ConnectionScan.validateTimeBeforeAfter(exitConnection.getArrTime(), startingTime));
       ConnectionScan.addEdgeToPath(path, tripPartArr, currentDestination, true);
 
       // Add the trip
@@ -192,7 +193,8 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
       for (int i = exitIndex; i >= enterIndex; i--) {
         final Connection connection = trip.getConnectionAtSequenceIndex(i);
 
-        final TransitNode connectionDep = createNodeForStop(connection.getDepStopId(), connection.getDepTime());
+        final TransitNode connectionDep = createNodeForStop(connection.getDepStopId(),
+            ConnectionScan.validateTimeBeforeAfter(connection.getDepTime(), startingTime));
         ConnectionScan.addEdgeToPath(path, connectionDep, currentConnectionArr, false);
 
         // Prepare next connection of the trip
@@ -281,9 +283,15 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
 
     // Relax all initial footpaths
     sources.stream().map(IHasId::getId).flatMap(mTable::getOutgoingFootpaths).forEach(footpath -> {
-      stopToTentativeArrTime[footpath.getArrStopId()] = startingTime + footpath.getDuration();
+      // Only use footpath if it improves the arrival time at the destination
+      final int footpathArrStopId = footpath.getArrStopId();
+      final int footpathTime = startingTime + footpath.getDuration();
+      if (footpathTime >= stopToTentativeArrTime[footpathArrStopId]) {
+        return;
+      }
+      stopToTentativeArrTime[footpathArrStopId] = footpathTime;
       // Add an initial footpath as journey pointer
-      stopToJourney[footpath.getArrStopId()] = new JourneyPointer(null, null, footpath);
+      stopToJourney[footpathArrStopId] = new JourneyPointer(null, null, footpath);
     });
 
     // Process all connections ordered starting from the first after the

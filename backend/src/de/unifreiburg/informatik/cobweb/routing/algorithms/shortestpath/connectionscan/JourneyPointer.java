@@ -68,4 +68,17 @@ public final class JourneyPointer {
   public Footpath getFootpath() {
     return mFootpath;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("JourneyPointer [enterConnection=");
+    builder.append(mEnterConnection);
+    builder.append(", exitConnection=");
+    builder.append(mExitConnection);
+    builder.append(", footpath=");
+    builder.append(mFootpath);
+    builder.append("]");
+    return builder.toString();
+  }
 }

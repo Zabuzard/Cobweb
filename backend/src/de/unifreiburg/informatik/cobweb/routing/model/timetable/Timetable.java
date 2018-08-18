@@ -193,7 +193,8 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
 
         // Construct footpath
         final double speed = RoutingUtil.getWalkingSpeed();
-        final int duration = (int) RoutingUtil.travelTime(distance, speed);
+        // Ensure the duration is strictly greater than zero
+        final int duration = (int) Math.max(1, RoutingUtil.travelTime(distance, speed));
         closeFootpathsToAdd.add(new Footpath(fromStopId, toStop.getId(), duration));
       });
     });
@@ -237,7 +238,8 @@ public final class Timetable implements ITimetableIdGenerator, Serializable {
         // Construct footpath
         final double distance = RoutingUtil.distanceEquiRect(fromStop, toStop);
         final double speed = RoutingUtil.getWalkingSpeed();
-        final int duration = (int) RoutingUtil.travelTime(distance, speed);
+        // Ensure the duration is strictly greater than zero
+        final int duration = (int) Math.max(1, RoutingUtil.travelTime(distance, speed));
         transitiveClosureToAdd.add(new Footpath(fromStopId, toStopId, duration));
       });
     });
