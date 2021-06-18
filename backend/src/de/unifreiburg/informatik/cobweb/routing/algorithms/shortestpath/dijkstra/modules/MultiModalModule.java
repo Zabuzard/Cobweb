@@ -71,7 +71,7 @@ public final class MultiModalModule<N extends INode, E extends IEdge<N>> impleme
    * Whether or not the given edge should be considered for relaxation.<br>
    * <br>
    * The method will ignore edges that are not of type
-   * {@link IHasTransportationMode}, i.e. return <tt>true</tt>. Else it checks
+   * {@link IHasTransportationMode}, i.e. return <code>true</code>. Else it checks
    * if the edge can be taken with any of the restricted transportation modes.
    */
   @Override

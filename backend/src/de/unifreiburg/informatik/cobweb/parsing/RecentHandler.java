@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * accepting new or more recent files.<br>
  * <br>
  * The format of the info files is assumed to be in a tab-separated format
- * (<tt>tsv</tt>) with two columns:
+ * (<code>tsv</code>) with two columns:
  * <ol>
  * <li>Path: The path to a file that is registered</li>
  * <li>last modified: The date the file was last modified when it was

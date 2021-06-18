@@ -26,7 +26,7 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
     implements IHasPathCost, Comparable<TentativeDistance<N, E>> {
   /**
    * The estimated distance from this node to the desired destination or
-   * <tt>0.0</tt> if not present.
+   * <code>0.0</code> if not present.
    */
   private final double mEstimatedDistance;
   /**
@@ -45,7 +45,7 @@ public final class TentativeDistance<N extends INode, E extends IEdge<N>>
 
   /**
    * Creates a new tentative distance container for the given node. This
-   * constructor sets the estimated distance to <tt>0.0</tt> which should be
+   * constructor sets the estimated distance to <code>0.0</code> which should be
    * used whenever there is no desired destination.
    *
    * @param node              The node to wrap around

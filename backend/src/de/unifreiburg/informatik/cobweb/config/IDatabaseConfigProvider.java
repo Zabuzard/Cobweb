@@ -43,8 +43,8 @@ public interface IDatabaseConfigProvider {
   /**
    * Whether an external or an internal in-memory database should be used.
    *
-   * @return <tt>True</tt> if an external database should be used,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if an external database should be used,
+   *         <code>false</code> otherwise
    */
   boolean useExternalDb();
 }

@@ -24,7 +24,7 @@ public final class AbortAfterModule<N extends INode, E extends IEdge<N>> impleme
    * @param       <N> Type of the nodes
    * @param       <E> Type of the edges
    * @param range The range after which to abort, in travel time measured in
-   *              <tt>seconds</tt>
+   *              <code>seconds</code>
    * @return The created module
    */
   public static <N extends INode, E extends IEdge<N>> AbortAfterModule<N, E> of(final double range) {
@@ -33,7 +33,7 @@ public final class AbortAfterModule<N extends INode, E extends IEdge<N>> impleme
 
   /**
    * The range after which to abort, in travel time measured in
-   * <tt>seconds</tt>.
+   * <code>seconds</code>.
    */
   private final double mRange;
 
@@ -42,7 +42,7 @@ public final class AbortAfterModule<N extends INode, E extends IEdge<N>> impleme
    * range.
    *
    * @param range The range after which to abort, in travel time measured in
-   *              <tt>seconds</tt>
+   *              <code>seconds</code>
    */
   public AbortAfterModule(final double range) {
     mRange = range;

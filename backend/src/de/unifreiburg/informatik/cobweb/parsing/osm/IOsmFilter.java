@@ -14,7 +14,7 @@ public interface IOsmFilter {
    * Whether or not the given OSM node is accepted by the filter.
    *
    * @param node The node in question
-   * @return <tt>True</tt> if the node is accepted, <tt>false</tt> otherwise
+   * @return <code>True</code> if the node is accepted, <code>false</code> otherwise
    */
   boolean filter(OsmNode node);
 
@@ -22,7 +22,7 @@ public interface IOsmFilter {
    * Whether or not the given OSM relation is accepted by the filter.
    *
    * @param relation The relation in question
-   * @return <tt>True</tt> if the relation is accepted, <tt>false</tt> otherwise
+   * @return <code>True</code> if the relation is accepted, <code>false</code> otherwise
    */
   boolean filter(OsmRelation relation);
 
@@ -30,7 +30,7 @@ public interface IOsmFilter {
    * Whether or not the given OSM way is accepted by the filter.
    *
    * @param way The way in question
-   * @return <tt>True</tt> if the way is accepted, <tt>false</tt> otherwise
+   * @return <code>True</code> if the way is accepted, <code>false</code> otherwise
    */
   boolean filter(OsmWay way);
 }

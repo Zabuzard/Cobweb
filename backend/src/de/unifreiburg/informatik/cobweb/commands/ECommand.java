@@ -29,7 +29,7 @@ public enum ECommand {
    * Gets the command that corresponds to the command name.
    *
    * @param name The command name
-   * @return The corresponding command or <tt>null</tt> if not present
+   * @return The corresponding command or <code>null</code> if not present
    */
   public static ECommand fromName(final String name) {
     for (final ECommand command : ECommand.values()) {

@@ -19,7 +19,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.INode;
  * <br>
  * If the nodes of the graph do not provide {@link RandomAccess}, the selection
  * might need to iterate all nodes in order to select the random nodes. In this
- * case the landmark generation runs in <tt>O(n)</tt>, else only in the amount
+ * case the landmark generation runs in <code>O(n)</code>, else only in the amount
  * of landmarks.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
@@ -53,7 +53,7 @@ public final class RandomLandmarks<N extends INode, G extends IGraph<N, ? extend
    * <br>
    * If the nodes of the graph do not provide {@link RandomAccess}, the
    * selection might need to iterate all nodes in order to select the random
-   * nodes. In this case the landmark generation runs in <tt>O(n)</tt>, else
+   * nodes. In this case the landmark generation runs in <code>O(n)</code>, else
    * only in the amount of landmarks.
    */
   @Override

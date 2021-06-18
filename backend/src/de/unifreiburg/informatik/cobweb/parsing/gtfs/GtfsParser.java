@@ -32,10 +32,10 @@ public final class GtfsParser {
    * Walks through the given directory or list of files and collects all GTFS
    * files that should be considered for parsing.
    *
-   * @param directory Directory that contains the GTFS files or <tt>null</tt> if
-   *                  <tt>files</tt> is used
+   * @param directory Directory that contains the GTFS files or <code>null</code> if
+   *                  <code>files</code> is used
    * @param files     A collection of files which contain the GTFS files or
-   *                  <tt>null</tt> if <tt>directory</tt> is used
+   *                  <code>null</code> if <code>directory</code> is used
    * @return A collection of GTFS files that should be considered for parsing
    * @throws IOException If an I/O exception occurred wile walking through the
    *                     directory
@@ -65,7 +65,7 @@ public final class GtfsParser {
    * extension.
    *
    * @param gtfsArchive The GTFS archive in question
-   * @return <tt>True</tt> if the given file is a GTFS archive, <tt>false</tt>
+   * @return <code>True</code> if the given file is a GTFS archive, <code>false</code>
    *         otherwise
    */
   private static boolean isGtfsArchive(final Path gtfsArchive) {
@@ -97,13 +97,13 @@ public final class GtfsParser {
    */
   private final Collection<IGtfsFileHandler> mAllHandler;
   /**
-   * Directory that contains the GTFS files or <tt>null</tt> if {@link #mFiles}
+   * Directory that contains the GTFS files or <code>null</code> if {@link #mFiles}
    * is used.
    */
   private final Path mDirectory;
 
   /**
-   * Collection of files that contain the GTFS files or <tt>null</tt> if
+   * Collection of files that contain the GTFS files or <code>null</code> if
    * {@link #mDirectory} is used.
    */
   private final Collection<Path> mFiles;
@@ -114,9 +114,9 @@ public final class GtfsParser {
    * parsed GTFS entities.
    *
    * @param directory  The directory that contains the GTFS files or
-   *                   <tt>null</tt> if <tt>files</tt> is used
+   *                   <code>null</code> if <code>files</code> is used
    * @param files      Collection of files that contain the GTFS files or
-   *                   <tt>null</tt> if <tt>directory</tt> is used
+   *                   <code>null</code> if <code>directory</code> is used
    * @param allHandler The handler to notify when parsing entities
    */
   public GtfsParser(final Path directory, final Collection<Path> files, final Collection<IGtfsFileHandler> allHandler) {

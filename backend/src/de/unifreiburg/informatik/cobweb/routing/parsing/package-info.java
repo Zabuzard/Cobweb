@@ -1,6 +1,6 @@
 /**
  * Utility methods to parse external data into the internal model. Like parsing
- * an <tt>OSM</tt> file into a
+ * an <code>OSM</code> file into a
  * {@link de.unifreiburg.informatik.cobweb.routing.model.graph.road.RoadGraph
  * RoadGraph}.
  *

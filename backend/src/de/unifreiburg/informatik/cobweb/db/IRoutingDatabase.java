@@ -20,7 +20,7 @@ public interface IRoutingDatabase {
    *
    * @param wayIds The way IDs to get highway data for
    * @param size   The amount of way IDs to get data for, i.e. the size of
-   *               <tt>wayIds</tt>. This value must be set correctly.
+   *               <code>wayIds</code>. This value must be set correctly.
    * @return Highway data for all highways that match the given way IDs. If no
    *         highway data was found for a way ID, then it is not contained in
    *         the resulting collection. No guarantees on the order of the
@@ -35,7 +35,7 @@ public interface IRoutingDatabase {
    *
    * @param wayIds The way IDs to get highway data for
    * @param size   The amount of way IDs to get data for, i.e. the size of
-   *               <tt>wayIds</tt>. This value must be set correctly.
+   *               <code>wayIds</code>. This value must be set correctly.
    * @return Highway data for all highways that match the given way IDs. If no
    *         highway data was found for a way ID, then it is not contained in
    *         the resulting collection. No guarantees on the order of the
@@ -104,7 +104,7 @@ public interface IRoutingDatabase {
    *
    * @param nodeIds The node IDs to get spatial data for
    * @param size    The amount of node IDs to get data for, i.e. the size of
-   *                <tt>nodeIds</tt>. This value must be set correctly.
+   *                <code>nodeIds</code>. This value must be set correctly.
    * @return Spatial data for all nodes that match the given node IDs. If no
    *         spatial data was found for a node ID, then it is not contained in
    *         the resulting collection. No guarantees on the order of the
@@ -119,7 +119,7 @@ public interface IRoutingDatabase {
    *
    * @param nodeIds The node IDs to get spatial data for
    * @param size    The amount of node IDs to get data for, i.e. the size of
-   *                <tt>nodeIds</tt>. This value must be set correctly.
+   *                <code>nodeIds</code>. This value must be set correctly.
    * @return Spatial data for all nodes that match the given node IDs. If no
    *         spatial data was found for a node ID, then it is not contained in
    *         the resulting collection. No guarantees on the order of the
@@ -162,7 +162,7 @@ public interface IRoutingDatabase {
    *
    * @param mappings The mappings to offer
    * @param size     The amount of mappings to offer, i.e. the size of
-   *                 <tt>mappings</tt>. This value must be set correctly.
+   *                 <code>mappings</code>. This value must be set correctly.
    */
   void offerIdMappings(Iterable<IdMapping> mappings, int size);
 
@@ -175,7 +175,7 @@ public interface IRoutingDatabase {
    *
    * @param mappings The mappings to offer
    * @param size     The amount of mappings to offer, i.e. the size of
-   *                 <tt>mappings</tt>. This value must be set correctly.
+   *                 <code>mappings</code>. This value must be set correctly.
    */
   void offerIdMappings(Stream<IdMapping> mappings, int size);
 
@@ -188,7 +188,7 @@ public interface IRoutingDatabase {
    *
    * @param entities The entities to offer
    * @param size     The amount of entities to offer, i.e. the size of
-   *                 <tt>entities</tt>. This value must be set correctly.
+   *                 <code>entities</code>. This value must be set correctly.
    */
   void offerOsmEntities(Iterable<OsmEntity> entities, int size);
 
@@ -201,7 +201,7 @@ public interface IRoutingDatabase {
    *
    * @param entities The entities to offer
    * @param size     The amount of entities to offer, i.e. the size of
-   *                 <tt>entities</tt>. This value must be set correctly.
+   *                 <code>entities</code>. This value must be set correctly.
    */
   void offerOsmEntities(Stream<OsmEntity> entities, int size);
 

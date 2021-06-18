@@ -11,8 +11,8 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.IReversedProvider;
 /**
  * Link edges link nodes of one graph to nodes of a different graph.<br>
  * <br>
- * Their cost is <tt>0</tt> and they offer all transportation modes available in
- * a road network. Their ID is always <tt>-1</tt>.
+ * Their cost is <code>0</code> and they offer all transportation modes available in
+ * a road network. Their ID is always <code>-1</code>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> The type of nodes
@@ -31,7 +31,7 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
    */
   private final Set<ETransportationMode> mModes;
   /**
-   * An object that provides a reversed flag or <tt>null</tt> if not present.
+   * An object that provides a reversed flag or <code>null</code> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
    * implement implicit edge reversal at constant time.
    */
@@ -54,7 +54,7 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
   }
 
   /**
-   * Gets the cost of this edge which is always <tt>0.0</tt>.
+   * Gets the cost of this edge which is always <code>0.0</code>.
    */
   @Override
   public double getCost() {
@@ -70,7 +70,7 @@ public final class LinkEdge<N extends ICoreNode> implements ICoreEdge<N> {
   }
 
   /**
-   * Gets the ID of this edge which is always <tt>-1</tt>.
+   * Gets the ID of this edge which is always <code>-1</code>.
    */
   @Override
   public int getId() {

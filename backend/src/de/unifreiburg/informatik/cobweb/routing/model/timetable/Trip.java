@@ -69,7 +69,7 @@ public final class Trip implements IHasId, Serializable {
    *
    * @param sequenceIndex The index in the sequence to get the connection for
    * @return The connection in the sequence at the given index
-   * @throws IndexOutOfBoundsException If the index is below <tt>0</tt> or
+   * @throws IndexOutOfBoundsException If the index is below <code>0</code> or
    *                                   greater equals the sequence size
    */
   public Connection getConnectionAtSequenceIndex(final int sequenceIndex) throws IndexOutOfBoundsException {

@@ -24,8 +24,8 @@ public interface IHasTransportationMode {
    * Whether the instance has the given transportation mode.
    *
    * @param mode The mode in question
-   * @return <tt>True</tt> if the instance has the given transportation mode,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the instance has the given transportation mode,
+   *         <code>false</code> otherwise
    */
   boolean hasTransportationMode(ETransportationMode mode);
 }

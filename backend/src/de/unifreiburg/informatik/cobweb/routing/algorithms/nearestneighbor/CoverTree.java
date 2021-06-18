@@ -22,7 +22,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.ISpatial;
  * The implementation is based on the paper:
  * <ul>
  * <li><a href="https://dl.acm.org/citation.cfm?id=1143857">Cover Trees for
- * Nearest Neighbor</a> - Beygelzimer et al. in <tt>ICML '06</tt></li>
+ * Nearest Neighbor</a> - Beygelzimer et al. in <code>ICML '06</code></li>
  * </ul>
  * Modified version from
  * <a href="https://github.com/loehndorf/covertree">GitHub: Loehndorf -
@@ -63,14 +63,14 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    */
   private final double mBase;
   /**
-   * If the tree uses bounds. If set to <tt>true</tt> the fields
+   * If the tree uses bounds. If set to <code>true</code> the fields
    * {@link #mMinLat}, {@link #mMinLong}, {@link #mMaxLat} and {@link #mMaxLong}
    * are respected.
    */
   private boolean mHasBounds;
   /**
    * The maximal latitude, only effective if {@link #mHasBounds} is set to
-   * <tt>true</tt>.
+   * <code>true</code>.
    */
   private float mMaxLat;
   /**
@@ -79,7 +79,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private int mMaxLevel;
   /**
    * The maximal longitude, only effective if {@link #mHasBounds} is set to
-   * <tt>true</tt>.
+   * <code>true</code>.
    */
   private float mMaxLong;
   /**
@@ -96,7 +96,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private final IMetric<E> mMetric;
   /**
    * The minimal latitude, only effective if {@link #mHasBounds} is set to
-   * <tt>true</tt>.
+   * <code>true</code>.
    */
   private float mMinLat;
   /**
@@ -105,7 +105,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private int mMinLevel;
   /**
    * The minimal longitude, only effective if {@link #mHasBounds} is set to
-   * <tt>true</tt>.
+   * <code>true</code>.
    */
   private float mMinLong;
   /**
@@ -122,7 +122,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   private Node<E> mRootNode;
 
   /**
-   * Create an initially empty cover tree at level <tt>0</tt> which
+   * Create an initially empty cover tree at level <code>0</code> which
    * automatically expands above and below.
    *
    * @param base   The base of the tree
@@ -156,7 +156,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Create an initially empty cover tree at level <tt>0</tt> which
+   * Create an initially empty cover tree at level <code>0</code> which
    * automatically expands above and below.
    *
    * @param metric The metric to use for determining distance between elements
@@ -167,7 +167,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
 
   /**
    * Get the cover of the given level. All points at this level are guaranteed
-   * to be <tt>2^level</tt> apart from one another.
+   * to be <code>2^level</code> apart from one another.
    *
    * @param level The level to get the cover of
    * @return The cover at the given level
@@ -193,7 +193,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Gets at least <tt>numCenters</tt> centers which are maximally apart from
+   * Gets at least <code>numCenters</code> centers which are maximally apart from
    * each other. All remaining centers are removed from the tree.<br>
    * <br>
    * This function only works as designed when the function
@@ -202,7 +202,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    * level of the tree.
    *
    * @param numCenters The number of centers to get
-   * @return At least <tt>numCenters</tt> centers which are maximally apart from
+   * @return At least <code>numCenters</code> centers which are maximally apart from
    *         each other
    */
   public List<E> getKCenters(final int numCenters) {
@@ -468,8 +468,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   /**
    * Insert the given element into the tree.<br>
    * <br>
-   * If the tree size is greater than <tt>level</tt> the lowest cover will be
-   * removed as long as it does not decrease tree size below <tt>level</tt>.
+   * If the tree size is greater than <code>level</code> the lowest cover will be
+   * removed as long as it does not decrease tree size below <code>level</code>.
    *
    * @param element The element to insert
    * @param level   The level
@@ -579,8 +579,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    *
    * @param first  The first element
    * @param second The second element
-   * @return <tt>True</tt> if both elements are at the same location,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if both elements are at the same location,
+   *         <code>false</code> otherwise
    */
   private boolean areAtSameLocation(final E first, final E second) {
     return first.getLatitude() == second.getLatitude() && first.getLongitude() == second.getLongitude();
@@ -592,8 +592,8 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
    *
    * @param first  The node containing the first element
    * @param second The node containing the first element
-   * @return <tt>True</tt> if both elements are at the same location,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if both elements are at the same location,
+   *         <code>false</code> otherwise
    */
   private boolean areAtSameLocation(final Node<E> first, final Node<E> second) {
     return areAtSameLocation(first.getElement(), second.getElement());
@@ -697,7 +697,7 @@ public final class CoverTree<E extends ISpatial> implements INearestNeighborComp
   }
 
   /**
-   * Removes all but <tt>numCenters</tt> elements.
+   * Removes all but <code>numCenters</code> elements.
    *
    * @param numCenters The amount of elements to keep
    * @return The cover-set

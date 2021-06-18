@@ -14,7 +14,7 @@ public interface IFileHandler {
    * Whether or not this handler accepts the given file.
    *
    * @param file The file in question
-   * @return <tt>True</tt> if the file is accepted, <tt>false</tt> otherwise
+   * @return <code>True</code> if the file is accepted, <code>false</code> otherwise
    */
   boolean isAcceptingFile(Path file);
 }

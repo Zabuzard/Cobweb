@@ -43,7 +43,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.Trip;
  * <br>
  * For details refer to:
  * <ul>
- * <li><tt>Connection Scan Algorithm</tt> - Dibbelt J., Pajor T., Strasser B.
+ * <li><code>Connection Scan Algorithm</code> - Dibbelt J., Pajor T., Strasser B.
  * and Wagner D. - 2017 -
  * <a href="https://arxiv.org/abs/1703.05997">arxiv.org/abs/1703.05997</a></li>
  * </ul>
@@ -68,8 +68,8 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
    * @param path        The path to add the edge to
    * @param source      The source node of the edge
    * @param destination The destination node of the edge
-   * @param walkByFoot  <tt>True</tt> if the transportation mode of the edge is
-   *                    by foot, <tt>false</tt> if by tram.
+   * @param walkByFoot  <code>True</code> if the transportation mode of the edge is
+   *                    by foot, <code>false</code> if by tram.
    */
   private static void addEdgeToPath(final EdgePath<ICoreNode, ICoreEdge<ICoreNode>> path, final TransitNode source,
       final TransitNode destination, final boolean walkByFoot) {
@@ -314,7 +314,7 @@ public final class ConnectionScan extends AShortestPathComputation<ICoreNode, IC
    *
    * @param sources         The sources to start computation from, must not be
    *                        empty.
-   * @param pathDestination The destination to route to or <tt>null</tt> if
+   * @param pathDestination The destination to route to or <code>null</code> if
    *                        routing to all reachable stops is desired
    * @param startingTime    The time to start routing at in seconds since
    *                        midnight

@@ -32,7 +32,7 @@ public final class HttpRequest {
   /**
    * Creates a new HTTP request with the given values.
    *
-   * @param type     The type of the request, like <tt>POST</tt>
+   * @param type     The type of the request, like <code>POST</code>
    * @param resource The resource the request requests
    * @param protocol The protocol used by the request
    * @param headers  A map connecting HTTP headers to their values

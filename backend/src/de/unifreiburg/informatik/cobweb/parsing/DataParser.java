@@ -33,7 +33,7 @@ public final class DataParser {
    */
   private final IParseConfigProvider mConfig;
   /**
-   * Collection of files that contain the files to parse or <tt>null</tt> if the
+   * Collection of files that contain the files to parse or <code>null</code> if the
    * directory set in the configuration file should be used.
    */
   private final Collection<Path> mFiles;
@@ -46,7 +46,7 @@ public final class DataParser {
    */
   private final Collection<IOsmFileHandler> mOsmHandler;
   /**
-   * <tt>True</tt> if the parser is used for the reducer command, will use a
+   * <code>True</code> if the parser is used for the reducer command, will use a
    * different configuration then.
    */
   private final boolean mUseReducerConfiguration;
@@ -56,7 +56,7 @@ public final class DataParser {
    *
    * @param config The configuration provider to use
    * @param files  Collection of files that contain the files to parse or
-   *               <tt>null</tt> if the directory set in the configuration file
+   *               <code>null</code> if the directory set in the configuration file
    *               should be used.
    */
   public DataParser(final IParseConfigProvider config, final Collection<Path> files) {
@@ -68,10 +68,10 @@ public final class DataParser {
    *
    * @param config                  The configuration provider to use
    * @param files                   Collection of files that contain the files
-   *                                to parse or <tt>null</tt> if the directory
+   *                                to parse or <code>null</code> if the directory
    *                                set in the configuration file should be
    *                                used.
-   * @param useReducerConfiguration <tt>True</tt> if the parser is used for the
+   * @param useReducerConfiguration <code>True</code> if the parser is used for the
    *                                reducer command, will use a different
    *                                configuration then
    */

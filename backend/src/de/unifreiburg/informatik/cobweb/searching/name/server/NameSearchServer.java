@@ -42,8 +42,8 @@ import de.zabuza.lexisearch.ranking.PostingBeforeRecordRanking;
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
  * Requests are parsed into {@link NameSearchRequest} and responses into
- * {@link NameSearchResponse}. Accepted HTTP methods are <tt>POST</tt> and
- * <tt>OPTIONS</tt>. The server will send <tt>BAD REQUEST</tt> to invalid
+ * {@link NameSearchResponse}. Accepted HTTP methods are <code>POST</code> and
+ * <code>OPTIONS</code>. The server will send <code>BAD REQUEST</code> to invalid
  * requests.<br>
  * <br>
  * The server itself handles clients in parallel using a cached thread pool. For
@@ -58,7 +58,7 @@ public final class NameSearchServer implements Runnable {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(NameSearchServer.class);
   /**
-   * The value to use for the <tt>q-grams</tt>, i.e. the <tt>q</tt>.
+   * The value to use for the <code>q-grams</code>, i.e. the <code>q</code>.
    */
   private static final int Q_GRAM_VALUE = 3;
   /**
@@ -143,7 +143,7 @@ public final class NameSearchServer implements Runnable {
    * <br>
    * A request to shutdown can be send using {@link #shutdown()}.
    *
-   * @return <tt>True</tt> if the server is running, <tt>false</tt> otherwise
+   * @return <code>True</code> if the server is running, <code>false</code> otherwise
    */
   public boolean isRunning() {
     return mServerThread.isAlive();

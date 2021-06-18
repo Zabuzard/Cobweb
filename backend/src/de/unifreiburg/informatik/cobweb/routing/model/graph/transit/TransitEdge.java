@@ -41,7 +41,7 @@ public class TransitEdge<N extends ICoreNode> implements ICoreEdge<N> {
    */
   private final Set<ETransportationMode> mModes;
   /**
-   * An object that provides a reversed flag or <tt>null</tt> if not present.
+   * An object that provides a reversed flag or <code>null</code> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
    * implement implicit edge reversal at constant time.
    */

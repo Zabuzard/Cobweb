@@ -1,5 +1,5 @@
 /**
- * Methods used for parsing <tt>GTFS</tt> data into the internal model, for
+ * Methods used for parsing <code>GTFS</code> data into the internal model, for
  * example a
  * {@link de.unifreiburg.informatik.cobweb.routing.model.graph.transit.TransitGraph
  * TransitGraph}.

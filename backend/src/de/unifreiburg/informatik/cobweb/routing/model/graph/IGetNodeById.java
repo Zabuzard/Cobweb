@@ -15,7 +15,7 @@ public interface IGetNodeById<N extends INode & IHasId> {
    * The implementation must be consistent with {@link #getNodeById(int)}.
    *
    * @param id The ID in question
-   * @return <tt>True</tt> if there is a node with the given ID, <tt>false</tt>
+   * @return <code>True</code> if there is a node with the given ID, <code>false</code>
    *         otherwise
    */
   boolean containsNodeWithId(int id);

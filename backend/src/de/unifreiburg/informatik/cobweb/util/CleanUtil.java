@@ -95,8 +95,8 @@ public final class CleanUtil {
    * must be empty.
    *
    * @param path The file or directory to delete
-   * @return <tt>True</tt> if the file or directory could be deleted,
-   *         <tt>false</tt> if not.
+   * @return <code>True</code> if the file or directory could be deleted,
+   *         <code>false</code> if not.
    */
   private static boolean deleteIfPossible(final Path path) {
     try {

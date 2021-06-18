@@ -31,8 +31,8 @@ public final class StronglyConnectedComponent<N> {
    * Adds the given node to the SCC if not already contained.
    *
    * @param node The node to add
-   * @return <tt>True</tt> if the node was not already contained and thus added,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the node was not already contained and thus added,
+   *         <code>false</code> otherwise
    */
   public boolean addNode(final N node) {
     return mNodes.add(node);
@@ -50,7 +50,7 @@ public final class StronglyConnectedComponent<N> {
   /**
    * Gets the root node of this SCC.
    *
-   * @return The root node or <tt>null</tt> if not set
+   * @return The root node or <code>null</code> if not set
    */
   public N getRootNode() {
     return mRootNode;

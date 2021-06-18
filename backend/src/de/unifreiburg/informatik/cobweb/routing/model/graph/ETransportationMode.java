@@ -36,7 +36,7 @@ public enum ETransportationMode {
    * Gets the transportation mode that corresponds to the given value.
    *
    * @param value The value to get the element from
-   * @return The corresponding transportation mode or <tt>null</tt> if not
+   * @return The corresponding transportation mode or <code>null</code> if not
    *         present
    */
   public static ETransportationMode fromValue(final int value) {

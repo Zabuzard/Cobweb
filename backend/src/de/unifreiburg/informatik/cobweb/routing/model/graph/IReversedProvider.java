@@ -12,7 +12,7 @@ public interface IReversedProvider extends Serializable {
   /**
    * Whether or not the object is reversed.
    *
-   * @return <tt>True</tt> if the object is reversed, <tt>false</tt> otherwise
+   * @return <code>True</code> if the object is reversed, <code>false</code> otherwise
    */
   boolean isReversed();
 }

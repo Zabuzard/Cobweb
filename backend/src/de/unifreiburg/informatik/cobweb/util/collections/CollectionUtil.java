@@ -10,7 +10,7 @@ import java.util.Collection;
 public final class CollectionUtil {
   /**
    * Increases the internal capacity of the given collection by appending
-   * <tt>null</tt> values until the collection has the desired capacity.
+   * <code>null</code> values until the collection has the desired capacity.
    *
    * @param            <E> The type of the elements contained in the collection
    * @param collection The collection to increase

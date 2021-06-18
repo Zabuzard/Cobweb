@@ -55,11 +55,11 @@ public final class RoadEdge<N extends ICoreNode> implements ICoreEdge<N>, IRoadE
    */
   private final int mId;
   /**
-   * The maximal speed allowed on this edge, in <tt>km/h</tt>.
+   * The maximal speed allowed on this edge, in <code>km/h</code>.
    */
   private final int mMaxSpeed;
   /**
-   * An object that provides a reversed flag or <tt>null</tt> if not present.
+   * An object that provides a reversed flag or <code>null</code> if not present.
    * Can be used to determine if the edge should be interpreted as reversed to
    * implement implicit edge reversal at constant time.
    */
@@ -82,7 +82,7 @@ public final class RoadEdge<N extends ICoreNode> implements ICoreEdge<N>, IRoadE
    * @param destination The destination node of the edge
    * @param type        The highway type of the edge, use
    *                    {@link EHighwayType#ROAD} if unknown
-   * @param maxSpeed    The maximal speed allowed on this edge, in <tt>km/h</tt>
+   * @param maxSpeed    The maximal speed allowed on this edge, in <code>km/h</code>
    * @param modes       The transportation modes allowed for this edge
    */
   public RoadEdge(final int id, final N source, final N destination, final EHighwayType type, final int maxSpeed,

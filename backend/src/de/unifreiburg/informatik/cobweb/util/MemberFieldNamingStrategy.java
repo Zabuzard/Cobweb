@@ -6,7 +6,7 @@ import com.google.gson.FieldNamingStrategy;
 
 /**
  * Field naming strategy for member variables. It translates a field named like
- * <tt>mField</tt> to <tt>field</tt>.
+ * <code>mField</code> to <code>field</code>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */

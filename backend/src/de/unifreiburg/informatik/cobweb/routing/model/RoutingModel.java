@@ -70,7 +70,7 @@ public final class RoutingModel {
    */
   private int mGraphSizeBeforeData;
   /**
-   * Link graph to route on or <tt>null</tt> if not used according to the mode.
+   * Link graph to route on or <code>null</code> if not used according to the mode.
    */
   private LinkGraph mLinkGraph;
   /**
@@ -86,12 +86,12 @@ public final class RoutingModel {
    */
   private RoadGraph<ICoreNode, ICoreEdge<ICoreNode>> mRoadGraph;
   /**
-   * The timetable to route on or <tt>null</tt> if not used according to the
+   * The timetable to route on or <code>null</code> if not used according to the
    * mode.
    */
   private Timetable mTimetable;
   /**
-   * Transit graph to route on or <tt>null</tt> if not used according to the
+   * Transit graph to route on or <code>null</code> if not used according to the
    * mode.
    */
   private TransitGraph<ICoreNode, ICoreEdge<ICoreNode>> mTransitGraph;

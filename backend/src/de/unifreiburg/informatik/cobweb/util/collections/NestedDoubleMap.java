@@ -30,7 +30,7 @@ public final class NestedDoubleMap<K1, K2> {
   private final Map<K1, MutableObjectDoubleMap<K2>> mK1ToK2ToDouble;
   /**
    * The initial capacity to use when creating maps which connect the second key
-   * to the double value or <tt>-1</tt> if a default value should be used.
+   * to the double value or <code>-1</code> if a default value should be used.
    */
   private int mNestedInitialCapacity;
 
@@ -84,8 +84,8 @@ public final class NestedDoubleMap<K1, K2> {
    *
    * @param key1 The first key
    * @param key2 The second key
-   * @return <tt>True</tt> if the map contains an entry for the keys,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the map contains an entry for the keys,
+   *         <code>false</code> otherwise
    */
   public boolean contains(final K1 key1, final K2 key2) {
     final ObjectDoubleMap<K2> k2ToDouble = mK1ToK2ToDouble.get(key1);
@@ -139,23 +139,23 @@ public final class NestedDoubleMap<K1, K2> {
 
   /**
    * Returns the map to which the specified first key is mapped, or
-   * <tt>null</tt> if this map contains no mapping for the first key.
+   * <code>null</code> if this map contains no mapping for the first key.
    *
    * @param key1 The first key
    * @return The map to which the specified first key is mapped, or
-   *         <tt>null</tt> if this map contains no mapping for the first key.
+   *         <code>null</code> if this map contains no mapping for the first key.
    */
   public ObjectDoubleMap<K2> get(final K1 key1) {
     return mK1ToK2ToDouble.get(key1);
   }
 
   /**
-   * Returns the value to which the specified keys are mapped, or <tt>0.0</tt>
+   * Returns the value to which the specified keys are mapped, or <code>0.0</code>
    * if this map contains no mapping for the keys.
    *
    * @param key1 The first key
    * @param key2 The second key
-   * @return The value to which the specified keys are mapped, or <tt>0.0</tt>
+   * @return The value to which the specified keys are mapped, or <code>0.0</code>
    *         if this map contains no mapping for the keys.
    */
   public double get(final K1 key1, final K2 key2) {
@@ -204,7 +204,7 @@ public final class NestedDoubleMap<K1, K2> {
    *
    * @param key1        First key
    * @param key2ToValue Map to associate
-   * @return The previous map associated with the given key, or <tt>null</tt> if
+   * @return The previous map associated with the given key, or <code>null</code> if
    *         there was no mapping for the key.
    */
   public MutableObjectDoubleMap<K2> put(final K1 key1, final MutableObjectDoubleMap<K2> key2ToValue) {
@@ -215,7 +215,7 @@ public final class NestedDoubleMap<K1, K2> {
    * Removes the mapping for the first key from this map if it is present.
    *
    * @param k1 The first key
-   * @return The previous value associated with the first key, or <tt>null</tt>
+   * @return The previous value associated with the first key, or <code>null</code>
    *         if there was no mapping for it.
    */
   public MutableObjectDoubleMap<K2> remove(final K1 k1) {
@@ -242,9 +242,9 @@ public final class NestedDoubleMap<K1, K2> {
 
   /**
    * The initial capacity to use when creating maps which connect the second key
-   * to the double value or <tt>-1</tt> if a default value should be used.
+   * to the double value or <code>-1</code> if a default value should be used.
    *
-   * @param initialCapacity The initial capacity to use or <tt>-1</tt> for a
+   * @param initialCapacity The initial capacity to use or <code>-1</code> for a
    *                        default value
    */
   public void setNestedInitialCapacity(final int initialCapacity) {

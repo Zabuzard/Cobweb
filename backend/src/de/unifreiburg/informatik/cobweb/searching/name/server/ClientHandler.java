@@ -148,7 +148,7 @@ public final class ClientHandler implements Runnable {
   }
 
   /**
-   * Serves a HTTP request of type <tt>OPTIONS</tt>.
+   * Serves a HTTP request of type <code>OPTIONS</code>.
    *
    * @throws IOException If an I/O exception occurred while sending the response
    *                     to the client
@@ -162,7 +162,7 @@ public final class ClientHandler implements Runnable {
   }
 
   /**
-   * Serves a HTTP request of type <tt>POST</tt>.
+   * Serves a HTTP request of type <code>POST</code>.
    *
    * @param request The request to serve
    * @throws IOException If an I/O exception occurred while sending the response

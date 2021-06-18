@@ -35,8 +35,8 @@ import de.unifreiburg.informatik.cobweb.searching.nearest.server.model.NearestSe
  * <br>
  * The REST API communicates over HTTP by sending and receiving JSON objects.
  * Requests are parsed into {@link NearestSearchRequest} and responses into
- * {@link NearestSearchResponse}. Accepted HTTP methods are <tt>POST</tt> and
- * <tt>OPTIONS</tt>. The server will send <tt>BAD REQUEST</tt> to invalid
+ * {@link NearestSearchResponse}. Accepted HTTP methods are <code>POST</code> and
+ * <code>OPTIONS</code>. The server will send <code>BAD REQUEST</code> to invalid
  * requests.<br>
  * <br>
  * The server itself handles clients in parallel using a cached thread pool. For
@@ -127,7 +127,7 @@ public final class NearestSearchServer implements Runnable {
    * <br>
    * A request to shutdown can be send using {@link #shutdown()}.
    *
-   * @return <tt>True</tt> if the server is running, <tt>false</tt> otherwise
+   * @return <code>True</code> if the server is running, <code>false</code> otherwise
    */
   public boolean isRunning() {
     return mServerThread.isAlive();

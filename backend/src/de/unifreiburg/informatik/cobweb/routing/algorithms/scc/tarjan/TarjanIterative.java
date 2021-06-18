@@ -70,7 +70,7 @@ public final class TarjanIterative<N extends INode, E extends IEdge<N>, G extend
    * new SCC.
    *
    * @param node        The node to update
-   * @param predecessor The predecessor of the node or <tt>null</tt> if not
+   * @param predecessor The predecessor of the node or <code>null</code> if not
    *                    present
    */
   private void doSetLowLinkTask(final N node, final N predecessor) {

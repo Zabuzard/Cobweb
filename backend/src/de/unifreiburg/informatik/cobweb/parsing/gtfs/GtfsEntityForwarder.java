@@ -18,7 +18,7 @@ import org.onebusaway.gtfs.model.Trip;
 
 /**
  * Implementation of a {@link EntityHandler} which extracts the type of the
- * <tt>GTFS</tt> entity and forwards the entities to the appropriate methods of
+ * <code>GTFS</code> entity and forwards the entities to the appropriate methods of
  * the {@link IGtfsHandler} interface.<br>
  * <br>
  * Primarily meant for subclasses to ease access to the entities.

@@ -27,15 +27,15 @@ import de.unifreiburg.informatik.cobweb.parsing.osm.IOsmFilter;
  * The filter is configured using a configuration file. The format of the file
  * allows two filtering modes:
  * <ul>
- * <li><tt>--KEEP</tt>: The following entries contain key-value pairs which
+ * <li><code>--KEEP</code>: The following entries contain key-value pairs which
  * every way must contain at least one of to be kept.</li>
- * <li><tt>--DROP</tt>: The following entries contain key-value pairs which are
+ * <li><code>--DROP</code>: The following entries contain key-value pairs which are
  * forbidden for a way. If a way contains at least one of them, it is
  * rejected.</li>
  * </ul>
  * A mode is indicated by a line containing only the above mode indicator. Modes
  * can be switched at any time. Empty lines are ignored and lines preceded by a
- * <tt>#</tt> are interpreted as comment and thus ignored too.<br>
+ * <code>#</code> are interpreted as comment and thus ignored too.<br>
  * <br>
  * An entry is a regular key-value pair with the key being interpreted as OSM
  * tag and the value as its OSM tag value. A valid configuration file might look
@@ -52,9 +52,9 @@ import de.unifreiburg.informatik.cobweb.parsing.osm.IOsmFilter;
  * train=yes
  * </pre>
  * <p>
- * The filter will accept only OSM ways that have a <tt>highway</tt> tag value
- * of either <tt>motorway</tt> or <tt>trunk</tt> and not a value <tt>yes</tt>
- * for the tag <tt>area</tt> or <tt>train</tt>.
+ * The filter will accept only OSM ways that have a <code>highway</code> tag value
+ * of either <code>motorway</code> or <code>trunk</code> and not a value <code>yes</code>
+ * for the tag <code>area</code> or <code>train</code>.
  * </p>
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
@@ -87,8 +87,8 @@ public final class OsmRoadFilter implements IOsmFilter {
    *
    * @param tag         The tag in question
    * @param tagToValues A map connecting tag names to their values
-   * @return <tt>True</tt> if the tag and its value are contained in the given
-   *         map, <tt>false</tt> otherwise
+   * @return <code>True</code> if the tag and its value are contained in the given
+   *         map, <code>false</code> otherwise
    */
   private static boolean isTagInMap(final OsmTag tag, final Map<String, Set<String>> tagToValues) {
     final Set<String> values = tagToValues.get(tag.getKey());
@@ -133,7 +133,7 @@ public final class OsmRoadFilter implements IOsmFilter {
    * OSM nodes are never accepted by this filter. Nodes should be read from ways
    * instead.
    *
-   * @return Always <tt>false</tt>
+   * @return Always <code>false</code>
    */
   @Override
   public boolean filter(final OsmNode node) {
@@ -145,7 +145,7 @@ public final class OsmRoadFilter implements IOsmFilter {
   /**
    * OSM relations are never accepted by this filter.
    *
-   * @return Always <tt>false</tt>
+   * @return Always <code>false</code>
    */
   @Override
   public boolean filter(final OsmRelation relation) {
@@ -236,8 +236,8 @@ public final class OsmRoadFilter implements IOsmFilter {
    * mode.
    *
    * @param tag The tag in question
-   * @return <tt>True</tt> if the tag and its value were registered in drop
-   *         mode, <tt>false</tt> otherwise
+   * @return <code>True</code> if the tag and its value were registered in drop
+   *         mode, <code>false</code> otherwise
    */
   private boolean isDropTag(final OsmTag tag) {
     return OsmRoadFilter.isTagInMap(tag, mTagToValuesDrop);
@@ -248,8 +248,8 @@ public final class OsmRoadFilter implements IOsmFilter {
    * mode.
    *
    * @param tag The tag in question
-   * @return <tt>True</tt> if the tag and its value were registered in keep
-   *         mode, <tt>false</tt> otherwise
+   * @return <code>True</code> if the tag and its value were registered in keep
+   *         mode, <code>false</code> otherwise
    */
   private boolean isKeepTag(final OsmTag tag) {
     return OsmRoadFilter.isTagInMap(tag, mTagToValuesKeep);

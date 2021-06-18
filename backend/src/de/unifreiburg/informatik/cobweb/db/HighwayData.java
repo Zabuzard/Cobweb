@@ -10,7 +10,7 @@ import de.unifreiburg.informatik.cobweb.parsing.osm.EHighwayType;
  */
 public final class HighwayData {
   /**
-   * Maximal allowed speed in <tt>km/h</tt>.
+   * Maximal allowed speed in <code>km/h</code>.
    */
   private final int mMaxSpeed;
   /**
@@ -26,9 +26,9 @@ public final class HighwayData {
    * Creates a new highway data object with the given attributes.
    *
    * @param wayId    The unique ID of the OSM way this highway belongs to
-   * @param type     The type of the highway. Do not use <tt>null</tt> if
+   * @param type     The type of the highway. Do not use <code>null</code> if
    *                 unknown, instead use {@link EHighwayType#ROAD}.
-   * @param maxSpeed The maximal allowed speed in <tt>km/h</tt>
+   * @param maxSpeed The maximal allowed speed in <code>km/h</code>
    */
   public HighwayData(final long wayId, final EHighwayType type, final int maxSpeed) {
     mWayId = wayId;
@@ -37,9 +37,9 @@ public final class HighwayData {
   }
 
   /**
-   * Gets the maximal allowed speed in <tt>km/h</tt>.
+   * Gets the maximal allowed speed in <code>km/h</code>.
    *
-   * @return The maximal allowed speed in <tt>km/h</tt>
+   * @return The maximal allowed speed in <code>km/h</code>
    */
   public int getMaxSpeed() {
     return mMaxSpeed;

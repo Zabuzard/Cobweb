@@ -91,7 +91,7 @@ public interface IRoutingConfigProvider {
   /**
    * Whether or not the graph cache should be used.
    *
-   * @return <tt>True</tt> if the graph cache should be used, <tt>false</tt>
+   * @return <code>True</code> if the graph cache should be used, <code>false</code>
    *         otherwise
    */
   boolean useGraphCache();

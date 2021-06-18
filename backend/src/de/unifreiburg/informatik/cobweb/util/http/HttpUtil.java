@@ -32,7 +32,7 @@ public final class HttpUtil {
    * Parses the content type out of the header value.
    *
    * @param value The header value of the content type header
-   * @return The content type or <tt>null</tt> if not present
+   * @return The content type or <code>null</code> if not present
    */
   public static EHttpContentType parseContentType(final String value) {
     if (value == null) {
@@ -47,8 +47,7 @@ public final class HttpUtil {
    *
    * @param input The stream that contains the HTTP request
    * @return The parsed HTTP request
-   * @throws IOException If an I/O exception occurred while reading from the
-   *                     stream
+   * @throws IOException If an I/O exception occurred while reading from the stream
    */
   public static HttpRequest parseRequest(final InputStream input) throws IOException {
     // Read the request
@@ -65,7 +64,8 @@ public final class HttpUtil {
       break;
     }
     // Parse the request
-    final String[] requestData = request.trim().split(" ");
+    final String[] requestData = request.trim()
+            .split(" ");
     final String type = requestData[0];
     final String resource = requestData[1];
     final String protocol = requestData[2];
@@ -95,36 +95,39 @@ public final class HttpUtil {
   }
 
   /**
-   * Sends the given response to the given client by using the HTTP/1.0
-   * protocol.
+   * Sends the given response to the given client by using the HTTP/1.0 protocol.
    *
    * @param response The response to send
    * @param client   Client to send to
    * @throws IOException If an I/O-Exception occurred.
    */
   public static void sendHttpResponse(final HttpResponse response, final Socket client) throws IOException {
-    final String charset = STANDARD_CHARSET.displayName().toLowerCase();
-    final byte[] contentRaw = response.getContent().getBytes(STANDARD_CHARSET);
+    final String charset = STANDARD_CHARSET.displayName()
+            .toLowerCase();
+    final byte[] contentRaw = response.getContent()
+            .getBytes(STANDARD_CHARSET);
 
     // Build response type
-    final String responseType =
-        "HTTP/1.0 " + response.getStatus().getStatusCode() + " " + response.getStatus() + HTTP_NEW_LINE;
+    final String responseType = "HTTP/1.0 " + response.getStatus()
+            .getStatusCode() + " " + response.getStatus() + HTTP_NEW_LINE;
 
     // Build response headers
     final StringBuilder responseHeaders = new StringBuilder();
     responseHeaders.append("Content-Length: " + contentRaw.length + HTTP_NEW_LINE);
-    responseHeaders
-        .append("Content-Type: " + response.getContentType().getTextValue() + "; charset=" + charset + HTTP_NEW_LINE);
+    responseHeaders.append("Content-Type: " + response.getContentType()
+            .getTextValue() + "; charset=" + charset + HTTP_NEW_LINE);
 
     // Set all given headers
-    for (final Entry<String, String> entry : response.getHeaders().entrySet()) {
+    for (final Entry<String, String> entry : response.getHeaders()
+            .entrySet()) {
       responseHeaders.append(entry.getKey() + ": " + entry.getValue() + HTTP_NEW_LINE);
     }
 
     // Write headers and content
     try (final DataOutputStream output = new DataOutputStream(client.getOutputStream())) {
       output.write(responseType.getBytes(STANDARD_CHARSET));
-      output.write(responseHeaders.toString().getBytes(STANDARD_CHARSET));
+      output.write(responseHeaders.toString()
+              .getBytes(STANDARD_CHARSET));
       output.write(HTTP_NEW_LINE.getBytes(STANDARD_CHARSET));
       output.write(contentRaw);
     }
@@ -133,19 +136,15 @@ public final class HttpUtil {
   /**
    * Reads the content of the given input stream.<br>
    * <br>
-   * The stream must already be advanced to the point where the content begins.
-   * The method will make sure that only the given amount of bytes is read from
-   * the stream. In particular, it will not read more than desired for buffering
-   * purpose.
+   * The stream must already be advanced to the point where the content begins. The method will make sure that only
+   * the given amount of bytes is read from the stream. In particular, it will not read more than desired for
+   * buffering purpose.
    *
    * @param contentLength The length of the content in amount of bytes
-   * @param input         The input stream from which to read. The stream must
-   *                      already be advanced to the point where the content
-   *                      begins.
-   * @return The read content, interpreted as string in the standard charset
-   *         represented by {@link #STANDARD_CHARSET}
-   * @throws IOException If an I/O exception occurred while reading from the
-   *                     stream
+   * @param input         The input stream from which to read. The stream must already be advanced to the point where
+   *                      the content begins.
+   * @return The read content, interpreted as string in the standard charset represented by {@link #STANDARD_CHARSET}
+   * @throws IOException If an I/O exception occurred while reading from the stream
    */
   private static String readHttpContent(final int contentLength, final InputStream input) throws IOException {
     final byte[] contentRawBuffer = new byte[contentLength];
@@ -160,14 +159,11 @@ public final class HttpUtil {
   /**
    * Reads one line of the given HTTP stream.<br>
    * <br>
-   * The method only reads exactly one line. In particular, it does not read
-   * more than desired for buffering purpose.
+   * The method only reads exactly one line. In particular, it does not read more than desired for buffering purpose.
    *
    * @param input The input stream to read from
-   * @return The read line, interpreted as string in the standard charset
-   *         represented by {@link #STANDARD_CHARSET}
-   * @throws IOException If an I/O exception occurred while reading from the
-   *                     stream
+   * @return The read line, interpreted as string in the standard charset represented by {@link #STANDARD_CHARSET}
+   * @throws IOException If an I/O exception occurred while reading from the stream
    */
   private static String readHttpLine(final InputStream input) throws IOException {
     final ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();

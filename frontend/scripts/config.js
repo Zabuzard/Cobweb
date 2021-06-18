@@ -13,12 +13,12 @@ var nameSearchRequestServer = 'http://localhost:2846/namesearch';
 /** The URL of the nearest search server which offers a REST API. */
 var nearestSearchRequestServer = 'http://localhost:2847/nearestsearch';
 /**The access-token of the Mapbox API to use. */
-var mapboxToken = 'pk.eyJ1IjoiemFidXphIiwiYSI6ImNqZzZ1bDhrajlkbjAzMHBvcHhmY3l1cHEifQ.XsLjaSUMP9wVdeHc3SP32g';
+var mapboxToken = 'pk.eyJ1IjoiemFidXphcmQiLCJhIjoiY2txMjNxOXVlMDl0YzJ1bG5hN2l4endvNyJ9.JQtSjLMS2eLlvxqIEpEGlQ';
 /** The URL of the Mapbox server. */
-var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
+var mapboxUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}';
 /** The attribution text to display on the map. */
-var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
-  + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+var mapboxAttribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	+ ' contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
 /** The maximal allowed zoom for the map. */
 var mapMaxZoom = 20;
 /** The default latitude to center the map view at. */
@@ -26,7 +26,7 @@ var mapDefaultLat = 49.23299;
 /** The default longitude to center the map view at. */
 var mapDefaultLong = 6.97633;
 /** The default zoom to start the map view at */
-var mapDefaultZoom = 6;
+var mapDefaultZoom = 12;
 /** The map to use. */
 var map;
 /** The layer which displays streets. */

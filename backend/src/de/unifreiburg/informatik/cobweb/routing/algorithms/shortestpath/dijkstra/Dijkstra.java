@@ -127,7 +127,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
   /**
    * Creates a tentative distance container for the given node.<br>
    * <br>
-   * If the <tt>pathDestination</tt> is not <tt>null</tt> the container will
+   * If the <code>pathDestination</code> is not <code>null</code> the container will
    * also include an estimated distance from the node to the destination. This
    * is computed using {@link #getEstimatedDistance(INode, INode)}.
    *
@@ -138,7 +138,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
    *                          node, i.e. the total cost of backtracking the
    *                          given parent edges to the source
    * @param pathDestination   The destination of the shortest path computation
-   *                          or <tt>null</tt> if not present
+   *                          or <code>null</code> if not present
    * @return A tentative distance container for the given node
    */
   private TentativeDistance<N, E> createDistance(final N node, final E parentEdge, final double tentativeDistance,
@@ -156,12 +156,12 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
    * and to all other nodes that were visited in the mean time.<br>
    * <br>
    * The shortest path from multiple sources is the minimal shortest path for
-   * all source nodes individually. If the destination is <tt>null</tt> the
+   * all source nodes individually. If the destination is <code>null</code> the
    * shortest paths to all nodes in the graph are computed.
    *
    * @param sources         The sources to compute the shortest path from
    * @param pathDestination The destination to compute the shortest path to or
-   *                        <tt>null</tt> if not present
+   *                        <code>null</code> if not present
    * @return A map connecting all visited nodes to their tentative distance
    *         container. The container represent the shortest path from the
    *         sources to that given node as destination.
@@ -258,12 +258,12 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
   /**
    * Whether or not the given edge should be considered for relaxation. The
    * algorithm will ignore the edge and not follow it if this method returns
-   * <tt>false</tt>.
+   * <code>false</code>.
    *
    * @param edge            The edge in question
    * @param pathDestination The destination of the shortest path computation or
-   *                        <tt>null</tt> if not present
-   * @return <tt>True</tt> if the edge should be considered, <tt>false</tt>
+   *                        <code>null</code> if not present
+   * @return <code>True</code> if the edge should be considered, <code>false</code>
    *         otherwise
    */
   @SuppressWarnings("unused")
@@ -328,7 +328,7 @@ public class Dijkstra<N extends INode, E extends IEdge<N>> extends AShortestPath
    *
    * @param tentativeDistance The tentative distance wrapper of the node that
    *                          was settled
-   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   * @return <code>True</code> if the computation should be aborted, <code>false</code>
    *         if not
    */
   protected boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {

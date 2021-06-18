@@ -16,8 +16,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * Adds the given edge to the graph if not already contained.
    *
    * @param edge The edge to add
-   * @return <tt>True</tt> if the edge was not already contained and thus added,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the edge was not already contained and thus added,
+   *         <code>false</code> otherwise
    */
   boolean addEdge(E edge);
 
@@ -25,8 +25,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * Adds the given node to the graph if not already contained.
    *
    * @param node The node to add
-   * @return <tt>True</tt> if the node was not already contained and thus added,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the node was not already contained and thus added,
+   *         <code>false</code> otherwise
    */
   boolean addNode(N node);
 
@@ -34,14 +34,14 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * Whether or not the given edge is contained in the graph.
    *
    * @param edge The edge in question
-   * @return <tt>True</tt> if the edge is contained in the graph, <tt>false</tt>
+   * @return <code>True</code> if the edge is contained in the graph, <code>false</code>
    *         otherwise
    */
   boolean containsEdge(E edge);
 
   /**
    * Gets the amount of edges contained in the graph. This operation should run
-   * in <tt>O(1)</tt>.
+   * in <code>O(1)</code>.
    *
    * @return The amount of edges contained in the graph
    */
@@ -49,7 +49,7 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
 
   /**
    * A stream over all edges this graph contains. The construction of the stream
-   * should run in <tt>O(1)</tt>.
+   * should run in <code>O(1)</code>.
    *
    * @return A stream over all edges this graph contains
    */
@@ -85,8 +85,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * Removes the given edge if it is contained in the graph.
    *
    * @param edge The edge to remove
-   * @return <tt>True</tt> if the edge was contained and thus removed,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the edge was contained and thus removed,
+   *         <code>false</code> otherwise
    */
   boolean removeEdge(E edge);
 
@@ -94,8 +94,8 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * Removes the given node if it is contained in the graph.
    *
    * @param node The node to remove
-   * @return <tt>True</tt> if the node was contained and thus removed,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the node was contained and thus removed,
+   *         <code>false</code> otherwise
    */
   boolean removeNode(N node);
 
@@ -107,13 +107,13 @@ public interface IGraph<N extends INode, E extends IEdge<N>> {
    * implementing class if this method runs fast or if it explicitly reverses
    * each edge. However, edges retrieved before the reversal still need to
    * remain equal to the edges after the reversal, according to their
-   * <tt>equals</tt> method.
+   * <code>equals</code> method.
    */
   void reverse();
 
   /**
    * Gets the amount of nodes contained in the graph. This operation should run
-   * in <tt>O(1)</tt>.
+   * in <code>O(1)</code>.
    *
    * @return The amount of nodes contained in the graph
    */

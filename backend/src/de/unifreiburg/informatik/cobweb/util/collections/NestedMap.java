@@ -25,7 +25,7 @@ public final class NestedMap<K1, K2, V> {
   private final Map<K1, Map<K2, V>> mK1ToK2ToV;
   /**
    * The initial capacity to use when creating maps which connect the second key
-   * to the value or <tt>-1</tt> if a default value should be used.
+   * to the value or <code>-1</code> if a default value should be used.
    */
   private int mNestedInitialCapacity;
 
@@ -79,8 +79,8 @@ public final class NestedMap<K1, K2, V> {
    *
    * @param key1 The first key
    * @param key2 The second key
-   * @return <tt>True</tt> if the map contains an entry for the keys,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the map contains an entry for the keys,
+   *         <code>false</code> otherwise
    */
   public boolean contains(final K1 key1, final K2 key2) {
     final Map<K2, V> k2ToV = mK1ToK2ToV.get(key1);
@@ -134,23 +134,23 @@ public final class NestedMap<K1, K2, V> {
 
   /**
    * Returns the map to which the specified first key is mapped, or
-   * <tt>null</tt> if this map contains no mapping for the first key.
+   * <code>null</code> if this map contains no mapping for the first key.
    *
    * @param key1 The first key
    * @return The map to which the specified first key is mapped, or
-   *         <tt>null</tt> if this map contains no mapping for the first key.
+   *         <code>null</code> if this map contains no mapping for the first key.
    */
   public Map<K2, V> get(final K1 key1) {
     return mK1ToK2ToV.get(key1);
   }
 
   /**
-   * Returns the value to which the specified keys are mapped, or <tt>null</tt>
+   * Returns the value to which the specified keys are mapped, or <code>null</code>
    * if this map contains no mapping for the keys.
    *
    * @param key1 The first key
    * @param key2 The second key
-   * @return The value to which the specified keys are mapped, or <tt>null</tt>
+   * @return The value to which the specified keys are mapped, or <code>null</code>
    *         if this map contains no mapping for the keys.
    */
   public V get(final K1 key1, final K2 key2) {
@@ -188,7 +188,7 @@ public final class NestedMap<K1, K2, V> {
    * @param key1  First key
    * @param key2  Second key
    * @param value Value to associate
-   * @return The previous value associated with the two keys, or <tt>null</tt>
+   * @return The previous value associated with the two keys, or <code>null</code>
    *         if there was no mapping for the keys.
    */
   public V put(final K1 key1, final K2 key2, final V value) {
@@ -200,7 +200,7 @@ public final class NestedMap<K1, K2, V> {
    *
    * @param key1        First key
    * @param key2ToValue Map to associate
-   * @return The previous map associated with the given key, or <tt>null</tt> if
+   * @return The previous map associated with the given key, or <code>null</code> if
    *         there was no mapping for the key.
    */
   public Map<K2, V> put(final K1 key1, final Map<K2, V> key2ToValue) {
@@ -211,7 +211,7 @@ public final class NestedMap<K1, K2, V> {
    * Removes the mapping for the first key from this map if it is present.
    *
    * @param k1 The first key
-   * @return The previous value associated with the first key, or <tt>null</tt>
+   * @return The previous value associated with the first key, or <code>null</code>
    *         if there was no mapping for it.
    */
   public Map<K2, V> remove(final K1 k1) {
@@ -223,7 +223,7 @@ public final class NestedMap<K1, K2, V> {
    *
    * @param k1 The first key
    * @param k2 The second key
-   * @return The previous value associated with the two keys, or <tt>null</tt>
+   * @return The previous value associated with the two keys, or <code>null</code>
    *         if there was no mapping for it.
    */
   public V remove(final K1 k1, final K2 k2) {
@@ -240,9 +240,9 @@ public final class NestedMap<K1, K2, V> {
 
   /**
    * The initial capacity to use when creating maps which connect the second key
-   * to the value or <tt>-1</tt> if a default value should be used.
+   * to the value or <code>-1</code> if a default value should be used.
    *
-   * @param initialCapacity The initial capacity to use or <tt>-1</tt> for a
+   * @param initialCapacity The initial capacity to use or <code>-1</code> for a
    *                        default value
    */
   public void setNestedInitialCapacity(final int initialCapacity) {

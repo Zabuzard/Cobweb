@@ -39,7 +39,7 @@ public final class ShortestPathComputationFactory {
    */
   private final int mAbortTravelTimeToAccessNodes;
   /**
-   * Object to use for computing access nodes. Or <tt>null</tt> if not used.
+   * Object to use for computing access nodes. Or <code>null</code> if not used.
    */
   private final IAccessNodeComputation<ICoreNode, ICoreNode> mAccessNodeComputation;
   /**
@@ -65,11 +65,11 @@ public final class ShortestPathComputationFactory {
   private final ERoutingModelMode mMode;
   /**
    * Object to use for retrieving the nearest road node to a given stop, or
-   * <tt>null</tt> if not used.
+   * <code>null</code> if not used.
    */
   private final INearestNeighborComputation<ICoreNode> mStopToNearestRoadNode;
   /**
-   * The timetable to use for transit data, or <tt>null</tt> if not used.
+   * The timetable to use for transit data, or <code>null</code> if not used.
    */
   private final Timetable mTable;
 
@@ -81,12 +81,12 @@ public final class ShortestPathComputationFactory {
    *
    * @param graph                        The graph to route on
    * @param table                        The timetable to route on, or
-   *                                     <tt>null</tt> if not used
+   *                                     <code>null</code> if not used
    * @param accessNodeComputation        The access node computation to use, or
-   *                                     <tt>null</tt> if not used.
+   *                                     <code>null</code> if not used.
    * @param stopToNearestRoadNode        Object to use for retrieving the
    *                                     nearest road node to a given stop, or
-   *                                     <tt>null</tt> if not used.
+   *                                     <code>null</code> if not used.
    * @param mode                         The mode to use for the routing model
    * @param abortTravelTimeToAccessNodes The travel time in seconds after which
    *                                     to abort shortest path computation to
@@ -222,7 +222,7 @@ public final class ShortestPathComputationFactory {
   /**
    * Gets the access node computation used by this factory.
    *
-   * @return The access node computation used by this factory, or <tt>null</tt>
+   * @return The access node computation used by this factory, or <code>null</code>
    *         if not used
    */
   public IAccessNodeComputation<ICoreNode, ICoreNode> getAccessNodeComputation() {
@@ -234,7 +234,7 @@ public final class ShortestPathComputationFactory {
    * to a given stop.
    *
    * @return The object used by this factory for retrieving the nearest road
-   *         node to a given stop, or <tt>null</tt> if not used
+   *         node to a given stop, or <code>null</code> if not used
    */
   public INearestNeighborComputation<ICoreNode> getStopToNearestRoadNode() {
     return mStopToNearestRoadNode;

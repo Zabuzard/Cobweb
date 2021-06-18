@@ -18,7 +18,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.IHasId;
 /**
  * Implementation of a {@link Map} which uses arrays internally. Values are
  * implicitly referred to by the unique ID of their key as index. Negative IDs
- * and <tt>null</tt> keys, as well as values are not supported.<br>
+ * and <code>null</code> keys, as well as values are not supported.<br>
  * <br>
  * This class is optimized for a use case where retrieval of the keys is not
  * needed and key IDs lie close to each other, preferable with no gaps between.
@@ -45,7 +45,7 @@ public final class IdMap<K extends IHasId, V> implements Map<K, V>, Serializable
   private int mSize;
   /**
    * The internal list which associates IDs of keys as index to their
-   * corresponding values. Can contain gaps which are indicated by <tt>null</tt>
+   * corresponding values. Can contain gaps which are indicated by <code>null</code>
    * values.
    */
   private final MutableList<V> mValues;
@@ -249,7 +249,7 @@ public final class IdMap<K extends IHasId, V> implements Map<K, V>, Serializable
 
   /**
    * Returns a stream over all values in this map. The stream is constructed in
-   * <tt>O(1)</tt>.
+   * <code>O(1)</code>.
    *
    * @return Stream over all values in this map
    */

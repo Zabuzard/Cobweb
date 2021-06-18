@@ -16,7 +16,7 @@ public final class TarjanTaskElement<N> {
    */
   private final N mNode;
   /**
-   * The predecessor of this node or <tt>null</tt> if not present
+   * The predecessor of this node or <code>null</code> if not present
    */
   private final N mPredecessor;
 
@@ -24,7 +24,7 @@ public final class TarjanTaskElement<N> {
    * Creates a new Tarjan task element for the given node and predecessor.
    *
    * @param node        The node to wrap
-   * @param predecessor The predecessor of the node or <tt>null</tt> if not
+   * @param predecessor The predecessor of the node or <code>null</code> if not
    *                    present
    */
   public TarjanTaskElement(final N node, final N predecessor) {
@@ -34,10 +34,10 @@ public final class TarjanTaskElement<N> {
   }
 
   /**
-   * Gets the current task for this element or <tt>null</tt> if all tasks have
+   * Gets the current task for this element or <code>null</code> if all tasks have
    * been accomplished.
    *
-   * @return The current task for this element or <tt>null</tt>
+   * @return The current task for this element or <code>null</code>
    */
   public ETarjanTask getCurrentTask() {
     return mCurrentTask;
@@ -53,9 +53,9 @@ public final class TarjanTaskElement<N> {
   }
 
   /**
-   * The predecessor of this element or <tt>null</tt> if not present
+   * The predecessor of this element or <code>null</code> if not present
    *
-   * @return The predecessor or <tt>null</tt>
+   * @return The predecessor or <code>null</code>
    */
   public N getPredecessor() {
     return mPredecessor;
@@ -63,7 +63,7 @@ public final class TarjanTaskElement<N> {
 
   /**
    * Reports the current task as accomplished and moves over to the next task.
-   * If all tasks have been executed, the task is set to <tt>null</tt>.
+   * If all tasks have been executed, the task is set to <code>null</code>.
    */
   public void reportTaskAccomplished() {
     if (mCurrentTask == null) {

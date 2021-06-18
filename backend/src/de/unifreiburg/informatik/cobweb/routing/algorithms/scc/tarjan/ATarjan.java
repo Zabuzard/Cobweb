@@ -52,7 +52,7 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
    */
   private final Set<N> mInDeque;
   /**
-   * The largest SCC in the graph, if computed already. Else <tt>null</tt>.
+   * The largest SCC in the graph, if computed already. Else <code>null</code>.
    */
   private StronglyConnectedComponent<N> mLargestScc;
   /**
@@ -127,8 +127,8 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
    * Whether or not the given node is registered as index node.
    *
    * @param node The node in question
-   * @return <tt>True</tt> if the node is registered as index node,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the node is registered as index node,
+   *         <code>false</code> otherwise
    */
   protected boolean containsIndexNode(final N node) {
     return mNodeToIndex.containsKey(node);
@@ -209,11 +209,11 @@ public abstract class ATarjan<N extends INode, E extends IEdge<N>, G extends IGr
 
   /**
    * Whether or not the given node is in the deque. This operations runs in
-   * <tt>O(1)</tt>.
+   * <code>O(1)</code>.
    *
    * @param node The node in question
-   * @return <tt>True</tt> if the given node is contained in the deque,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the given node is contained in the deque,
+   *         <code>false</code> otherwise
    */
   protected boolean isInDeque(final N node) {
     return mInDeque.contains(node);

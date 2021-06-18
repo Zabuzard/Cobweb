@@ -46,14 +46,14 @@ public final class OsmParser {
    * Walks through the given directory or list of files and collects all OSM
    * files that should be considered for parsing. If a file is prefixed with
    * {@link #REDUCED_PREFIX}, the unreduced variant will not be considered. This
-   * behavior can be reversed by using <tt>considerUnreduced</tt>.
+   * behavior can be reversed by using <code>considerUnreduced</code>.
    *
    * @param directory             Directory that contains the OSM files or
-   *                              <tt>null</tt> if <tt>files</tt> is used
+   *                              <code>null</code> if <code>files</code> is used
    * @param files                 A collection of files which contain the OSM
-   *                              files or <tt>null</tt> if <tt>directory</tt>
+   *                              files or <code>null</code> if <code>directory</code>
    *                              is used
-   * @param considerUnreducedOnly If <tt>true</tt> the behavior is reversed and
+   * @param considerUnreducedOnly If <code>true</code> the behavior is reversed and
    *                              the method collects all unreduced variants
    * @return A collection of OSM files that should be considered for parsing
    * @throws IOException If an I/O exception occurred wile walking through the
@@ -106,8 +106,8 @@ public final class OsmParser {
 
   /**
    * Creates an input stream for the given OSM file such that it is ready to be
-   * used for parsing. Will correctly handle compressed files like <tt>bz2</tt>,
-   * <tt>gz</tt> or <tt>xz</tt> files.
+   * used for parsing. Will correctly handle compressed files like <code>bz2</code>,
+   * <code>gz</code> or <code>xz</code> files.
    *
    * @param osmFile The OSM file to create an input stream for
    * @return An input stream for the given OSM file
@@ -141,21 +141,21 @@ public final class OsmParser {
    */
   private final Collection<IOsmFileHandler> mAllHandler;
   /**
-   * If <tt>true</tt> the parser considers unreduced variants of OSM files only.
+   * If <code>true</code> the parser considers unreduced variants of OSM files only.
    */
   private final boolean mConsiderUnreducedOnly;
   /**
-   * Directory that contains the OSM files or <tt>null</tt> if {@link #mFiles}
+   * Directory that contains the OSM files or <code>null</code> if {@link #mFiles}
    * is used.
    */
   private final Path mDirectory;
   /**
-   * Collection of files that contain the OSM files or <tt>null</tt> if
+   * Collection of files that contain the OSM files or <code>null</code> if
    * {@link #mDirectory} is used.
    */
   private final Collection<Path> mFiles;
   /**
-   * If <tt>true</tt> each OSM file will be streamed twice, else only once
+   * If <code>true</code> each OSM file will be streamed twice, else only once
    */
   private final boolean mStreamTwice;
   /**
@@ -171,9 +171,9 @@ public final class OsmParser {
    * The parser will not parse meta data of entities.
    *
    * @param directory  The directory that contains the OSM files or
-   *                   <tt>null</tt> if <tt>files</tt> is used
+   *                   <code>null</code> if <code>files</code> is used
    * @param files      Collection of files that contain the OSM files or
-   *                   <tt>null</tt> if <tt>directory</tt> is used
+   *                   <code>null</code> if <code>directory</code> is used
    * @param allHandler The handler to notify when parsing entities
    */
   public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler) {
@@ -188,13 +188,13 @@ public final class OsmParser {
    * The parser will not parse meta data of entities.
    *
    * @param directory             The directory that contains the OSM files or
-   *                              <tt>null</tt> if <tt>files</tt> is used
+   *                              <code>null</code> if <code>files</code> is used
    * @param files                 Collection of files that contain the OSM files
-   *                              or <tt>null</tt> if <tt>directory</tt> is used
+   *                              or <code>null</code> if <code>directory</code> is used
    * @param allHandler            The handler to notify when parsing entities
-   * @param considerUnreducedOnly If <tt>true</tt> the parser considers
+   * @param considerUnreducedOnly If <code>true</code> the parser considers
    *                              unreduced variants of OSM files only
-   * @param streamTwice           If <tt>true</tt> each OSM file will be
+   * @param streamTwice           If <code>true</code> each OSM file will be
    *                              streamed twice, else only once
    */
   public OsmParser(final Path directory, final Collection<Path> files, final Collection<IOsmFileHandler> allHandler,
@@ -208,13 +208,13 @@ public final class OsmParser {
    * entities.
    *
    * @param directory             The directory that contains the OSM files or
-   *                              <tt>null</tt> if <tt>files</tt> is used
+   *                              <code>null</code> if <code>files</code> is used
    * @param files                 Collection of files that contain the OSM files
-   *                              or <tt>null</tt> if <tt>directory</tt> is used
+   *                              or <code>null</code> if <code>directory</code> is used
    * @param allHandler            The handler to notify when parsing entities
-   * @param considerUnreducedOnly If <tt>true</tt> the parser considers
+   * @param considerUnreducedOnly If <code>true</code> the parser considers
    *                              unreduced variants of OSM files only
-   * @param streamTwice           If <tt>true</tt> each OSM file will be
+   * @param streamTwice           If <code>true</code> each OSM file will be
    *                              streamed twice, else only once
    * @param useMetaData           Whether or not the parser should parse meta
    *                              data for the entities

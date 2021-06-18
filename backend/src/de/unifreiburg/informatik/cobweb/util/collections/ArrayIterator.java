@@ -29,12 +29,12 @@ public final class ArrayIterator<E> implements Iterator<E> {
   /**
    * Creates an iterator which iterates over the given array.<br>
    * <br>
-   * The array <b>must only contain</b> elements of the generic type <tt>E</tt>
+   * The array <b>must only contain</b> elements of the generic type <code>E</code>
    * as specified. For performance reasons the iterator does not check the type
    * and will simply attempt to cast when using {@link #next()}.
    *
    * @param elements The array to iterate over which must only contain elements
-   *                 of type <tt>E</tt> as specified
+   *                 of type <code>E</code> as specified
    */
   public ArrayIterator(final Object[] elements) {
     this(elements, 0, elements.length);
@@ -44,7 +44,7 @@ public final class ArrayIterator<E> implements Iterator<E> {
    * Creates an iterator which iterates over the given array in the given
    * range.<br>
    * <br>
-   * The array <b>must only contain</b> elements of the generic type <tt>E</tt>
+   * The array <b>must only contain</b> elements of the generic type <code>E</code>
    * as specified. For performance reasons the iterator does not check the type
    * and will simply attempt to cast when using {@link #next()}.<br>
    * <br>
@@ -52,7 +52,7 @@ public final class ArrayIterator<E> implements Iterator<E> {
    * are within array bounds.
    *
    * @param elements The array to iterate over which must only contain elements
-   *                 of type <tt>E</tt> as specified
+   *                 of type <code>E</code> as specified
    * @param from     The index of the first element to return. This bound is
    *                 inclusive.
    * @param to       One after the index of the last element to return. If

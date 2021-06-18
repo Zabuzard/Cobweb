@@ -177,11 +177,11 @@ public final class ConfigStore implements IConfigProvider, IParseConfigProvider,
   }
 
   /**
-   * Gets the default value stored for the given key or <tt>null</tt> if there
+   * Gets the default value stored for the given key or <code>null</code> if there
    * is no.
    *
    * @param key The key to get the default value for
-   * @return The default value or <tt>null</tt>
+   * @return The default value or <code>null</code>
    */
   private String getDefaultValue(final String key) {
     return mDefaultSettings.get(key);

@@ -22,15 +22,15 @@ public final class RoutingUtil {
    */
   private static final int HALF_CIRCLE_DEG = 180;
   /**
-   * Maximal speed of a bike in <tt>km/h</tt>.
+   * Maximal speed of a bike in <code>km/h</code>.
    */
   private static final int MAX_BIKE_SPEED = 14;
   /**
-   * Maximal walking speed in <tt>km/h</tt>.
+   * Maximal walking speed in <code>km/h</code>.
    */
   private static final int MAX_FOOT_SPEED = 5;
   /**
-   * The maximal possible speed on a road in <tt>km/h</tt>
+   * The maximal possible speed on a road in <code>km/h</code>
    */
   private static final double MAXIMAL_ROAD_SPEED = 200.0;
   /**
@@ -38,14 +38,14 @@ public final class RoutingUtil {
    */
   private static final int MILLIS_TO_NANO = 1_000_000;
   /**
-   * Factor to multiply with to convert <tt>mph</tt> (miles per hour) into
-   * <tt>km/h</tt> (kilometres per hour).
+   * Factor to multiply with to convert <code>mph</code> (miles per hour) into
+   * <code>km/h</code> (kilometres per hour).
    */
   private static final double MPH_TO_KMH = 1.60934;
 
   /**
-   * Factor to multiply with to convert <tt>m/s</tt> (metres per second) into
-   * <tt>km/h</tt> (kilometres per hour).
+   * Factor to multiply with to convert <code>m/s</code> (metres per second) into
+   * <code>km/h</code> (kilometres per hour).
    */
   private static final double MS_TO_KMH = 3.6;
 
@@ -55,10 +55,10 @@ public final class RoutingUtil {
   private static final int SECONDS_TO_MILLIS = 1_000;
 
   /**
-   * Converts the given value in <tt>degrees</tt> into <tt>radians</tt>.
+   * Converts the given value in <code>degrees</code> into <code>radians</code>.
    *
-   * @param deg The value in <tt>degrees</tt> to convert
-   * @return The corresponding value in <tt>radians</tt>
+   * @param deg The value in <code>degrees</code> to convert
+   * @return The corresponding value in <code>radians</code>
    */
   public static double degToRad(final double deg) {
     return deg * Math.PI / HALF_CIRCLE_DEG;
@@ -92,10 +92,10 @@ public final class RoutingUtil {
    * Gets the speed used on the given highway.
    *
    * @param type     The type of the highway
-   * @param maxSpeed The maximal allowed speed on the highway or <tt>-1</tt> if
+   * @param maxSpeed The maximal allowed speed on the highway or <code>-1</code> if
    *                 not present
    * @param mode     The transportation mode to use for traveling
-   * @return The speed used on the highway in <tt>km/h</tt>
+   * @return The speed used on the highway in <code>km/h</code>
    */
   public static double getSpeedOfHighway(final EHighwayType type, final int maxSpeed, final ETransportationMode mode) {
     final int speedOnRoad;
@@ -140,112 +140,112 @@ public final class RoutingUtil {
   }
 
   /**
-   * Gets the maximal walking speed in <tt>km/h</tt>.
+   * Gets the maximal walking speed in <code>km/h</code>.
    *
-   * @return The maximal walking speed in <tt>km/h</tt>
+   * @return The maximal walking speed in <code>km/h</code>
    */
   public static double getWalkingSpeed() {
     return MAX_FOOT_SPEED;
   }
 
   /**
-   * Converts the given value in <tt>km/h</tt> (kilometres per hour) into
-   * <tt>m/s</tt> (metres per second).
+   * Converts the given value in <code>km/h</code> (kilometres per hour) into
+   * <code>m/s</code> (metres per second).
    *
-   * @param kmh The value in <tt>km/h</tt> to convert
-   * @return The corresponding value in <tt>m/s</tt>
+   * @param kmh The value in <code>km/h</code> to convert
+   * @return The corresponding value in <code>m/s</code>
    */
   public static double kmhToMs(final double kmh) {
     return kmh / MS_TO_KMH;
   }
 
   /**
-   * Gets the maximal possible speed on a road in <tt>km/h</tt>.
+   * Gets the maximal possible speed on a road in <code>km/h</code>.
    *
-   * @return The maximal possible speed in <tt>km/h</tt>
+   * @return The maximal possible speed in <code>km/h</code>
    */
   public static double maximalRoadSpeed() {
     return MAXIMAL_ROAD_SPEED;
   }
 
   /**
-   * Converts the given value in <tt>milliseconds</tt> into <tt>seconds</tt>.
+   * Converts the given value in <code>milliseconds</code> into <code>seconds</code>.
    *
-   * @param millis The value in <tt>milliseconds</tt> to convert
-   * @return The corresponding value in <tt>seconds</tt>
+   * @param millis The value in <code>milliseconds</code> to convert
+   * @return The corresponding value in <code>seconds</code>
    */
   public static double millisToSeconds(final long millis) {
     return ((double) millis) / SECONDS_TO_MILLIS;
   }
 
   /**
-   * Converts the given value in <tt>mph</tt> (miles per hour)<tt> into
-   * km/h</tt> (kilometres per hour).
+   * Converts the given value in <code>mph</code> (miles per hour)<code> into
+   * km/h</code> (kilometres per hour).
    *
-   * @param mph The value in <tt>mph</tt> to convert
-   * @return The corresponding value in <tt>km/h</tt>
+   * @param mph The value in <code>mph</code> to convert
+   * @return The corresponding value in <code>km/h</code>
    */
   public static double mphToKmh(final double mph) {
     return mph * MPH_TO_KMH;
   }
 
   /**
-   * Converts the given value in <tt>m/s</tt> (metres per second)<tt> into
-   * km/h</tt> (kilometres per hour).
+   * Converts the given value in <code>m/s</code> (metres per second)<code> into
+   * km/h</code> (kilometres per hour).
    *
-   * @param ms The value in <tt>ms/s</tt> to convert
-   * @return The corresponding value in <tt>km/h</tt>
+   * @param ms The value in <code>ms/s</code> to convert
+   * @return The corresponding value in <code>km/h</code>
    */
   public static double msToKmh(final double ms) {
     return ms * MS_TO_KMH;
   }
 
   /**
-   * Converts the given value in <tt>nanoseconds</tt> to <tt>milliseconds</tt>.
+   * Converts the given value in <code>nanoseconds</code> to <code>milliseconds</code>.
    * The result is rounded down.
    *
-   * @param nanos The value in <tt>nanoseconds</tt> to convert
-   * @return The corresponding value in <tt>milliseconds</tt>, rounded down
+   * @param nanos The value in <code>nanoseconds</code> to convert
+   * @return The corresponding value in <code>milliseconds</code>, rounded down
    */
   public static long nanosToMillis(final long nanos) {
     return nanos / MILLIS_TO_NANO;
   }
 
   /**
-   * Converts the given value in <tt>nanoseconds</tt> to <tt>seconds</tt>.
+   * Converts the given value in <code>nanoseconds</code> to <code>seconds</code>.
    *
-   * @param nanos The value in <tt>nanoseconds</tt> to convert
-   * @return The corresponding value in <tt>seconds</tt>
+   * @param nanos The value in <code>nanoseconds</code> to convert
+   * @return The corresponding value in <code>seconds</code>
    */
   public static double nanosToSeconds(final long nanos) {
     return ((double) nanos) / MILLIS_TO_NANO / SECONDS_TO_MILLIS;
   }
 
   /**
-   * Converts the given value in <tt>radians</tt> into <tt>degrees</tt>.
+   * Converts the given value in <code>radians</code> into <code>degrees</code>.
    *
-   * @param rad The value in <tt>radians</tt> to convert
-   * @return The corresponding value in <tt>degrees</tt>
+   * @param rad The value in <code>radians</code> to convert
+   * @return The corresponding value in <code>degrees</code>
    */
   public static double radToDeg(final double rad) {
     return rad * HALF_CIRCLE_DEG / Math.PI;
   }
 
   /**
-   * Converts the given value in <tt>seconds</tt> into <tt>milliseconds</tt>.
+   * Converts the given value in <code>seconds</code> into <code>milliseconds</code>.
    *
-   * @param seconds The value in <tt>seconds</tt> to convert
-   * @return The corresponding value in <tt>milliseconds</tt>
+   * @param seconds The value in <code>seconds</code> to convert
+   * @return The corresponding value in <code>milliseconds</code>
    */
   public static double secondsToMillis(final double seconds) {
     return seconds * SECONDS_TO_MILLIS;
   }
 
   /**
-   * Converts the given value in <tt>seconds</tt> to <tt>nanoseconds</tt>.
+   * Converts the given value in <code>seconds</code> to <code>nanoseconds</code>.
    *
-   * @param seconds The value in <tt>seconds</tt> to convert
-   * @return The corresponding value in <tt>nanoseconds</tt>
+   * @param seconds The value in <code>seconds</code> to convert
+   * @return The corresponding value in <code>nanoseconds</code>
    */
   public static long secondsToNanos(final double seconds) {
     return (long) (RoutingUtil.secondsToMillis(seconds) * MILLIS_TO_NANO);
@@ -254,9 +254,9 @@ public final class RoutingUtil {
   /**
    * Gets the time need to travel the given distance with the given speed.
    *
-   * @param distance The distance to travel in <tt>metres</tt>
-   * @param speed    The speed to travel with in <tt>km/h</tt>
-   * @return The time need to travel in <tt>seconds</tt>
+   * @param distance The distance to travel in <code>metres</code>
+   * @param speed    The speed to travel with in <code>km/h</code>
+   * @return The time need to travel in <code>seconds</code>
    */
   public static double travelTime(final double distance, final double speed) {
     return distance / RoutingUtil.kmhToMs(speed);

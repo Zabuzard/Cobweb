@@ -22,7 +22,7 @@ public enum ERouteElementType {
    * Gets the route element type that corresponds to the given value.
    *
    * @param value The value to get the element from
-   * @return The corresponding route element type or <tt>null</tt> if not
+   * @return The corresponding route element type or <code>null</code> if not
    *         present
    */
   public static ERouteElementType fromValue(final int value) {

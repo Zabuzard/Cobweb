@@ -54,7 +54,7 @@ public final class ExternalDatabase extends ADatabase {
    * Pushes the given ID mapping to the database if not already contained.<br>
    * <br>
    * In case multiple mappings are to be pushed, auto-commit should be set to
-   * <tt>false</tt> before calling the method. The method will not force a
+   * <code>false</code> before calling the method. The method will not force a
    * commit on its own.
    *
    * @param mapping    The mapping to push to the database
@@ -82,7 +82,7 @@ public final class ExternalDatabase extends ADatabase {
    * Pushes the given OSM node to the database if not already contained.<br>
    * <br>
    * In case multiple nodes are to be pushed, auto-commit should be set to
-   * <tt>false</tt> before calling the method. The method will not force a
+   * <code>false</code> before calling the method. The method will not force a
    * commit on its own.
    *
    * @param node       The node to push to the database
@@ -120,7 +120,7 @@ public final class ExternalDatabase extends ADatabase {
    * Pushes the given OSM way to the database if not already contained.<br>
    * <br>
    * In case multiple ways are to be pushed, auto-commit should be set to
-   * <tt>false</tt> before calling the method. The method will not force a
+   * <code>false</code> before calling the method. The method will not force a
    * commit on its own.
    *
    * @param way        The way to push to the database

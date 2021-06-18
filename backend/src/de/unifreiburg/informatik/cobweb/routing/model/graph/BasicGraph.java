@@ -116,7 +116,7 @@ public final class BasicGraph extends AGraph<BasicNode, BasicEdge<BasicNode>> im
    * Reverses the graph. That is, all directed edges switch source with
    * destination.<br>
    * <br>
-   * The implementation runs in <tt>O(|E|)</tt>, that is in the amount of edges.
+   * The implementation runs in <code>O(|E|)</code>, that is in the amount of edges.
    * Edge reversal is made explicit by replacing all previous edges with new
    * edges that have the same ID but are reversed.
    */

@@ -35,10 +35,10 @@ public final class RangedListIterator<E> implements Iterator<E> {
    * @param to       The index one after the last element to return, i.e. an
    *                 exclusive bound
    * @throws IllegalArgumentException If any bound of the range is below
-   *                                  <tt>0</tt> or greater than the size of the
-   *                                  list (greater equals for <tt>from</tt>).
-   *                                  Or if <tt>from</tt> is greater equals
-   *                                  <tt>to</tt>. Or the list does not
+   *                                  <code>0</code> or greater than the size of the
+   *                                  list (greater equals for <code>from</code>).
+   *                                  Or if <code>from</code> is greater equals
+   *                                  <code>to</code>. Or the list does not
    *                                  implement {@link RandomAccess}.
    */
   public RangedListIterator(final List<E> elements, final int from, final int to) throws IllegalArgumentException {

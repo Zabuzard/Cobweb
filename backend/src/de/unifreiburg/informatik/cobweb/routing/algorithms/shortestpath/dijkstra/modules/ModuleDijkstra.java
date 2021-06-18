@@ -81,11 +81,11 @@ public final class ModuleDijkstra<N extends INode, E extends IEdge<N>> extends D
   /**
    * Whether or not the given edge should be considered for relaxation. The
    * algorithm will ignore the edge and not follow it if this method returns
-   * <tt>false</tt>.<br>
+   * <code>false</code>.<br>
    * <br>
    * This will be the case if any modules
    * {@link IModule#considerEdgeForRelaxation(IEdge, INode)} method returns
-   * <tt>false</tt>.
+   * <code>false</code>.
    */
   @Override
   protected boolean considerEdgeForRelaxation(final E edge, final N pathDestination) {
@@ -149,11 +149,11 @@ public final class ModuleDijkstra<N extends INode, E extends IEdge<N>> extends D
    * <br>
    * This will be the case if any modules
    * {@link IModule#shouldAbort(TentativeDistance)} method returns
-   * <tt>true</tt>.
+   * <code>true</code>.
    *
    * @param tentativeDistance The tentative distance wrapper of the node that
    *                          was settled
-   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   * @return <code>True</code> if the computation should be aborted, <code>false</code>
    *         if not
    */
   @Override

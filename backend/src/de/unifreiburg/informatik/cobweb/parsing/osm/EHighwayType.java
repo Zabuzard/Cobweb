@@ -80,11 +80,11 @@ public enum EHighwayType {
   private static final Map<String, EHighwayType> NAME_TO_TYPE = EHighwayType.constructLookupTable();
 
   /**
-   * Gets the highway type corresponding to the given tag name or <tt>null</tt>
-   * if there is no. The method runs in <tt>O(1)</tt>.
+   * Gets the highway type corresponding to the given tag name or <code>null</code>
+   * if there is no. The method runs in <code>O(1)</code>.
    *
    * @param name The tag name of the highway type to get
-   * @return The corresponding highway type or <tt>null</tt>
+   * @return The corresponding highway type or <code>null</code>
    */
   public static EHighwayType fromName(final String name) {
     return NAME_TO_TYPE.get(name);
@@ -107,7 +107,7 @@ public enum EHighwayType {
   }
 
   /**
-   * The average speed for this highway type in <tt>km/h</tt>.
+   * The average speed for this highway type in <code>km/h</code>.
    */
   private final int mAverageSpeed;
   /**
@@ -119,7 +119,7 @@ public enum EHighwayType {
    * Creates a new highway type with the given tag name and average speed.
    *
    * @param textValue    The tag name
-   * @param averageSpeed The average speed in <tt>km/h</tt>
+   * @param averageSpeed The average speed in <code>km/h</code>
    */
   private EHighwayType(final String textValue, final int averageSpeed) {
     mName = textValue;
@@ -127,9 +127,9 @@ public enum EHighwayType {
   }
 
   /**
-   * Gets the average speed of this highway type, in <tt>km/h</tt>.
+   * Gets the average speed of this highway type, in <code>km/h</code>.
    *
-   * @return The average speed of this highway type, in <tt>km/h</tt>
+   * @return The average speed of this highway type, in <code>km/h</code>
    */
   public int getAverageSpeed() {
     return mAverageSpeed;

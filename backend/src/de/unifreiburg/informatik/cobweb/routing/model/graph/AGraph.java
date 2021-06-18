@@ -189,8 +189,8 @@ public abstract class AGraph<N extends INode & Serializable, E extends IEdge<N> 
    * @param edge        The edge to remove
    * @param keyNode     The key of the set where the edge is to be removed from
    * @param nodeToEdges The map that connects nodes to a set of edges
-   * @return <tt>True</tt> if the edge was found and thus removed,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the edge was found and thus removed,
+   *         <code>false</code> otherwise
    */
   private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, Set<E>> nodeToEdges) {
     final Set<E> edges = nodeToEdges.get(keyNode);

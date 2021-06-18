@@ -15,8 +15,8 @@ public interface IHasTransitStops<N extends INode> {
    * Adds the given stop to this graph.
    *
    * @param stop The stop to add
-   * @return <tt>True</tt> if the stop was added, i.e. not already contained,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the stop was added, i.e. not already contained,
+   *         <code>false</code> otherwise
    */
   public boolean addStop(TransitStop<N> stop);
 
@@ -35,8 +35,8 @@ public interface IHasTransitStops<N extends INode> {
    * Removes the given stop to this graph.
    *
    * @param stop The stop to remove
-   * @return <tt>True</tt> if the stop was removed, i.e. was contained,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the stop was removed, i.e. was contained,
+   *         <code>false</code> otherwise
    */
   public boolean removeStop(TransitStop<N> stop);
 }

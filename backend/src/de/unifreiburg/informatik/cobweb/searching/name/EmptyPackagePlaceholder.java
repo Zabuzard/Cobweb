@@ -3,7 +3,7 @@ package de.unifreiburg.informatik.cobweb.searching.name;
 /**
  * This class is a placeholder for an empty package.<br>
  * <br>
- * It is used to counter a bug in <tt>Javadoc</tt> (see <a href=
+ * It is used to counter a bug in <code>Javadoc</code> (see <a href=
  * "https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4492654">JDK-4492654</a>).
  * Where the tool fails to generate documentation for empty packages.<br>
  * <br>

@@ -19,12 +19,12 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
   /**
    * Whether or not the given edge should be considered for relaxation. The
    * algorithm will ignore the edge and not follow it if this method returns
-   * <tt>false</tt>.
+   * <code>false</code>.
    *
    * @param edge            The edge in question
    * @param pathDestination The destination of the shortest path computation or
-   *                        <tt>null</tt> if not present
-   * @return <tt>True</tt> if the edge should be considered, <tt>false</tt>
+   *                        <code>null</code> if not present
+   * @return <code>True</code> if the edge should be considered, <code>false</code>
    *         otherwise
    */
   default boolean considerEdgeForRelaxation(@SuppressWarnings("unused") final E edge,
@@ -71,7 +71,7 @@ public interface IModule<N extends INode, E extends IEdge<N>> {
    *
    * @param tentativeDistance The tentative distance wrapper of the node that
    *                          was settled
-   * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
+   * @return <code>True</code> if the computation should be aborted, <code>false</code>
    *         if not
    */
   default boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {

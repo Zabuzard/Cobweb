@@ -45,7 +45,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
    * Creates a new initially empty edge path that can be build reversely
    *
    * @param buildReversely Whether or not the path is build reversely. If
-   *                       <tt>true</tt> calls to
+   *                       <code>true</code> calls to
    *                       {@link #addEdge(IEdge, double)} are interpreted to
    *                       start from the end of the path. So the destination of
    *                       the first added edge is the destination of the path
@@ -122,7 +122,7 @@ public final class EdgePath<N extends INode, E extends IEdge<N>> implements IPat
   /**
    * Whether or not the path is build reversely.
    *
-   * @return <tt>True</tt> if the path is build reversely, <tt>false</tt> if not
+   * @return <code>True</code> if the path is build reversely, <code>false</code> if not
    */
   public boolean isBuildReversely() {
     return mBuildReversely;

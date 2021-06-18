@@ -107,24 +107,24 @@ public final class Application {
    * <br>
    * Supported commands are
    * <ul>
-   * <li><b><tt>empty</tt></b> or <b><tt>args[0] = start</tt></b>: Starts the
+   * <li><b><code>empty</code></b> or <b><code>args[0] = start</code></b>: Starts the
    * default service which answers routing requests over a REST API.</li>
-   * <li><b><tt>args[0] = reduce</tt></b>: Reduces all input data such that the
+   * <li><b><code>args[0] = reduce</code></b>: Reduces all input data such that the
    * default service will run faster.</li>
-   * <li><b><tt>args[0] = clean</tt></b>: Clears the database and all cached and
+   * <li><b><code>args[0] = clean</code></b>: Clears the database and all cached and
    * serialized data.</li>
-   * <li><b><tt>args[0] = benchmark</tt></b>: Initializes the API and benchmarks
+   * <li><b><code>args[0] = benchmark</code></b>: Initializes the API and benchmarks
    * the routing model.</li>
-   * <li><b><tt>args[1+]</tt></b>: Paths to data files that should be used by
+   * <li><b><code>args[1+]</code></b>: Paths to data files that should be used by
    * the commands instead of the files from the directories set in the
    * configuration file.
    * <ul>
-   * <li><tt>start</tt>: Uses the given files as data files (OSM, GTFS) instead
+   * <li><code>start</code>: Uses the given files as data files (OSM, GTFS) instead
    * of the set directories.</li>
-   * <li><tt>reduce</tt>: Reduces the given unreduced data files (OSM, GTFS)
+   * <li><code>reduce</code>: Reduces the given unreduced data files (OSM, GTFS)
    * instead of the unreduced files in the set directories.</li>
-   * <li><tt>clean</tt>: Not supported, will ignore paths.</li>
-   * <li><tt>benchmark</tt>: Uses the given files as data files (OSM, GTFS)
+   * <li><code>clean</code>: Not supported, will ignore paths.</li>
+   * <li><code>benchmark</code>: Uses the given files as data files (OSM, GTFS)
    * instead of the set directories.</li>
    * </ul>
    * </li>
@@ -234,8 +234,8 @@ public final class Application {
   /**
    * Returns whether the application was requested to shutdown.
    *
-   * @return <tt>True</tt> if the application was requested to shutdown,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the application was requested to shutdown,
+   *         <code>false</code> otherwise
    */
   public synchronized boolean wasShutdownRequested() {
     return mWasShutdownRequested;

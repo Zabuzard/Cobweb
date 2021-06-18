@@ -18,7 +18,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.graph.ETransportationMode;
 public final class RouteElement {
   /**
    * A list of latitude and longitude coordinates belonging to this element.
-   * Thus, the size of the arrays is <tt>2</tt>.
+   * Thus, the size of the arrays is <code>2</code>.
    */
   private List<float[]> mGeom;
   /**
@@ -62,7 +62,7 @@ public final class RouteElement {
    * @param type The type of this route element
    * @param name The name of this element or empty if not present
    * @param geom A list of latitude and longitude coordinates belonging to this
-   *             element. The size of the arrays must be <tt>2</tt>.
+   *             element. The size of the arrays must be <code>2</code>.
    */
   public RouteElement(final ERouteElementType type, final String name, final List<float[]> geom) {
     this(type, ETransportationMode.IRRELEVANT, name, geom);
@@ -79,7 +79,7 @@ public final class RouteElement {
 
   /**
    * Gets the list of latitude and longitude coordinates belonging to this
-   * element. Thus, the size of the arrays is <tt>2</tt>.
+   * element. Thus, the size of the arrays is <code>2</code>.
    *
    * @return A list of latitude and longitude coordinates
    */

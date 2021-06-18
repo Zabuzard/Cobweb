@@ -13,7 +13,7 @@ import de.unifreiburg.informatik.cobweb.routing.model.timetable.Timetable;
 
 /**
  * Implementation of an access node computation that, given a road node,
- * provides the <tt>k</tt> nearest transit stops as access nodes.
+ * provides the <code>k</code> nearest transit stops as access nodes.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */

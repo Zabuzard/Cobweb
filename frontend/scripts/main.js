@@ -94,14 +94,14 @@ function initMap() {
 	mapStreetLayer = L.tileLayer(mapboxUrl, {
 		attribution: mapboxAttribution,
     	maxZoom: mapMaxZoom,
-    	id: 'mapbox.streets',
+    	id: 'mapbox/streets-v11',
     	accessToken: mapboxToken
 	});
 
 	mapSatelliteLayer = L.tileLayer(mapboxUrl, {
 		attribution: mapboxAttribution,
     	maxZoom: mapMaxZoom,
-    	id: 'mapbox.satellite',
+    	id: 'mapbox/satellite-v9',
     	accessToken: mapboxToken
 	});
 

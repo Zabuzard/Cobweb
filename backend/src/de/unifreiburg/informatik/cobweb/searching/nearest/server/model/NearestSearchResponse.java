@@ -16,7 +16,7 @@ package de.unifreiburg.informatik.cobweb.searching.nearest.server.model;
 public final class NearestSearchResponse {
   /**
    * The unique ID of the OSM node which is nearest to the requested location or
-   * <tt>-1</tt> to indicate that there is no nearest node.
+   * <code>-1</code> to indicate that there is no nearest node.
    */
   private long mId;
   /**
@@ -37,7 +37,7 @@ public final class NearestSearchResponse {
    *
    * @param time      The duration answering the query took, in milliseconds
    * @param id        The unique ID of the OSM node which is nearest to the
-   *                  requested location or <tt>-1</tt> to indicate that there
+   *                  requested location or <code>-1</code> to indicate that there
    *                  is no nearest node
    * @param latitude  The latitude coordinate of the matched OSM node
    * @param longitude The longitude coordinate of the matched OSM node
@@ -60,9 +60,9 @@ public final class NearestSearchResponse {
 
   /**
    * Gets the unique ID of the OSM node which is nearest to the requested
-   * location or <tt>-1</tt> to indicate that there is no nearest node.
+   * location or <code>-1</code> to indicate that there is no nearest node.
    *
-   * @return The unique ID of the OSM node or <tt>-1</tt> to indicate that there
+   * @return The unique ID of the OSM node or <code>-1</code> to indicate that there
    *         is no nearest node
    */
   public long getId() {

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * order when iterating.<br>
  * <br>
  * This set is <b>extremely optimized</b> for a use case of where sets with a
- * <b>very low size</b> is needed (below <tt>7</tt>) which are rarely modified.
+ * <b>very low size</b> is needed (below <code>7</code>) which are rarely modified.
  * The {@link #contains(Object)} method and iteration operates faster on arrays
  * for this small sizes. In reverse, any modifications like {@link #add(Object)}
  * and {@link #remove(Object)} operate slower.<br>
@@ -55,11 +55,11 @@ public final class HybridArrayHashSet<E> implements Set<E>, Serializable {
    */
   private static final int THRESHOLD = 6;
   /**
-   * If in array-mode this contains the elements of the set, else <tt>null</tt>.
+   * If in array-mode this contains the elements of the set, else <code>null</code>.
    */
   private Object[] mArray;
   /**
-   * If in set-mode this contains the elements of the set, else <tt>null</tt>.
+   * If in set-mode this contains the elements of the set, else <code>null</code>.
    */
   private Set<E> mSet;
 
@@ -97,7 +97,7 @@ public final class HybridArrayHashSet<E> implements Set<E>, Serializable {
 
   /**
    * Creates a new set with the given elements. The set will be empty if
-   * <tt>null</tt> or an empty array is passed.
+   * <code>null</code> or an empty array is passed.
    *
    * @param elements The elements the set should contain
    */
@@ -437,9 +437,9 @@ public final class HybridArrayHashSet<E> implements Set<E>, Serializable {
 
   /**
    * Whether or not the set is currently in <i>set-mode</i>. This is determined
-   * by {@link #mArray} being <tt>null</tt> only.
+   * by {@link #mArray} being <code>null</code> only.
    *
-   * @return <tt>True</tt> if the set is in <i>set-mode</i>, <tt>false</tt> if
+   * @return <code>True</code> if the set is in <i>set-mode</i>, <code>false</code> if
    *         in <i>array-mode</i>
    */
   private boolean useSet() {

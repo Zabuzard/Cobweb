@@ -18,17 +18,17 @@ public interface IConfigProvider {
   Map<String, String> getAllSettings();
 
   /**
-   * Gets the value of the setting with the given key or <tt>null</tt> if there
+   * Gets the value of the setting with the given key or <code>null</code> if there
    * is no.
    *
    * @param key The key to get the value
-   * @return The value corresponding to the given key or <tt>null</tt>
+   * @return The value corresponding to the given key or <code>null</code>
    */
   String getSetting(String key);
 
   /**
    * Sets the value of the setting with the given key to the given value.
-   * Setting <tt>null</tt> should be avoided, the behavior is undefined.
+   * Setting <code>null</code> should be avoided, the behavior is undefined.
    *
    * @param key   The key to set the value for
    * @param value The value to set

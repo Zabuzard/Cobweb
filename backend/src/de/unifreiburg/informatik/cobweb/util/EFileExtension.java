@@ -10,11 +10,11 @@ package de.unifreiburg.informatik.cobweb.util;
  */
 public enum EFileExtension {
   /**
-   * BZip2 file, known under the extension <tt>bz2</tt>.
+   * BZip2 file, known under the extension <code>bz2</code>.
    */
   B_ZIP_TWO("bz2"),
   /**
-   * GZip file, known under the extension <tt>gz</tt>.
+   * GZip file, known under the extension <code>gz</code>.
    */
   G_ZIP("gz"),
   /**
@@ -22,7 +22,7 @@ public enum EFileExtension {
    */
   NONE(""),
   /**
-   * OSM file, known under the extension <tt>osm</tt>.
+   * OSM file, known under the extension <code>osm</code>.
    */
   OSM("osm"),
   /**
@@ -30,11 +30,11 @@ public enum EFileExtension {
    */
   UNKNOWN(null),
   /**
-   * XZ file, known under the extension <tt>xz</tt>.
+   * XZ file, known under the extension <code>xz</code>.
    */
   XZ("xz"),
   /**
-   * Zip file, known under the extension <tt>zip</tt>.
+   * Zip file, known under the extension <code>zip</code>.
    */
   ZIP("zip");
 

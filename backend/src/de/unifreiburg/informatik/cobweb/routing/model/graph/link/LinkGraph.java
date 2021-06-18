@@ -49,8 +49,8 @@ public final class LinkGraph
    * @param link        The link edge to remove
    * @param keyNode     The key of the set where the link is to be removed from
    * @param nodeToLinks The map that connects nodes to a set of links
-   * @return <tt>True</tt> if the link was found and thus removed,
-   *         <tt>false</tt> otherwise
+   * @return <code>True</code> if the link was found and thus removed,
+   *         <code>false</code> otherwise
    */
   private static boolean removeLinkFromMap(final LinkEdge<ICoreNode> link, final ICoreNode keyNode,
       final Map<ICoreNode, Set<LinkEdge<ICoreNode>>> nodeToLinks) {

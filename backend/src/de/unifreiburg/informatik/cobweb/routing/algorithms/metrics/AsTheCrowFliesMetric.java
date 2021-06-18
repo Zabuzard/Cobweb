@@ -9,7 +9,7 @@ import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
  * <br>
  * Given two objects it computes the direct, straight-line, distance of both
  * objects based on their coordinates. The distance is measured as travel time
- * in <tt>seconds</tt>.
+ * in <code>seconds</code>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <N> The type of objects the metric operates on, must implement
@@ -19,7 +19,7 @@ public final class AsTheCrowFliesMetric<N extends ISpatial> implements IMetric<N
 
   /**
    * The distance between both given objects, measured as travel time in
-   * <tt>seconds</tt>.
+   * <code>seconds</code>.
    */
   @Override
   public double distance(final N first, final N second) {

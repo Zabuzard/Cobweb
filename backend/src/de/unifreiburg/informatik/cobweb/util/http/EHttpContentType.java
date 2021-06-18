@@ -40,7 +40,7 @@ public enum EHttpContentType {
    *
    * @param textValue The text value to get the type of
    * @return The content type that corresponds to the given text or
-   *         <tt>null</tt> if not present
+   *         <code>null</code> if not present
    */
   public static EHttpContentType fromTextValue(final String textValue) {
     for (final EHttpContentType contentType : EHttpContentType.values()) {

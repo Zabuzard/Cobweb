@@ -109,15 +109,15 @@ public final class DatabaseUtil {
 
   /**
    * Sets the given value to the given index position of the statement or
-   * <tt>SQL NULL</tt> if the value is <tt>null</tt>.<br>
+   * <code>SQL NULL</code> if the value is <code>null</code>.<br>
    * <br>
    * The implementation is equivalent to calling
-   * {@code statement.setNull(index, Types.INTEGER)} if <tt>value</tt> is
-   * <tt>null</tt> or {@code statement.setInt(index, value)} otherwise.
+   * {@code statement.setNull(index, Types.INTEGER)} if <code>value</code> is
+   * <code>null</code> or {@code statement.setInt(index, value)} otherwise.
    *
    * @param index     The index position of the statement to set the value to
-   * @param value     The value to set or <tt>null</tt> if it should be set to
-   *                  <tt>SQL NULL</tt>
+   * @param value     The value to set or <code>null</code> if it should be set to
+   *                  <code>SQL NULL</code>
    * @param statement The statement to set the value for
    * @throws SQLException If an SQLException occurred while setting the value,
    *                      like an invalid index
@@ -133,15 +133,15 @@ public final class DatabaseUtil {
 
   /**
    * Sets the given value to the given index position of the statement or
-   * <tt>SQL NULL</tt> if the value is <tt>null</tt>.<br>
+   * <code>SQL NULL</code> if the value is <code>null</code>.<br>
    * <br>
    * The implementation is equivalent to calling
-   * {@code statement.setNull(index, Types.VARCHAR)} if <tt>value</tt> is
-   * <tt>null</tt> or {@code statement.setString(index, value)} otherwise.
+   * {@code statement.setNull(index, Types.VARCHAR)} if <code>value</code> is
+   * <code>null</code> or {@code statement.setString(index, value)} otherwise.
    *
    * @param index     The index position of the statement to set the value to
-   * @param value     The value to set or <tt>null</tt> if it should be set to
-   *                  <tt>SQL NULL</tt>
+   * @param value     The value to set or <code>null</code> if it should be set to
+   *                  <code>SQL NULL</code>
    * @param statement The statement to set the value for
    * @throws SQLException If an SQLException occurred while setting the value,
    *                      like an invalid index

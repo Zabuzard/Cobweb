@@ -126,7 +126,7 @@ public final class RequestHandler {
    * @param amount   The maximal amount of matches to build. It is ensured that
    *                 the resulting list does not contain more entries than
    *                 specified by this parameter.
-   * @return A list of maximal <tt>amount</tt> matches corresponding to the
+   * @return A list of maximal <code>amount</code> matches corresponding to the
    *         given postings
    */
   private List<Match> buildMatches(final List<Posting> postings, final int amount) {

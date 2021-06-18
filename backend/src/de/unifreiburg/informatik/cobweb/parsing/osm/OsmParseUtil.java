@@ -16,24 +16,24 @@ import de.unifreiburg.informatik.cobweb.util.RoutingUtil;
  */
 public final class OsmParseUtil {
   /**
-   * The maximal speed allowed on motorways in switzerland, in <tt>km/h</tt>.
+   * The maximal speed allowed on motorways in switzerland, in <code>km/h</code>.
    */
   public static final int CH_MOTORWAY_SPEED = 120;
   /**
    * The maximal speed allowed on rural highways in switzerland, in
-   * <tt>km/h</tt>.
+   * <code>km/h</code>.
    */
   public static final int CH_RURAL_SPEED = 80;
   /**
-   * The maximal speed allowed in urban areas in switzerland, in <tt>km/h</tt>.
+   * The maximal speed allowed in urban areas in switzerland, in <code>km/h</code>.
    */
   public static final int CH_URBAN_SPEED = 50;
   /**
-   * The maximal speed allowed on living streets in germany, in <tt>km/h</tt>.
+   * The maximal speed allowed on living streets in germany, in <code>km/h</code>.
    */
   public static final int DE_LIVING_STREET_SPEED = 7;
   /**
-   * The maximal walking speed in germany, in <tt>km/h</tt>.
+   * The maximal walking speed in germany, in <code>km/h</code>.
    */
   public static final int DE_WALK_SPEED = 7;
   /**
@@ -61,7 +61,7 @@ public final class OsmParseUtil {
    * Gets the highway type of the given OSM way.
    *
    * @param tagToValue Map connecting the tags of the OSM way to their values
-   * @return The highway type or <tt>null</tt> if not present
+   * @return The highway type or <code>null</code> if not present
    */
   public static EHighwayType parseHighwayType(final Map<String, String> tagToValue) {
     final String highwayText = tagToValue.get(HIGHWAY_TAG);
@@ -72,15 +72,15 @@ public final class OsmParseUtil {
   }
 
   /**
-   * Gets the maximal allowed speed for the given OSM way in <tt>km/h</tt>.<br>
+   * Gets the maximal allowed speed for the given OSM way in <code>km/h</code>.<br>
    * <br>
    * If the value is in a wrong format an average value will be returned. In
    * particular, the method will not throw any exception. But the error will be
    * logged.
    *
    * @param tagToValue Map connecting the tags of the OSM way to their values
-   * @return The maximal allowed speed, an average value or <tt>-1</tt> if not
-   *         present. The speed is in <tt>km/h</tt>.
+   * @return The maximal allowed speed, an average value or <code>-1</code> if not
+   *         present. The speed is in <code>km/h</code>.
    */
   public static int parseMaxSpeed(final Map<String, String> tagToValue) {
     // TODO This method should be made more abstract, using maps for the
@@ -115,15 +115,15 @@ public final class OsmParseUtil {
       return EHighwayType.MOTORWAY.getAverageSpeed();
     }
     // "CH:rural" refers to the maximal speed on rural highways in switzerland
-    if (maxSpeedText.equals("CH:rural")) {
+    if (maxSpeedText.equals("CH:rural") || maxSpeedText.equals("DE:rural")) {
       return CH_RURAL_SPEED;
     }
     // "CH:motorway" refers to the maximal speed on motorways in switzerland
-    if (maxSpeedText.equals("CH:motorway")) {
+    if (maxSpeedText.equals("CH:motorway") || maxSpeedText.equals("DE:motorway")) {
       return CH_MOTORWAY_SPEED;
     }
     // "CH:urban" refers to the maximal speed in urban areas in switzerland
-    if (maxSpeedText.equals("CH:urban")) {
+    if (maxSpeedText.equals("CH:urban") || maxSpeedText.equals("DE:urban")) {
       return CH_URBAN_SPEED;
     }
     // "DE:living_street" refers to the maximal speed on living streets in
@@ -143,6 +143,17 @@ public final class OsmParseUtil {
     // "tp" is a typo referring to "50" (t and p are close to 5 and 0 on the
     // keyboard).
     if (maxSpeedText.equals("tp")) {
+      return 50;
+    }
+    // "zone" refers to the maximal walking speed in german pedestrian zones
+    if (maxSpeedText.equals("DE:zone:30") || maxSpeedText.equals("DE:zone30")) {
+      return 30;
+    }
+    // "zone" refers to the maximal walking speed in german pedestrian zones
+    if (maxSpeedText.equals("DE:zone:20")) {
+      return 20;
+    }
+    if (maxSpeedText.equals("=50 maxspeed:conditional=30 @ (08:00-16:00)")) {
       return 50;
     }
 
@@ -190,10 +201,10 @@ public final class OsmParseUtil {
    * Gets the direction of the given OSM way.
    *
    * @param tagToValue Map connecting the tags of the OSM way to their values
-   * @return A value greater than <tt>0</tt> if the way goes only into the
+   * @return A value greater than <code>0</code> if the way goes only into the
    *         direction it was declared in the OSM file. A value less than
-   *         <tt>0</tt> if it goes into the opposite direction than declared in
-   *         the OSM file. Or <tt>0</tt> if the way goes into both directions or
+   *         <code>0</code> if it goes into the opposite direction than declared in
+   *         the OSM file. Or <code>0</code> if the way goes into both directions or
    *         the value was not present or could not be parsed.
    */
   public static int parseWayDirection(final Map<String, String> tagToValue) {

@@ -25,8 +25,8 @@ public final class IdMapping {
    *
    * @param osmId      The OSM ID to map to the internal ID
    * @param internalId The internal ID to map to the OSM ID
-   * @param isNode     <tt>True</tt> if this mapping is for a node,
-   *                   <tt>false</tt> for a way
+   * @param isNode     <code>True</code> if this mapping is for a node,
+   *                   <code>false</code> for a way
    */
   public IdMapping(final long osmId, final int internalId, final boolean isNode) {
     mOsmId = osmId;
@@ -55,7 +55,7 @@ public final class IdMapping {
   /**
    * Whether or not this mapping is for a node or a way.
    *
-   * @return <tt>True</tt> if this mapping is for a node, <tt>false</tt> for a
+   * @return <code>True</code> if this mapping is for a node, <code>false</code> for a
    *         way
    */
   public boolean isNode() {

@@ -8,8 +8,8 @@ import java.util.RandomAccess;
  * Iterator for a list with random access that iterates over a given range. The
  * range is allowed to overflow the bound.<br>
  * <br>
- * For example iterating over a list of size <tt>7</tt> from index <tt>5</tt> to
- * <tt>2</tt> (exclusive) which would return indices <tt>5, 6, 0, 1</tt>.
+ * For example iterating over a list of size <code>7</code> from index <code>5</code> to
+ * <code>2</code> (exclusive) which would return indices <code>5, 6, 0, 1</code>.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  * @param <E> The type of the elements
@@ -24,12 +24,12 @@ public final class RangedOverflowListIterator<E> implements Iterator<E> {
    * Creates an iterator that iterates all elements of the given list starting
    * from the given index (inclusive).<br>
    * <br>
-   * For example using a list of size <tt>4</tt> with index <tt>2</tt> would
-   * traverse indices <tt>2, 3, 0, 1</tt>.
+   * For example using a list of size <code>4</code> with index <code>2</code> would
+   * traverse indices <code>2, 3, 0, 1</code>.
    *
    * @param elements The elements to iterate
    * @param from     The index of the first element to iterate from (inclusive)
-   * @throws IllegalArgumentException If the bound is below <tt>0</tt> or
+   * @throws IllegalArgumentException If the bound is below <code>0</code> or
    *                                  greater equals the size. Or the list does
    *                                  not implement {@link RandomAccess}.
    */
@@ -42,17 +42,17 @@ public final class RangedOverflowListIterator<E> implements Iterator<E> {
    * from the given index (inclusive) to the given index (exclusive). The right
    * bound is allowed to overflow the bounds.<br>
    * <br>
-   * For example using a list of size <tt>5</tt> with a range of <tt>[3, 2)</tt>
-   * would traverse indices <tt>3, 4, 0, 1</tt>.
+   * For example using a list of size <code>5</code> with a range of <code>[3, 2)</code>
+   * would traverse indices <code>3, 4, 0, 1</code>.
    *
    * @param elements The elements to iterate
    * @param from     The index of the first element to iterate from, i.e. an
    *                 inclusive bound
    * @param to       The index one after the last element to iterate to, i.e. an
    *                 exclusive bound
-   * @throws IllegalArgumentException If one of the bounds is below <tt>0</tt>
+   * @throws IllegalArgumentException If one of the bounds is below <code>0</code>
    *                                  or greater the size (greater equals for
-   *                                  <tt>from</tt>). Or the list does not
+   *                                  <code>from</code>). Or the list does not
    *                                  implement {@link RandomAccess}.
    */
   public RangedOverflowListIterator(final List<E> elements, final int from, final int to)
